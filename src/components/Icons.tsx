@@ -109,3 +109,31 @@ export function CheckIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function PencilIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
+export function StarIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 2.5l2.9 6.1 6.6.7-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.1 1.3-6.6-4.9-4.6 6.6-.7Z" />
+    </svg>
+  )
+}
+
+export function ChartIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 20V10" />
+      <path d="M11 20V4" />
+      <path d="M18 20v-7" />
+      <path d="M3 20h18" />
+    </svg>
+  )
+}

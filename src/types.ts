@@ -18,6 +18,10 @@ export interface Exercise {
   muscleGroup: MuscleGroup
   isCustom: boolean
   createdAt: number
+  /** Set when the exercise was removed from the library. The row (and its
+   * name) is kept so past sessions that used it still display correctly —
+   * it's just hidden from the picker and the exercise list. */
+  deletedAt?: number
 }
 
 export interface Workout {
@@ -26,6 +30,8 @@ export interface Workout {
   date: string
   createdAt: number
   notes?: string
+  /** Overall perceived difficulty for the whole session, 1-10. */
+  rpe?: number | null
 }
 
 /** Links an exercise to a workout, preserving the order it was added in. */
@@ -42,7 +48,6 @@ export interface SetEntry {
   weight: number
   reps: number
   order: number
-  rpe?: number
   createdAt: number
 }
 

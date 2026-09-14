@@ -60,6 +60,11 @@ export async function removeSet(setId: number): Promise<void> {
   await db.sets.delete(setId)
 }
 
+/** Sets (or clears, with `null`) the overall perceived-difficulty rating for a session. */
+export async function updateWorkoutRpe(workoutId: number, rpe: number | null): Promise<void> {
+  await db.workouts.update(workoutId, { rpe })
+}
+
 /** Deletes an entire workout and all its exercises/sets. */
 export async function deleteWorkout(workoutId: number): Promise<void> {
   await db.transaction('rw', db.workouts, db.workoutExercises, db.sets, async () => {

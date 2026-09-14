@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import type { SetEntry } from '../types'
-import { TrashIcon } from './Icons'
+import { StarIcon, TrashIcon } from './Icons'
 
 interface SetRowProps {
   set: SetEntry
   index: number
+  /** True when this set ties or holds the all-time PR (weight or volume) for its exercise. */
+  isPR?: boolean
   onChangeWeight: (weight: number) => void
   onChangeReps: (reps: number) => void
   onRemove: () => void
 }
 
-export function SetRow({ set, index, onChangeWeight, onChangeReps, onRemove }: SetRowProps) {
+export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemove }: SetRowProps) {
   // Local state is the source of truth while this row is being edited. It's
   // only re-synced from props when a *different* set is mounted into this row
   // (new set.id) — not on every set.weight/reps change — otherwise rapid
@@ -62,8 +64,13 @@ export function SetRow({ set, index, onChangeWeight, onChangeReps, onRemove }: S
 
   return (
     <div className="flex items-center gap-2">
-      <span className="w-5 shrink-0 text-center text-sm font-medium text-slate-400">
-        {index + 1}
+      <span
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+          isPR ? 'bg-amber-100 text-amber-500' : 'text-slate-400'
+        }`}
+        title={isPR ? 'Nouveau record personnel' : undefined}
+      >
+        {isPR ? <StarIcon className="h-3.5 w-3.5" /> : index + 1}
       </span>
 
       <div className="flex flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">

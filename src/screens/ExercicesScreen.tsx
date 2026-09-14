@@ -3,13 +3,26 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import { db } from '../db'
 import type { Exercise, MuscleGroup } from '../types'
-import { CreateExerciseForm } from '../components/ExercisePickerSheet'
-import { ChevronRightIcon, PlusIcon, SearchIcon, XIcon } from '../components/Icons'
+import { CreateExerciseForm, EditExerciseForm } from '../components/ExercisePickerSheet'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { countExerciseUsage, softDeleteExercise } from '../lib/exerciseActions'
+import {
+  ChevronRightIcon,
+  PencilIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
+  XIcon,
+} from '../components/Icons'
 
 export function ExercicesScreen() {
   const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
-  const exercises = useLiveQuery(() => db.exercises.orderBy('name').toArray(), []) ?? []
+  const [editing, setEditing] = useState<Exercise | null>(null)
+  const [deleting, setDeleting] = useState<{ exercise: Exercise; usageCount: number } | null>(null)
+
+  const exercises =
+    useLiveQuery(() => db.exercises.orderBy('name').filter((e) => !e.deletedAt).toArray(), []) ?? []
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -24,6 +37,17 @@ export function ExercicesScreen() {
     }
     return map
   }, [filtered])
+
+  async function handleDeleteClick(ex: Exercise) {
+    const usageCount = await countExerciseUsage(ex.id!)
+    setDeleting({ exercise: ex, usageCount })
+  }
+
+  async function confirmDelete() {
+    if (!deleting) return
+    await softDeleteExercise(deleting.exercise.id!)
+    setDeleting(null)
+  }
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
@@ -56,16 +80,33 @@ export function ExercicesScreen() {
           </h3>
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             {list.map((ex, i) => (
-              <Link
+              <div
                 key={ex.id}
-                to={`/exercices/${ex.id}`}
-                className={`flex items-center justify-between px-4 py-3 active:bg-slate-50 ${
-                  i > 0 ? 'border-t border-slate-100' : ''
-                }`}
+                className={`flex items-center gap-1 pr-2 ${i > 0 ? 'border-t border-slate-100' : ''}`}
               >
-                <span className="text-base text-slate-900">{ex.name}</span>
-                <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
-              </Link>
+                <Link to={`/exercices/${ex.id}`} className="flex flex-1 items-center justify-between py-3 pl-4 active:bg-slate-50">
+                  <span className="text-base text-slate-900">{ex.name}</span>
+                  <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setEditing(ex)}
+                  className="shrink-0 p-2 text-slate-300 active:text-brand-600"
+                  aria-label={`Renommer ${ex.name}`}
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </button>
+                {ex.isCustom && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteClick(ex)}
+                    className="shrink-0 p-2 text-slate-300 active:text-red-500"
+                    aria-label={`Supprimer ${ex.name}`}
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -98,6 +139,44 @@ export function ExercicesScreen() {
             />
           </div>
         </div>
+      )}
+
+      {editing && (
+        <div className="fixed inset-0 z-40 flex flex-col bg-white">
+          <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
+            <h2 className="text-lg font-bold text-slate-900">Renommer l'exercice</h2>
+            <button
+              type="button"
+              onClick={() => setEditing(null)}
+              className="rounded-full p-2 text-slate-500 active:bg-slate-100"
+              aria-label="Fermer"
+            >
+              <XIcon className="h-6 w-6" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-8">
+            <EditExerciseForm
+              exercise={editing}
+              onSaved={() => setEditing(null)}
+              onCancel={() => setEditing(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {deleting && (
+        <ConfirmDialog
+          title={`Supprimer « ${deleting.exercise.name} » ?`}
+          message={
+            deleting.usageCount > 0
+              ? `Cet exercice a été utilisé dans ${deleting.usageCount} séance${deleting.usageCount > 1 ? 's' : ''}. Son historique sera conservé, mais il ne sera plus proposé pour vos prochaines séances.`
+              : 'Cette action est définitive.'
+          }
+          confirmLabel="Supprimer"
+          danger
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleting(null)}
+        />
       )}
     </div>
   )

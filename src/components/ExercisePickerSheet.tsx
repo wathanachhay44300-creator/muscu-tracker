@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
+import { renameExercise } from '../lib/exerciseActions'
 import { MUSCLE_GROUPS, type Exercise, type MuscleGroup } from '../types'
 import { SearchIcon, XIcon, PlusIcon } from './Icons'
 
@@ -15,7 +16,8 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
   const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
 
-  const exercises = useLiveQuery(() => db.exercises.orderBy('name').toArray(), []) ?? []
+  const exercises =
+    useLiveQuery(() => db.exercises.orderBy('name').filter((e) => !e.deletedAt).toArray(), []) ?? []
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -111,30 +113,25 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
   )
 }
 
-export function CreateExerciseForm({
-  initialName,
-  onCreated,
-  onCancel,
-}: {
+interface ExerciseFormProps {
   initialName: string
-  onCreated: (exercise: Exercise) => void
+  initialGroup: MuscleGroup
+  submitLabel: string
+  onSubmit: (values: { name: string; muscleGroup: MuscleGroup }) => Promise<void>
   onCancel: () => void
-}) {
+}
+
+/** Shared name + muscle-group fields, used for both creating and renaming an exercise. */
+function ExerciseForm({ initialName, initialGroup, submitLabel, onSubmit, onCancel }: ExerciseFormProps) {
   const [name, setName] = useState(initialName)
-  const [group, setGroup] = useState<MuscleGroup>('Autre')
+  const [group, setGroup] = useState<MuscleGroup>(initialGroup)
   const [saving, setSaving] = useState(false)
 
-  async function handleCreate() {
+  async function handleSubmit() {
     const trimmed = name.trim()
     if (!trimmed || saving) return
     setSaving(true)
-    const id = await db.exercises.add({
-      name: trimmed,
-      muscleGroup: group,
-      isCustom: true,
-      createdAt: Date.now(),
-    })
-    onCreated({ id, name: trimmed, muscleGroup: group, isCustom: true, createdAt: Date.now() })
+    await onSubmit({ name: trimmed, muscleGroup: group })
   }
 
   return (
@@ -178,13 +175,60 @@ export function CreateExerciseForm({
         </button>
         <button
           type="button"
-          onClick={handleCreate}
+          onClick={handleSubmit}
           disabled={!name.trim() || saving}
           className="flex-1 rounded-xl bg-brand-600 py-3 font-medium text-white disabled:opacity-40 active:bg-brand-700"
         >
-          Ajouter
+          {submitLabel}
         </button>
       </div>
     </div>
+  )
+}
+
+export function CreateExerciseForm({
+  initialName,
+  onCreated,
+  onCancel,
+}: {
+  initialName: string
+  onCreated: (exercise: Exercise) => void
+  onCancel: () => void
+}) {
+  return (
+    <ExerciseForm
+      initialName={initialName}
+      initialGroup="Autre"
+      submitLabel="Ajouter"
+      onCancel={onCancel}
+      onSubmit={async ({ name, muscleGroup }) => {
+        const createdAt = Date.now()
+        const id = await db.exercises.add({ name, muscleGroup, isCustom: true, createdAt })
+        onCreated({ id, name, muscleGroup, isCustom: true, createdAt })
+      }}
+    />
+  )
+}
+
+export function EditExerciseForm({
+  exercise,
+  onSaved,
+  onCancel,
+}: {
+  exercise: Exercise
+  onSaved: () => void
+  onCancel: () => void
+}) {
+  return (
+    <ExerciseForm
+      initialName={exercise.name}
+      initialGroup={exercise.muscleGroup}
+      submitLabel="Enregistrer"
+      onCancel={onCancel}
+      onSubmit={async ({ name, muscleGroup }) => {
+        await renameExercise(exercise.id!, { name, muscleGroup })
+        onSaved()
+      }}
+    />
   )
 }

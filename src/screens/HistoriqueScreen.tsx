@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useWorkoutHistory } from '../hooks/useHistory'
 import { formatDateFr, relativeDateLabel } from '../lib/date'
+import { formatVolume } from '../lib/stats'
 import { CalendarIcon, ChevronRightIcon } from '../components/Icons'
 
 export function HistoriqueScreen() {
@@ -21,7 +22,7 @@ export function HistoriqueScreen() {
       )}
 
       <div className="space-y-2.5">
-        {history?.map(({ workout, exerciseCount, setCount }) => (
+        {history?.map(({ workout, exerciseCount, setCount, volume }) => (
           <Link
             key={workout.id}
             to={`/historique/${workout.id}`}
@@ -33,6 +34,7 @@ export function HistoriqueScreen() {
               <p className="mt-1 text-sm text-slate-500">
                 {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''} · {setCount} série
                 {setCount > 1 ? 's' : ''}
+                {volume > 0 && <> · {formatVolume(volume)} kg</>}
               </p>
             </div>
             <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
