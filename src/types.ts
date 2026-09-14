@@ -56,3 +56,29 @@ export interface WorkoutExerciseWithSets extends WorkoutExercise {
   exercise: Exercise
   sets: SetEntry[]
 }
+
+/** A reusable session blueprint, e.g. "Push", "Full Body". */
+export interface WorkoutTemplate {
+  id?: number
+  name: string
+  createdAt: number
+}
+
+/** Links an exercise to a template, with how many sets to pre-create when starting from it. */
+export interface TemplateExercise {
+  id?: number
+  templateId: number
+  exerciseId: number
+  order: number
+  targetSets: number
+}
+
+/** A template scheduled for a future (or today's) date. Consumed once that
+ * session is actually started — it's a to-do, not a historical record. */
+export interface PlannedSession {
+  id?: number
+  /** ISO date, format yyyy-mm-dd */
+  date: string
+  templateId: number
+  createdAt: number
+}

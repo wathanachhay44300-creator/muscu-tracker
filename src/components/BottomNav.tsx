@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { DumbbellIcon, CalendarIcon, ListIcon } from './Icons'
+import { DumbbellIcon, CalendarIcon, ClipboardIcon, ListIcon } from './Icons'
 
 const TABS = [
   { to: '/', label: 'Séance', icon: DumbbellIcon, end: true },
   { to: '/historique', label: 'Historique', icon: CalendarIcon, end: false },
   { to: '/exercices', label: 'Exercices', icon: ListIcon, end: false },
+  { to: '/programmes', label: 'Programmes', icon: ClipboardIcon, end: false },
 ]
 
 export function BottomNav() {

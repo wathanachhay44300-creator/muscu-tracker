@@ -7,6 +7,8 @@ import { HistoriqueScreen } from './screens/HistoriqueScreen'
 import { HistoriqueDetailScreen } from './screens/HistoriqueDetailScreen'
 import { ExercicesScreen } from './screens/ExercicesScreen'
 import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
+import { ProgrammesScreen } from './screens/ProgrammesScreen'
+import { TemplateDetailScreen } from './screens/TemplateDetailScreen'
 import { DumbbellIcon } from './components/Icons'
 
 export default function App() {
@@ -29,10 +31,13 @@ export default function App() {
       <div className="min-h-dvh bg-slate-50">
         <Routes>
           <Route path="/" element={<SeanceScreen />} />
+          <Route path="/jour/:date" element={<SeanceScreen />} />
           <Route path="/historique" element={<HistoriqueScreen />} />
           <Route path="/historique/:workoutId" element={<HistoriqueDetailScreen />} />
           <Route path="/exercices" element={<ExercicesScreen />} />
           <Route path="/exercices/:exerciseId" element={<ExerciseDetailScreen />} />
+          <Route path="/programmes" element={<ProgrammesScreen />} />
+          <Route path="/programmes/:templateId" element={<TemplateDetailScreen />} />
         </Routes>
         <BottomNav />
       </div>

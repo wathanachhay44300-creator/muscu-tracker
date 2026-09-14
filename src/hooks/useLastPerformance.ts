@@ -1,11 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '../db'
-import type { SetEntry } from '../types'
-
-export interface LastPerformance {
-  date: string
-  sets: SetEntry[]
-}
+import { getLastPerformance, type LastPerformance } from '../lib/performance'
 
 /**
  * The most recent *other* session that logged this exercise, so it can be
@@ -19,19 +13,6 @@ export function useLastPerformance(
 ): LastPerformance | null | undefined {
   return useLiveQuery(async () => {
     if (!exerciseId) return undefined
-    const links = await db.workoutExercises.where('exerciseId').equals(exerciseId).toArray()
-    const candidates = links.filter((l) => l.workoutId !== excludeWorkoutId)
-
-    let best: { date: string; sets: SetEntry[] } | null = null
-    for (const link of candidates) {
-      const workout = await db.workouts.get(link.workoutId)
-      if (!workout) continue
-      const sets = await db.sets.where('workoutExerciseId').equals(link.id!).sortBy('order')
-      if (sets.length === 0) continue
-      if (!best || workout.date > best.date) {
-        best = { date: workout.date, sets }
-      }
-    }
-    return best
+    return getLastPerformance(exerciseId, excludeWorkoutId)
   }, [exerciseId, excludeWorkoutId])
 }

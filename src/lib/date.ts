@@ -1,9 +1,12 @@
+/** Converts a Date to yyyy-mm-dd in local time (not UTC). */
+export function dateToISO(d: Date): string {
+  const offset = d.getTimezoneOffset()
+  return new Date(d.getTime() - offset * 60_000).toISOString().slice(0, 10)
+}
+
 /** Returns today's date as yyyy-mm-dd, in local time (not UTC). */
 export function todayISO(): string {
-  const d = new Date()
-  const offset = d.getTimezoneOffset()
-  const local = new Date(d.getTime() - offset * 60_000)
-  return local.toISOString().slice(0, 10)
+  return dateToISO(new Date())
 }
 
 const WEEKDAYS_FR = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam']
@@ -35,22 +38,17 @@ export function formatDateFr(iso: string, opts: { withYear?: boolean } = {}): st
 /** Adds (or subtracts) days to an ISO yyyy-mm-dd date, returning a new ISO date. */
 export function addDays(iso: string, delta: number): string {
   const [y, m, d] = iso.split('-').map(Number)
-  const date = new Date(y, m - 1, d + delta)
-  const offset = date.getTimezoneOffset()
-  return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 10)
+  return dateToISO(new Date(y, m - 1, d + delta))
 }
 
 export function isToday(iso: string): boolean {
   return iso === todayISO()
 }
 
-/** Human label: "Aujourd'hui", "Hier", or the formatted date. */
+/** Human label: "Aujourd'hui", "Hier", "Demain", or the formatted date. */
 export function relativeDateLabel(iso: string): string {
-  if (isToday(iso)) return "Aujourd'hui"
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  const offset = yesterday.getTimezoneOffset()
-  const yISO = new Date(yesterday.getTime() - offset * 60_000).toISOString().slice(0, 10)
-  if (iso === yISO) return 'Hier'
+  if (iso === todayISO()) return "Aujourd'hui"
+  if (iso === addDays(todayISO(), -1)) return 'Hier'
+  if (iso === addDays(todayISO(), 1)) return 'Demain'
   return formatDateFr(iso)
 }

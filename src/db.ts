@@ -1,5 +1,13 @@
 import Dexie, { type Table } from 'dexie'
-import type { Exercise, SetEntry, Workout, WorkoutExercise } from './types'
+import type {
+  Exercise,
+  PlannedSession,
+  SetEntry,
+  TemplateExercise,
+  Workout,
+  WorkoutExercise,
+  WorkoutTemplate,
+} from './types'
 import { DEFAULT_EXERCISES } from './lib/exercisesSeed'
 
 class MuscuDB extends Dexie {
@@ -7,6 +15,9 @@ class MuscuDB extends Dexie {
   workouts!: Table<Workout, number>
   workoutExercises!: Table<WorkoutExercise, number>
   sets!: Table<SetEntry, number>
+  workoutTemplates!: Table<WorkoutTemplate, number>
+  templateExercises!: Table<TemplateExercise, number>
+  plannedSessions!: Table<PlannedSession, number>
 
   constructor() {
     super('muscu-tracker')
@@ -15,6 +26,17 @@ class MuscuDB extends Dexie {
       workouts: '++id, date',
       workoutExercises: '++id, workoutId, exerciseId',
       sets: '++id, workoutExerciseId',
+    })
+    // v2: templates (Phase 3) — unchanged stores are repeated, as Dexie
+    // requires each version to declare the full schema it wants.
+    this.version(2).stores({
+      exercises: '++id, name, muscleGroup, isCustom',
+      workouts: '++id, date',
+      workoutExercises: '++id, workoutId, exerciseId',
+      sets: '++id, workoutExerciseId',
+      workoutTemplates: '++id, name',
+      templateExercises: '++id, templateId, exerciseId',
+      plannedSessions: '++id, date, templateId',
     })
   }
 }

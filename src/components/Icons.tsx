@@ -127,6 +127,18 @@ export function StarIcon(props: IconProps) {
   )
 }
 
+export function ClipboardIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="5" y="4.5" width="14" height="17" rx="2" />
+      <path d="M9 4.5V3.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+      <path d="M8.5 11h7" />
+      <path d="M8.5 15h7" />
+      <path d="M8.5 19h4" />
+    </svg>
+  )
+}
+
 export function ChartIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
