@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { renameExercise } from '../lib/exerciseActions'
-import { MUSCLE_GROUPS, type Exercise, type MuscleGroup } from '../types'
+import { guessLoadType } from '../lib/loadType'
+import { LOAD_TYPES, MUSCLE_GROUPS, type Exercise, type LoadType, type MuscleGroup } from '../types'
 import { SearchIcon, XIcon, PlusIcon } from './Icons'
 
 interface ExercisePickerSheetProps {
@@ -116,22 +117,43 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
 interface ExerciseFormProps {
   initialName: string
   initialGroup: MuscleGroup
+  initialLoadType: LoadType
+  /** True for create: the load type re-suggests itself as the name changes, until the user picks one manually. */
+  autoSuggestLoadType?: boolean
   submitLabel: string
-  onSubmit: (values: { name: string; muscleGroup: MuscleGroup }) => Promise<void>
+  onSubmit: (values: { name: string; muscleGroup: MuscleGroup; loadType: LoadType }) => Promise<void>
   onCancel: () => void
 }
 
-/** Shared name + muscle-group fields, used for both creating and renaming an exercise. */
-function ExerciseForm({ initialName, initialGroup, submitLabel, onSubmit, onCancel }: ExerciseFormProps) {
+/** Shared name + muscle-group + load-type fields, used for both creating and renaming an exercise. */
+function ExerciseForm({
+  initialName,
+  initialGroup,
+  initialLoadType,
+  autoSuggestLoadType = false,
+  submitLabel,
+  onSubmit,
+  onCancel,
+}: ExerciseFormProps) {
   const [name, setName] = useState(initialName)
   const [group, setGroup] = useState<MuscleGroup>(initialGroup)
+  const [loadType, setLoadType] = useState<LoadType>(initialLoadType)
+  const [loadTypeTouched, setLoadTypeTouched] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (autoSuggestLoadType && !loadTypeTouched) {
+      setLoadType(guessLoadType(name, group))
+    }
+    // Re-suggest only while the user hasn't picked a load type themselves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, group, autoSuggestLoadType, loadTypeTouched])
 
   async function handleSubmit() {
     const trimmed = name.trim()
     if (!trimmed || saving) return
     setSaving(true)
-    await onSubmit({ name: trimmed, muscleGroup: group })
+    await onSubmit({ name: trimmed, muscleGroup: group, loadType })
   }
 
   return (
@@ -161,6 +183,28 @@ function ExerciseForm({ initialName, initialGroup, submitLabel, onSubmit, onCanc
               }`}
             >
               {g}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-600">Type de chargement</label>
+        <div className="flex flex-wrap gap-2">
+          {LOAD_TYPES.map((lt) => (
+            <button
+              key={lt}
+              type="button"
+              onClick={() => {
+                setLoadType(lt)
+                setLoadTypeTouched(true)
+              }}
+              className={`rounded-full px-3.5 py-2 text-sm font-medium ${
+                loadType === lt
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-slate-100 text-slate-600 active:bg-slate-200'
+              }`}
+            >
+              {lt}
             </button>
           ))}
         </div>
@@ -199,12 +243,14 @@ export function CreateExerciseForm({
     <ExerciseForm
       initialName={initialName}
       initialGroup="Autre"
+      initialLoadType={guessLoadType(initialName)}
+      autoSuggestLoadType
       submitLabel="Ajouter"
       onCancel={onCancel}
-      onSubmit={async ({ name, muscleGroup }) => {
+      onSubmit={async ({ name, muscleGroup, loadType }) => {
         const createdAt = Date.now()
-        const id = await db.exercises.add({ name, muscleGroup, isCustom: true, createdAt })
-        onCreated({ id, name, muscleGroup, isCustom: true, createdAt })
+        const id = await db.exercises.add({ name, muscleGroup, loadType, isCustom: true, createdAt })
+        onCreated({ id, name, muscleGroup, loadType, isCustom: true, createdAt })
       }}
     />
   )
@@ -223,10 +269,11 @@ export function EditExerciseForm({
     <ExerciseForm
       initialName={exercise.name}
       initialGroup={exercise.muscleGroup}
+      initialLoadType={exercise.loadType}
       submitLabel="Enregistrer"
       onCancel={onCancel}
-      onSubmit={async ({ name, muscleGroup }) => {
-        await renameExercise(exercise.id!, { name, muscleGroup })
+      onSubmit={async ({ name, muscleGroup, loadType }) => {
+        await renameExercise(exercise.id!, { name, muscleGroup, loadType })
         onSaved()
       }}
     />

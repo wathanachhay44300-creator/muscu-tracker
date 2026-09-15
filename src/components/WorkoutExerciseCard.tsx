@@ -64,6 +64,7 @@ export function WorkoutExerciseCard({ we, workoutId }: WorkoutExerciseCardProps)
             key={set.id}
             set={set}
             index={i}
+            loadType={we.exercise.loadType}
             isPR={isPR(set)}
             onChangeWeight={(weight) => updateSet(set.id!, { weight })}
             onChangeReps={(reps) => updateSet(set.id!, { reps })}

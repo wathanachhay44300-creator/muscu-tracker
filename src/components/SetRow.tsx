@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import type { SetEntry } from '../types'
+import type { LoadType, SetEntry } from '../types'
 import { DumbbellIcon, StarIcon, TrashIcon } from './Icons'
 import { PlateCalculatorSheet } from './PlateCalculatorSheet'
+
+/** The plate calculator only makes sense for these — the rest have no plates to pick. */
+const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
 
 interface SetRowProps {
   set: SetEntry
   index: number
+  loadType: LoadType
   /** True when this set ties or holds the all-time PR (weight or volume) for its exercise. */
   isPR?: boolean
   onChangeWeight: (weight: number) => void
@@ -13,7 +17,7 @@ interface SetRowProps {
   onRemove: () => void
 }
 
-export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemove }: SetRowProps) {
+export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeReps, onRemove }: SetRowProps) {
   // Local state is the source of truth while this row is being edited. It's
   // only re-synced from props when a *different* set is mounted into this row
   // (new set.id) — not on every set.weight/reps change — otherwise rapid
@@ -132,16 +136,20 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
           +
         </button>
       </div>
-      <button
-        type="button"
-        onClick={() => setCalculatorOpen(true)}
-        className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-brand-600"
-        aria-label="Calculateur de plaques"
-        title="Calculateur de plaques"
-      >
-        <DumbbellIcon className="h-2.5 w-2.5" />
-        kg
-      </button>
+      {PLATE_CALC_LOAD_TYPES.includes(loadType) ? (
+        <button
+          type="button"
+          onClick={() => setCalculatorOpen(true)}
+          className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-brand-600"
+          aria-label="Calculateur de plaques"
+          title="Calculateur de plaques"
+        >
+          <DumbbellIcon className="h-2.5 w-2.5" />
+          kg
+        </button>
+      ) : (
+        <span className="shrink-0 text-[10px] font-medium text-slate-400">kg</span>
+      )}
 
       <div className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
         <button
@@ -183,8 +191,12 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
         <TrashIcon className="h-4 w-4" />
       </button>
 
-      {calculatorOpen && (
-        <PlateCalculatorSheet initialWeight={weight} onClose={() => setCalculatorOpen(false)} />
+      {calculatorOpen && PLATE_CALC_LOAD_TYPES.includes(loadType) && (
+        <PlateCalculatorSheet
+          initialWeight={weight}
+          loadType={loadType}
+          onClose={() => setCalculatorOpen(false)}
+        />
       )}
     </div>
   )

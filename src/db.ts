@@ -70,6 +70,7 @@ export async function ensureSeedData() {
       DEFAULT_EXERCISES.map((e) => ({
         name: e.name,
         muscleGroup: e.muscleGroup,
+        loadType: e.loadType,
         isCustom: false,
         createdAt: now,
       })),

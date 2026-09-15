@@ -1,5 +1,5 @@
 import { db } from '../db'
-import type { MuscleGroup } from '../types'
+import type { LoadType, MuscleGroup } from '../types'
 
 /** Number of past sessions (workouts) that used this exercise at least once. */
 export async function countExerciseUsage(exerciseId: number): Promise<number> {
@@ -19,7 +19,7 @@ export async function softDeleteExercise(exerciseId: number): Promise<void> {
 
 export async function renameExercise(
   exerciseId: number,
-  patch: { name: string; muscleGroup: MuscleGroup },
+  patch: { name: string; muscleGroup: MuscleGroup; loadType: LoadType },
 ): Promise<void> {
   await db.exercises.update(exerciseId, patch)
 }

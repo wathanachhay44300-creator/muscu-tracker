@@ -1,21 +1,36 @@
 export const MUSCLE_GROUPS = [
-  'Pectoraux',
+  'Quadriceps',
+  'Ischio-jambiers',
+  'Fessiers',
+  'Mollets',
   'Dos',
+  'Pectoraux',
   'Épaules',
   'Biceps',
   'Triceps',
-  'Jambes',
   'Abdominaux',
-  'Cardio',
+  'Avant-bras',
   'Autre',
 ] as const
 
 export type MuscleGroup = (typeof MUSCLE_GROUPS)[number]
 
+/** How an exercise is loaded, which determines whether/how the plate calculator applies. */
+export const LOAD_TYPES = [
+  'Barre libre',
+  'Machine à plaques',
+  'Poulie / pile de poids',
+  'Haltères',
+  'Poids du corps',
+] as const
+
+export type LoadType = (typeof LOAD_TYPES)[number]
+
 export interface Exercise {
   id?: number
   name: string
   muscleGroup: MuscleGroup
+  loadType: LoadType
   isCustom: boolean
   createdAt: number
   /** Set when the exercise was removed from the library. The row (and its
