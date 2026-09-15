@@ -3,6 +3,7 @@ import { useWorkoutDetail } from '../hooks/useWorkout'
 import { addExerciseToWorkout, updateWorkoutRpe } from '../lib/workoutActions'
 import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
+import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { PlusIcon } from './Icons'
 import type { Exercise } from '../types'
@@ -45,6 +46,12 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
           {setCount > 1 ? 's' : ''}
           {sessionVolume > 0 && <> · {formatVolume(sessionVolume)} kg au total</>}
         </p>
+      )}
+
+      {exercises.length > 0 && (
+        <MuscleGroupBreakdown
+          items={exercises.map((we) => ({ muscleGroup: we.exercise.muscleGroup, setCount: we.sets.length }))}
+        />
       )}
 
       {exercises.map((we) => (

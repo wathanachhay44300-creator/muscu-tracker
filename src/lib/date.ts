@@ -41,6 +41,19 @@ export function addDays(iso: string, delta: number): string {
   return dateToISO(new Date(y, m - 1, d + delta))
 }
 
+/** Adds (or subtracts) whole weeks to an ISO date. */
+export function addWeeks(iso: string, delta: number): string {
+  return addDays(iso, delta * 7)
+}
+
+/** The Monday of the ISO week containing this date. */
+export function mondayOf(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  const daysSinceMonday = (date.getDay() + 6) % 7 // Sun=0 -> 6, Mon=1 -> 0, ...
+  return addDays(iso, -daysSinceMonday)
+}
+
 export function isToday(iso: string): boolean {
   return iso === todayISO()
 }

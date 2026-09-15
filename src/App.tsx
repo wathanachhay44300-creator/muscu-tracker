@@ -9,6 +9,7 @@ import { ExercicesScreen } from './screens/ExercicesScreen'
 import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { ProgrammesScreen } from './screens/ProgrammesScreen'
 import { TemplateDetailScreen } from './screens/TemplateDetailScreen'
+import { WeeklyBreakdownScreen } from './screens/WeeklyBreakdownScreen'
 import { DumbbellIcon } from './components/Icons'
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/" element={<SeanceScreen />} />
           <Route path="/jour/:date" element={<SeanceScreen />} />
           <Route path="/historique" element={<HistoriqueScreen />} />
+          <Route path="/historique/semaine" element={<WeeklyBreakdownScreen />} />
           <Route path="/historique/:workoutId" element={<HistoriqueDetailScreen />} />
           <Route path="/exercices" element={<ExercicesScreen />} />
           <Route path="/exercices/:exerciseId" element={<ExerciseDetailScreen />} />

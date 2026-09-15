@@ -11,6 +11,7 @@ import {
 } from '../lib/templateActions'
 import { schedulePlannedSession, startWorkoutFromTemplate } from '../lib/planningActions'
 import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
+import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { ChevronLeftIcon, PlusIcon, TrashIcon } from '../components/Icons'
 import { todayISO } from '../lib/date'
@@ -140,6 +141,15 @@ export function TemplateDetailScreen() {
         <PlusIcon className="h-5 w-5" />
         Ajouter un exercice
       </button>
+
+      {exercises.length > 0 && (
+        <div className="mt-4">
+          <MuscleGroupBreakdown
+            title="Répartition par muscle (prévue)"
+            items={exercises.map((te) => ({ muscleGroup: te.exercise.muscleGroup, setCount: te.targetSets }))}
+          />
+        </div>
+      )}
 
       {exercises.length > 0 && (
         <div className="mt-6 space-y-2.5">

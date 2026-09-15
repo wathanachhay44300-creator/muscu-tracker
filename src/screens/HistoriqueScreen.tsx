@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useWorkoutHistory } from '../hooks/useHistory'
 import { formatDateFr, relativeDateLabel } from '../lib/date'
 import { formatVolume } from '../lib/stats'
-import { CalendarIcon, ChevronRightIcon } from '../components/Icons'
+import { CalendarIcon, ChartIcon, ChevronRightIcon } from '../components/Icons'
 
 export function HistoriqueScreen() {
   const history = useWorkoutHistory()
@@ -10,6 +10,17 @@ export function HistoriqueScreen() {
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
       <h1 className="mb-5 text-lg font-bold text-slate-900">Historique</h1>
+
+      <Link
+        to="/historique/semaine"
+        className="mb-4 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm active:bg-slate-50"
+      >
+        <div className="flex items-center gap-2.5">
+          <ChartIcon className="h-5 w-5 text-brand-500" />
+          <span className="font-medium text-slate-800">Répartition par muscle (semaine)</span>
+        </div>
+        <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+      </Link>
 
       {history && history.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-300 px-4 py-14 text-center">

@@ -63,9 +63,9 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-1">
       <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+        className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
           isPR ? 'bg-amber-100 text-amber-500' : 'text-slate-400'
         }`}
         title={isPR ? 'Nouveau record personnel' : undefined}
@@ -73,11 +73,11 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
         {isPR ? <StarIcon className="h-3.5 w-3.5" /> : index + 1}
       </span>
 
-      <div className="flex flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+      <div className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
         <button
           type="button"
           onClick={() => stepWeight(-2.5)}
-          className="px-3 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
           aria-label="Moins 2.5 kg"
         >
           −
@@ -88,27 +88,25 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
           onFocus={(e) => e.target.select()}
           onBlur={(e) => commitWeight(e.target.value)}
           inputMode="decimal"
-          className="w-full min-w-0 bg-transparent py-3 text-center text-lg font-semibold text-slate-900 outline-none"
+          className="w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none"
           aria-label="Poids en kg"
         />
         <button
           type="button"
           onClick={() => stepWeight(2.5)}
-          className="px-3 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
           aria-label="Plus 2.5 kg"
         >
           +
         </button>
       </div>
-      <span className="shrink-0 text-xs font-medium text-slate-400">kg</span>
+      <span className="shrink-0 text-[10px] font-medium text-slate-400">kg</span>
 
-      <span className="shrink-0 text-slate-300">×</span>
-
-      <div className="flex flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+      <div className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
         <button
           type="button"
           onClick={() => stepReps(-1)}
-          className="px-3 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
           aria-label="Moins une répétition"
         >
           −
@@ -119,27 +117,27 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
           onFocus={(e) => e.target.select()}
           onBlur={(e) => commitReps(e.target.value)}
           inputMode="numeric"
-          className="w-full min-w-0 bg-transparent py-3 text-center text-lg font-semibold text-slate-900 outline-none"
+          className="w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none"
           aria-label="Répétitions"
         />
         <button
           type="button"
           onClick={() => stepReps(1)}
-          className="px-3 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
           aria-label="Plus une répétition"
         >
           +
         </button>
       </div>
-      <span className="shrink-0 text-xs font-medium text-slate-400">reps</span>
+      <span className="shrink-0 text-[10px] font-medium text-slate-400">reps</span>
 
       <button
         type="button"
         onClick={onRemove}
-        className="shrink-0 p-2 text-slate-300 active:text-red-500"
+        className="shrink-0 p-1 text-slate-300 active:text-red-500"
         aria-label="Supprimer la série"
       >
-        <TrashIcon className="h-5 w-5" />
+        <TrashIcon className="h-4 w-4" />
       </button>
     </div>
   )
