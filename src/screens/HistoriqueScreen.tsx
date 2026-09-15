@@ -8,7 +8,7 @@ export function HistoriqueScreen() {
   const history = useWorkoutHistory()
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <h1 className="mb-5 text-lg font-bold text-slate-900">Historique</h1>
 
       <Link

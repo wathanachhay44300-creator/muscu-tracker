@@ -50,7 +50,7 @@ export function ExercicesScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-slate-900">Exercices</h1>
         <button
@@ -119,7 +119,7 @@ export function ExercicesScreen() {
       )}
 
       {creating && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-white">
+        <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-white">
           <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
             <h2 className="text-lg font-bold text-slate-900">Nouvel exercice</h2>
             <button
@@ -142,7 +142,7 @@ export function ExercicesScreen() {
       )}
 
       {editing && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-white">
+        <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-white">
           <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
             <h2 className="text-lg font-bold text-slate-900">Renommer l'exercice</h2>
             <button

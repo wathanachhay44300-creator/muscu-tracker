@@ -24,7 +24,7 @@ export function ProgrammesScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-slate-900">Programmes</h1>
         <button

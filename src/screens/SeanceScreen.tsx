@@ -29,7 +29,7 @@ export function SeanceScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <div className="mb-5 flex items-center justify-between">
         <button
           type="button"

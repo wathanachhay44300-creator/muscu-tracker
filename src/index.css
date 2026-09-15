@@ -53,3 +53,84 @@ textarea {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* ---- Motion ----
+ * Everything below animates only `transform`/`opacity` (GPU-composited,
+ * never triggers layout) and stays within 150–300ms. `prefers-reduced-
+ * motion` collapses all of it to effectively instant, app-wide, without
+ * needing to special-case every component. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle press feedback on every tappable control, for free. */
+button:not(:disabled),
+a {
+  transition: transform 150ms ease;
+}
+button:not(:disabled):active,
+a:active {
+  transform: scale(0.96);
+}
+
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-slide-in 200ms ease-out;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-pop-in {
+  animation: pop-in 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fade-in-backdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade-in-backdrop {
+  animation: fade-in-backdrop 150ms ease-out;
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: slide-up-fade 200ms ease-out;
+}

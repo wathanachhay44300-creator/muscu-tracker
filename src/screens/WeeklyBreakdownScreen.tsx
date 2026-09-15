@@ -15,7 +15,7 @@ export function WeeklyBreakdownScreen() {
   const totalSets = items?.reduce((sum, i) => sum + i.setCount, 0) ?? 0
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"

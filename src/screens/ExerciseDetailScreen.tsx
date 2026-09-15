@@ -32,7 +32,7 @@ export function ExerciseDetailScreen() {
 
   if (!history) {
     return (
-      <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+      <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
         <p className="text-slate-400">Exercice introuvable.</p>
       </div>
     )
@@ -50,7 +50,7 @@ export function ExerciseDetailScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"

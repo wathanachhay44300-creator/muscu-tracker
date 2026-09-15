@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SetEntry } from '../types'
-import { StarIcon, TrashIcon } from './Icons'
+import { DumbbellIcon, StarIcon, TrashIcon } from './Icons'
+import { PlateCalculatorSheet } from './PlateCalculatorSheet'
 
 interface SetRowProps {
   set: SetEntry
@@ -22,6 +23,14 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
   const [reps, setReps] = useState(set.reps)
   const [weightText, setWeightText] = useState(trimZero(set.weight))
   const [repsText, setRepsText] = useState(String(set.reps))
+  const [calculatorOpen, setCalculatorOpen] = useState(false)
+
+  // Brief scale "pop" on the number when a stepper button changes it —
+  // transform-only, so it stays cheap and GPU-composited.
+  const [weightPulse, setWeightPulse] = useState(false)
+  const [repsPulse, setRepsPulse] = useState(false)
+  const weightPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const repsPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setWeight(set.weight)
@@ -31,6 +40,25 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
     // Only re-sync when a new set is mounted into this row, not on every edit.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [set.id])
+
+  useEffect(() => {
+    return () => {
+      if (weightPulseTimeout.current) clearTimeout(weightPulseTimeout.current)
+      if (repsPulseTimeout.current) clearTimeout(repsPulseTimeout.current)
+    }
+  }, [])
+
+  function pulseWeight() {
+    setWeightPulse(true)
+    if (weightPulseTimeout.current) clearTimeout(weightPulseTimeout.current)
+    weightPulseTimeout.current = setTimeout(() => setWeightPulse(false), 150)
+  }
+
+  function pulseReps() {
+    setRepsPulse(true)
+    if (repsPulseTimeout.current) clearTimeout(repsPulseTimeout.current)
+    repsPulseTimeout.current = setTimeout(() => setRepsPulse(false), 150)
+  }
 
   function commitWeight(raw: string) {
     const n = parseFloat(raw.replace(',', '.'))
@@ -53,6 +81,7 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
     setWeight(n)
     setWeightText(trimZero(n))
     onChangeWeight(n)
+    pulseWeight()
   }
 
   function stepReps(delta: number) {
@@ -60,17 +89,18 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
     setReps(n)
     setRepsText(String(n))
     onChangeReps(n)
+    pulseReps()
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1">
+    <div className="animate-fade-in flex flex-wrap items-center gap-1">
       <span
         className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
           isPR ? 'bg-amber-100 text-amber-500' : 'text-slate-400'
         }`}
         title={isPR ? 'Nouveau record personnel' : undefined}
       >
-        {isPR ? <StarIcon className="h-3.5 w-3.5" /> : index + 1}
+        {isPR ? <StarIcon className="animate-pop-in h-3.5 w-3.5" /> : index + 1}
       </span>
 
       <div className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
@@ -88,7 +118,9 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
           onFocus={(e) => e.target.select()}
           onBlur={(e) => commitWeight(e.target.value)}
           inputMode="decimal"
-          className="w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none"
+          className={`w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
+            weightPulse ? 'scale-110' : 'scale-100'
+          }`}
           aria-label="Poids en kg"
         />
         <button
@@ -100,7 +132,16 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
           +
         </button>
       </div>
-      <span className="shrink-0 text-[10px] font-medium text-slate-400">kg</span>
+      <button
+        type="button"
+        onClick={() => setCalculatorOpen(true)}
+        className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-brand-600"
+        aria-label="Calculateur de plaques"
+        title="Calculateur de plaques"
+      >
+        <DumbbellIcon className="h-2.5 w-2.5" />
+        kg
+      </button>
 
       <div className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
         <button
@@ -117,7 +158,9 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
           onFocus={(e) => e.target.select()}
           onBlur={(e) => commitReps(e.target.value)}
           inputMode="numeric"
-          className="w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none"
+          className={`w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
+            repsPulse ? 'scale-110' : 'scale-100'
+          }`}
           aria-label="Répétitions"
         />
         <button
@@ -139,6 +182,10 @@ export function SetRow({ set, index, isPR, onChangeWeight, onChangeReps, onRemov
       >
         <TrashIcon className="h-4 w-4" />
       </button>
+
+      {calculatorOpen && (
+        <PlateCalculatorSheet initialWeight={weight} onClose={() => setCalculatorOpen(false)} />
+      )}
     </div>
   )
 }

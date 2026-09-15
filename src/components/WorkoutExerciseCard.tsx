@@ -28,7 +28,7 @@ export function WorkoutExerciseCard({ we, workoutId }: WorkoutExerciseCardProps)
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="animate-fade-in rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
           <Link

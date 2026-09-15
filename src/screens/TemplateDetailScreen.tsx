@@ -30,7 +30,7 @@ export function TemplateDetailScreen() {
 
   if (!detail) {
     return (
-      <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+      <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
         <p className="text-slate-400">Programme introuvable.</p>
       </div>
     )
@@ -60,7 +60,7 @@ export function TemplateDetailScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4">
+    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"
@@ -227,11 +227,11 @@ function ScheduleSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-sm rounded-t-2xl bg-white p-5 pb-safe shadow-lg sm:rounded-2xl"
+        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-white p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-base font-semibold text-slate-900">Planifier cette séance</h2>

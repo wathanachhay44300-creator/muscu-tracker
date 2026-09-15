@@ -82,3 +82,15 @@ export interface PlannedSession {
   templateId: number
   createdAt: number
 }
+
+export interface PlateOption {
+  weight: number
+  enabled: boolean
+}
+
+/** Singleton settings row for the plate calculator (id is always fixed). */
+export interface PlateCalculatorSettings {
+  id: 'plateCalculator'
+  barWeight: number
+  plates: PlateOption[]
+}

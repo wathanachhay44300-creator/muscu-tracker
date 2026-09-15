@@ -2,6 +2,7 @@ import Dexie, { type Table } from 'dexie'
 import type {
   Exercise,
   PlannedSession,
+  PlateCalculatorSettings,
   SetEntry,
   TemplateExercise,
   Workout,
@@ -18,6 +19,7 @@ class MuscuDB extends Dexie {
   workoutTemplates!: Table<WorkoutTemplate, number>
   templateExercises!: Table<TemplateExercise, number>
   plannedSessions!: Table<PlannedSession, number>
+  settings!: Table<PlateCalculatorSettings, string>
 
   constructor() {
     super('muscu-tracker')
@@ -37,6 +39,17 @@ class MuscuDB extends Dexie {
       workoutTemplates: '++id, name',
       templateExercises: '++id, templateId, exerciseId',
       plannedSessions: '++id, date, templateId',
+    })
+    // v3: settings (plate calculator preferences).
+    this.version(3).stores({
+      exercises: '++id, name, muscleGroup, isCustom',
+      workouts: '++id, date',
+      workoutExercises: '++id, workoutId, exerciseId',
+      sets: '++id, workoutExerciseId',
+      workoutTemplates: '++id, name',
+      templateExercises: '++id, templateId, exerciseId',
+      plannedSessions: '++id, date, templateId',
+      settings: 'id',
     })
   }
 }
