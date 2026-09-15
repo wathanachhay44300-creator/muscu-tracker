@@ -7,10 +7,86 @@
   --color-brand-500: #6366f1;
   --color-brand-600: #4f46e5;
   --color-brand-700: #4338ca;
+
+  /* Card/sheet background. Distinct from `white` (kept literal, e.g. for
+   * text on colored buttons) so it can invert independently in dark mode. */
+  --color-surface: #ffffff;
 }
 
+/* ---- Theme ----
+ * Dark mode works by overriding the underlying Tailwind color variables
+ * rather than adding `dark:` classes everywhere: every existing bg-slate-*,
+ * text-slate-*, bg-amber-50, etc. utility across the app already resolves
+ * through these custom properties, so re-pointing them here re-themes the
+ * whole app from one place. Two triggers, matching the spec:
+ *  - no explicit choice: follow the OS via prefers-color-scheme
+ *  - explicit choice (data-theme attribute, set by the theme toggle and
+ *    persisted to localStorage): wins regardless of the OS setting
+ */
 :root {
   color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-surface: #1e293b;
+
+    --color-slate-50: #0f172a;
+    --color-slate-100: #334155;
+    --color-slate-200: #475569;
+    --color-slate-300: #64748b;
+    --color-slate-600: #cbd5e1;
+    --color-slate-700: #e2e8f0;
+    --color-slate-800: #f1f5f9;
+    --color-slate-900: #f8fafc;
+
+    --color-brand-50: #312e81;
+    --color-brand-300: #6366f1;
+    --color-brand-700: #818cf8;
+
+    --color-red-50: #3f1212;
+    --color-red-200: #7f1d1d;
+    --color-red-700: #f87171;
+
+    --color-amber-50: #451a03;
+    --color-amber-100: #78350f;
+    --color-amber-200: #92400e;
+    --color-amber-600: #fbbf24;
+    --color-amber-700: #fde68a;
+
+    --color-emerald-600: #34d399;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-surface: #1e293b;
+
+  --color-slate-50: #0f172a;
+  --color-slate-100: #334155;
+  --color-slate-200: #475569;
+  --color-slate-300: #64748b;
+  --color-slate-600: #cbd5e1;
+  --color-slate-700: #e2e8f0;
+  --color-slate-800: #f1f5f9;
+  --color-slate-900: #f8fafc;
+
+  --color-brand-50: #312e81;
+  --color-brand-300: #6366f1;
+  --color-brand-700: #818cf8;
+
+  --color-red-50: #3f1212;
+  --color-red-200: #7f1d1d;
+  --color-red-700: #f87171;
+
+  --color-amber-50: #451a03;
+  --color-amber-100: #78350f;
+  --color-amber-200: #92400e;
+  --color-amber-600: #fbbf24;
+  --color-amber-700: #fde68a;
+
+  --color-emerald-600: #34d399;
 }
 
 html,
@@ -20,8 +96,8 @@ body,
 }
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--color-slate-50);
+  color: var(--color-slate-900);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
@@ -58,7 +134,9 @@ textarea {
  * Everything below animates only `transform`/`opacity` (GPU-composited,
  * never triggers layout) and stays within 150–300ms. `prefers-reduced-
  * motion` collapses all of it to effectively instant, app-wide, without
- * needing to special-case every component. */
+ * needing to special-case every component. The same rule also covers the
+ * light/dark color-swap transition below, so switching themes never
+ * animates for people who asked for reduced motion. */
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -71,10 +149,29 @@ textarea {
   }
 }
 
+/* Smooth, short fade on every color-bearing property, so toggling the theme
+ * (or the OS setting changing under us) never flashes — colors cross-fade
+ * instead of snapping. Combined with the press-feedback transform below on
+ * the same elements so one rule doesn't clobber the other. */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    fill 200ms ease,
+    stroke 200ms ease;
+}
+
 /* Subtle press feedback on every tappable control, for free. */
 button:not(:disabled),
 a {
-  transition: transform 150ms ease;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    transform 150ms ease;
 }
 button:not(:disabled):active,
 a:active {

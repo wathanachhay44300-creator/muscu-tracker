@@ -24,7 +24,7 @@ export function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-white p-5 pb-safe shadow-lg sm:rounded-2xl"
+        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-base font-semibold text-slate-900">{title}</h2>

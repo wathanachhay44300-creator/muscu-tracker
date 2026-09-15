@@ -51,7 +51,7 @@ export function ProgrammesScreen() {
             <Link
               key={template.id}
               to={`/programmes/${template.id}`}
-              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm active:bg-slate-50"
+              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
             >
               <div>
                 <p className="font-semibold text-slate-900">{template.name}</p>
@@ -76,7 +76,7 @@ export function ProgrammesScreen() {
           {upcoming.map(({ session, templateName }) => (
             <div
               key={session.id}
-              className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3"
+              className="flex items-center justify-between rounded-xl border border-slate-200 bg-surface px-4 py-3"
             >
               <Link to={`/jour/${session.date}`} className="flex-1 active:opacity-60">
                 <p className="text-sm font-semibold text-slate-800">{relativeDateLabel(session.date)}</p>
@@ -112,7 +112,7 @@ function CreateTemplateSheet({
   const [name, setName] = useState('')
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-white">
+    <div className="fixed inset-0 z-40 flex flex-col bg-surface">
       <div className="flex items-center justify-between border-b border-slate-200 px-4 pt-safe pt-4 pb-3">
         <h2 className="text-lg font-bold text-slate-900">Nouveau programme</h2>
         <button

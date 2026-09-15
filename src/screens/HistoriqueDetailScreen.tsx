@@ -57,7 +57,7 @@ export function HistoriqueDetailScreen() {
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className="flex-1 rounded-xl bg-white py-2.5 font-medium text-slate-600 active:bg-slate-100"
+                className="flex-1 rounded-xl bg-surface py-2.5 font-medium text-slate-600 active:bg-slate-100"
               >
                 Annuler
               </button>

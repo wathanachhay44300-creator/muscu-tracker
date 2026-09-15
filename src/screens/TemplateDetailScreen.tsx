@@ -91,7 +91,7 @@ export function TemplateDetailScreen() {
           {exercises.map((te) => (
             <div
               key={te.id}
-              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3"
+              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-surface px-4 py-3"
             >
               <div className="min-w-0">
                 <p className="truncate font-medium text-slate-900">{te.exercise.name}</p>
@@ -231,7 +231,7 @@ function ScheduleSheet({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-white p-5 pb-safe shadow-lg sm:rounded-2xl"
+        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-base font-semibold text-slate-900">Planifier cette séance</h2>

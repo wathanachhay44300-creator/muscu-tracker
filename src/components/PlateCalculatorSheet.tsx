@@ -27,7 +27,7 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-white p-5 pb-safe shadow-lg sm:rounded-2xl"
+        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">

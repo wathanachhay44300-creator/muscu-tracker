@@ -68,7 +68,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
       </button>
 
       {exercises.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">Ressenti de la séance (RPE)</p>
             {workout.rpe != null && (

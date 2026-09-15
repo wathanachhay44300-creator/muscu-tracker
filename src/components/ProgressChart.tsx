@@ -40,29 +40,36 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
 
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label="Graphique de progression">
-      <text x={PAD_X} y={12} fontSize="10" fill="#94a3b8" fontWeight="600">
+      <text x={PAD_X} y={12} fontSize="10" fill="var(--color-slate-400)" fontWeight="600">
         {formatVal(maxV)} {unit}
       </text>
-      <path d={areaPath} fill="#eef2ff" />
-      <path d={path} fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={areaPath} fill="var(--color-brand-50)" />
+      <path
+        d={path}
+        fill="none"
+        stroke="var(--color-brand-600)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       {coords.map((c, i) => (
         <circle
           key={i}
           cx={c.x}
           cy={c.y}
           r={i === coords.length - 1 ? 3.5 : 2.5}
-          fill={i === coords.length - 1 ? '#4f46e5' : '#ffffff'}
-          stroke="#4f46e5"
+          fill={i === coords.length - 1 ? 'var(--color-brand-600)' : 'var(--color-surface)'}
+          stroke="var(--color-brand-600)"
           strokeWidth="1.5"
         />
       ))}
-      <text x={last.x} y={last.y - 8} fontSize="10" fill="#4f46e5" fontWeight="700" textAnchor="end">
+      <text x={last.x} y={last.y - 8} fontSize="10" fill="var(--color-brand-600)" fontWeight="700" textAnchor="end">
         {formatVal(last.value)} {unit}
       </text>
-      <text x={PAD_X} y={HEIGHT - 6} fontSize="9" fill="#94a3b8">
+      <text x={PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--color-slate-400)">
         {formatDateFr(points[0].date, { withYear: false })}
       </text>
-      <text x={WIDTH - PAD_X} y={HEIGHT - 6} fontSize="9" fill="#94a3b8" textAnchor="end">
+      <text x={WIDTH - PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--color-slate-400)" textAnchor="end">
         {formatDateFr(points[points.length - 1].date, { withYear: false })}
       </text>
     </svg>

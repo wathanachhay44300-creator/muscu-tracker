@@ -37,7 +37,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
   }, [filtered])
 
   return (
-    <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-white">
+    <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
       <div className="flex items-center gap-2 border-b border-slate-200 px-4 pt-safe pt-4 pb-3">
         <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
           <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />

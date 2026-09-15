@@ -100,21 +100,21 @@ export function ExerciseDetailScreen() {
           )}
 
           {chartPoints.length >= 2 && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-semibold text-slate-700">Progression</p>
                 <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium">
                   <button
                     type="button"
                     onClick={() => setMetric('weight')}
-                    className={`rounded-md px-2.5 py-1 ${metric === 'weight' ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-500'}`}
+                    className={`rounded-md px-2.5 py-1 ${metric === 'weight' ? 'bg-surface text-brand-600 shadow-sm' : 'text-slate-500'}`}
                   >
                     Poids max
                   </button>
                   <button
                     type="button"
                     onClick={() => setMetric('volume')}
-                    className={`rounded-md px-2.5 py-1 ${metric === 'volume' ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-500'}`}
+                    className={`rounded-md px-2.5 py-1 ${metric === 'volume' ? 'bg-surface text-brand-600 shadow-sm' : 'text-slate-500'}`}
                   >
                     Volume
                   </button>
@@ -130,7 +130,7 @@ export function ExerciseDetailScreen() {
               return (
                 <div
                   key={entry.workout.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                  className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-sm font-semibold text-slate-700">

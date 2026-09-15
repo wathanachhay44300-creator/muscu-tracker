@@ -78,7 +78,7 @@ export function ExercicesScreen() {
           <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
             {group}
           </h3>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-surface">
             {list.map((ex, i) => (
               <div
                 key={ex.id}
@@ -119,7 +119,7 @@ export function ExercicesScreen() {
       )}
 
       {creating && (
-        <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-white">
+        <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
           <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
             <h2 className="text-lg font-bold text-slate-900">Nouvel exercice</h2>
             <button
@@ -142,7 +142,7 @@ export function ExercicesScreen() {
       )}
 
       {editing && (
-        <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-white">
+        <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
           <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
             <h2 className="text-lg font-bold text-slate-900">Renommer l'exercice</h2>
             <button

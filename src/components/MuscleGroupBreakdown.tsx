@@ -14,7 +14,7 @@ export function MuscleGroupBreakdown({ items, title = 'Répartition par muscle' 
   if (breakdown.length === 0) return null
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
       <p className="mb-2.5 text-sm font-semibold text-slate-700">{title}</p>
       <div className="space-y-2">
         {breakdown.map(({ group, count }) => (

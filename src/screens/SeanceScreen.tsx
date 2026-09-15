@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { WorkoutEditor } from '../components/WorkoutEditor'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { ChevronLeftIcon, ChevronRightIcon, ClipboardIcon, DumbbellIcon } from '../components/Icons'
 import { useWorkoutIdForDate } from '../hooks/useWorkout'
 import { usePlannedSessionForDate } from '../hooks/usePlannedSessions'
@@ -30,6 +31,9 @@ export function SeanceScreen() {
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
+      <div className="mb-2 flex justify-end">
+        <ThemeToggle />
+      </div>
       <div className="mb-5 flex items-center justify-between">
         <button
           type="button"
