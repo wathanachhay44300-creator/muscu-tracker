@@ -2,7 +2,13 @@ import { useState } from 'react'
 import { useRestTimer } from '../hooks/useRestTimer'
 import { PauseIcon, PlayIcon, RefreshIcon, TimerIcon, XIcon } from './Icons'
 
-const PRESETS_SEC = [30, 60, 90, 120]
+const PRESETS = [
+  { sec: 30, label: '30s' },
+  { sec: 60, label: '60s' },
+  { sec: 90, label: '90s' },
+  { sec: 120, label: '120s' },
+  { sec: 180, label: '3 min' },
+]
 
 function formatCountdown(ms: number): string {
   const totalSec = Math.ceil(ms / 1000)
@@ -76,15 +82,15 @@ export function RestTimerWidget() {
             </div>
 
             {!timer.hasTimer || timer.isDone ? (
-              <div className="grid grid-cols-4 gap-2">
-                {PRESETS_SEC.map((sec) => (
+              <div className="grid grid-cols-3 gap-2">
+                {PRESETS.map((preset) => (
                   <button
-                    key={sec}
+                    key={preset.sec}
                     type="button"
-                    onClick={() => timer.start(sec * 1000)}
+                    onClick={() => timer.start(preset.sec * 1000)}
                     className="rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white active:bg-brand-700"
                   >
-                    {sec}s
+                    {preset.label}
                   </button>
                 ))}
               </div>
