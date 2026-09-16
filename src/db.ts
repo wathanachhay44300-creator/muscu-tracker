@@ -1,9 +1,11 @@
 import Dexie, { type Table } from 'dexie'
 import type {
   AppPreferences,
+  BodyMeasurement,
   Exercise,
   PlannedSession,
   PlateCalculatorSettings,
+  ProgressPhoto,
   SetEntry,
   TemplateExercise,
   Workout,
@@ -23,6 +25,8 @@ class MuscuDB extends Dexie {
   // A single keyed store shared by every singleton settings row (plate
   // calculator preferences, app preferences, …), distinguished by `id`.
   settings!: Table<PlateCalculatorSettings | AppPreferences, string>
+  bodyMeasurements!: Table<BodyMeasurement, number>
+  progressPhotos!: Table<ProgressPhoto, number>
 
   constructor() {
     super('muscu-tracker')
@@ -65,6 +69,19 @@ class MuscuDB extends Dexie {
       templateExercises: '++id, templateId, exerciseId',
       plannedSessions: '++id, date, templateId',
       settings: 'id',
+    })
+    // v5: Phase 4 — body measurements over time and local progress photos.
+    this.version(5).stores({
+      exercises: '++id, name, muscleGroup, isCustom',
+      workouts: '++id, date, templateId',
+      workoutExercises: '++id, workoutId, exerciseId',
+      sets: '++id, workoutExerciseId',
+      workoutTemplates: '++id, name',
+      templateExercises: '++id, templateId, exerciseId',
+      plannedSessions: '++id, date, templateId',
+      settings: 'id',
+      bodyMeasurements: '++id, date',
+      progressPhotos: '++id, date',
     })
   }
 }

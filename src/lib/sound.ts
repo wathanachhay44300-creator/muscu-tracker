@@ -34,3 +34,28 @@ export function playRecordChime(): void {
     osc.stop(start + 0.25)
   }
 }
+
+/**
+ * Three short identical beeps for the rest timer running out — distinct from
+ * the two-note record chime so the two are never confused by ear.
+ */
+export function playTimerDoneChime(): void {
+  const ctx = getAudioContext()
+  if (!ctx) return
+  if (ctx.state === 'suspended') void ctx.resume()
+
+  const now = ctx.currentTime
+  for (let i = 0; i < 3; i++) {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'square'
+    osc.frequency.value = 1046.5 // C6
+    const start = now + i * 0.18
+    gain.gain.setValueAtTime(0, start)
+    gain.gain.linearRampToValueAtTime(0.12, start + 0.01)
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.14)
+    osc.connect(gain).connect(ctx.destination)
+    osc.start(start)
+    osc.stop(start + 0.16)
+  }
+}

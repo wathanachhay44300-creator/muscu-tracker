@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
-import { addExerciseToWorkout, finishWorkout, updateWorkoutRpe } from '../lib/workoutActions'
+import { addExerciseToWorkout, finishWorkout, updateWorkoutNotes, updateWorkoutRpe } from '../lib/workoutActions'
 import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
+import { RestTimerWidget } from './RestTimerWidget'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
 import type { Exercise } from '../types'
@@ -20,11 +21,30 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const navigate = useNavigate()
 
+  const [notes, setNotes] = useState('')
+  const notesLoadedFor = useRef<number | null>(null)
+  const notesTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  useEffect(() => {
+    if (!detail) return
+    if (notesLoadedFor.current === workoutId) return
+    notesLoadedFor.current = workoutId
+    setNotes(detail.workout.notes ?? '')
+  }, [detail, workoutId])
+
+  useEffect(() => () => clearTimeout(notesTimeout.current), [])
+
   if (!detail) return null
   const { workout, exercises } = detail
 
   const setCount = exercises.reduce((sum, we) => sum + we.sets.length, 0)
   const sessionVolume = totalVolume(exercises.flatMap((we) => we.sets))
+
+  function handleNotesChange(value: string) {
+    setNotes(value)
+    clearTimeout(notesTimeout.current)
+    notesTimeout.current = setTimeout(() => updateWorkoutNotes(workoutId, value), 400)
+  }
 
   async function handleSelectExercise(exercise: Exercise) {
     await addExerciseToWorkout(workoutId, exercise.id!)
@@ -107,6 +127,17 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         </div>
       )}
 
+      <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
+        <p className="mb-2 text-sm font-semibold text-slate-700">Notes de séance</p>
+        <textarea
+          value={notes}
+          onChange={(e) => handleNotesChange(e.target.value)}
+          placeholder="Fatigue, sommeil, douleurs, contexte…"
+          rows={3}
+          className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-brand-400"
+        />
+      </div>
+
       {pickerOpen && (
         <ExercisePickerSheet
           excludeIds={exercises.map((e) => e.exerciseId)}
@@ -125,6 +156,8 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
           {workout.finishedAt ? 'Voir le bilan' : 'Terminer la séance'}
         </button>
       )}
+
+      <RestTimerWidget />
     </div>
   )
 }

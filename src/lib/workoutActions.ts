@@ -65,6 +65,11 @@ export async function updateWorkoutRpe(workoutId: number, rpe: number | null): P
   await db.workouts.update(workoutId, { rpe })
 }
 
+/** Sets the free-text note for a session (fatigue, sommeil, douleurs, contexte…). */
+export async function updateWorkoutNotes(workoutId: number, notes: string): Promise<void> {
+  await db.workouts.update(workoutId, { notes: notes.trim() ? notes : undefined })
+}
+
 /**
  * Marks a session as done — purely a UX signal to close out the "in
  * progress" state and unlock the duration in its summary. Data is already

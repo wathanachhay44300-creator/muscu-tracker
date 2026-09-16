@@ -122,3 +122,27 @@ export interface AppPreferences {
   /** Short chime played when a personal record is revealed on the session summary. */
   soundEnabled: boolean
 }
+
+/** One day's body-weight/measurements entry. All fields optional so the user
+ * can log just their weight some days and full measurements other days. */
+export interface BodyMeasurement {
+  id?: number
+  /** ISO date, format yyyy-mm-dd. One entry per date (upserted). */
+  date: string
+  weight?: number
+  chest?: number
+  waist?: number
+  hips?: number
+  arms?: number
+  thighs?: number
+  createdAt: number
+}
+
+/** A locally-stored progress photo, organized by the date it was taken. */
+export interface ProgressPhoto {
+  id?: number
+  /** ISO date, format yyyy-mm-dd. */
+  date: string
+  blob: Blob
+  createdAt: number
+}

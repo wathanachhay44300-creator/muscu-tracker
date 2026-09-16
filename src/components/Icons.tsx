@@ -193,3 +193,81 @@ export function SpeakerOffIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function ScaleIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 2.5" />
+      <path d="M9.5 3.5h5" />
+    </svg>
+  )
+}
+
+export function CameraIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 8.5a1.5 1.5 0 0 1 1.5-1.5h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  )
+}
+
+export function TimerIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="13.5" r="8" />
+      <path d="M12 13.5V9.5" />
+      <path d="M9.5 2.5h5" />
+      <path d="M18.5 6.5l1.2-1.2" />
+    </svg>
+  )
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 3.5v11" />
+      <path d="M7.5 10l4.5 4.5L16.5 10" />
+      <path d="M4.5 18.5h15" />
+    </svg>
+  )
+}
+
+export function UploadIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 18.5v-11" />
+      <path d="M7.5 12l4.5-4.5L16.5 12" />
+      <path d="M4.5 18.5h15" />
+    </svg>
+  )
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M7 4.5v15l13-7.5Z" />
+    </svg>
+  )
+}
+
+export function PauseIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <rect x="6" y="4.5" width="4.5" height="15" rx="1" />
+      <rect x="13.5" y="4.5" width="4.5" height="15" rx="1" />
+    </svg>
+  )
+}
+
+export function RefreshIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4.5 12a7.5 7.5 0 0 1 12.6-5.5l1.9 1.8" />
+      <path d="M19.5 12a7.5 7.5 0 0 1-12.6 5.5l-1.9-1.8" />
+      <path d="M19.5 4.5v4h-4" />
+      <path d="M4.5 19.5v-4h4" />
+    </svg>
+  )
+}

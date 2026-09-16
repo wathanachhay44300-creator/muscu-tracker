@@ -2,7 +2,14 @@ import { Link } from 'react-router-dom'
 import { useWorkoutHistory } from '../hooks/useHistory'
 import { formatDateFr, relativeDateLabel } from '../lib/date'
 import { formatVolume } from '../lib/stats'
-import { CalendarIcon, ChartIcon, ChevronRightIcon } from '../components/Icons'
+import {
+  CalendarIcon,
+  CameraIcon,
+  ChartIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  ScaleIcon,
+} from '../components/Icons'
 
 export function HistoriqueScreen() {
   const history = useWorkoutHistory()
@@ -11,16 +18,51 @@ export function HistoriqueScreen() {
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       <h1 className="mb-5 text-lg font-bold text-slate-900">Historique</h1>
 
-      <Link
-        to="/historique/semaine"
-        className="mb-4 flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
-      >
-        <div className="flex items-center gap-2.5">
-          <ChartIcon className="h-5 w-5 text-brand-500" />
-          <span className="font-medium text-slate-800">Répartition par muscle (semaine)</span>
-        </div>
-        <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
-      </Link>
+      <div className="mb-4 space-y-2.5">
+        <Link
+          to="/historique/semaine"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <ChartIcon className="h-5 w-5 text-brand-500" />
+            <span className="font-medium text-slate-800">Répartition par muscle (semaine)</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
+
+        <Link
+          to="/corps"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <ScaleIcon className="h-5 w-5 text-brand-500" />
+            <span className="font-medium text-slate-800">Poids &amp; mensurations</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
+
+        <Link
+          to="/photos"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <CameraIcon className="h-5 w-5 text-brand-500" />
+            <span className="font-medium text-slate-800">Photos de progression</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
+
+        <Link
+          to="/donnees"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <DownloadIcon className="h-5 w-5 text-brand-500" />
+            <span className="font-medium text-slate-800">Export / import des données</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
+      </div>
 
       {history && history.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-300 px-4 py-14 text-center">
