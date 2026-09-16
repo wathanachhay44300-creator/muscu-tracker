@@ -51,6 +51,18 @@ class MuscuDB extends Dexie {
       plannedSessions: '++id, date, templateId',
       settings: 'id',
     })
+    // v4: workouts remember which template they were started from, so the
+    // next quick-start from that program can pre-fill from it specifically.
+    this.version(4).stores({
+      exercises: '++id, name, muscleGroup, isCustom',
+      workouts: '++id, date, templateId',
+      workoutExercises: '++id, workoutId, exerciseId',
+      sets: '++id, workoutExerciseId',
+      workoutTemplates: '++id, name',
+      templateExercises: '++id, templateId, exerciseId',
+      plannedSessions: '++id, date, templateId',
+      settings: 'id',
+    })
   }
 }
 

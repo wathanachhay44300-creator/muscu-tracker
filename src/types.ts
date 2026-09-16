@@ -47,6 +47,9 @@ export interface Workout {
   notes?: string
   /** Overall perceived difficulty for the whole session, 1-10. */
   rpe?: number | null
+  /** Set when the session was started from a template — used to find the
+   * last time this same program was run, for pre-filling next time. */
+  templateId?: number
 }
 
 /** Links an exercise to a workout, preserving the order it was added in. */
