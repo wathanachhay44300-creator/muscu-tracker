@@ -50,6 +50,9 @@ export interface Workout {
   /** Set when the session was started from a template — used to find the
    * last time this same program was run, for pre-filling next time. */
   templateId?: number
+  /** Set when the user taps "Terminer la séance" — marks it done and, with
+   * `createdAt`, gives an approximate session duration for the summary. */
+  finishedAt?: number
 }
 
 /** Links an exercise to a workout, preserving the order it was added in. */

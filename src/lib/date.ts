@@ -65,3 +65,12 @@ export function relativeDateLabel(iso: string): string {
   if (iso === addDays(todayISO(), 1)) return 'Demain'
   return formatDateFr(iso)
 }
+
+/** Formats a duration in milliseconds as "42 min" or "1h05". */
+export function formatDuration(ms: number): string {
+  const totalMinutes = Math.round(Math.max(0, ms) / 60_000)
+  if (totalMinutes < 1) return '< 1 min'
+  const h = Math.floor(totalMinutes / 60)
+  const m = totalMinutes % 60
+  return h === 0 ? `${m} min` : `${h}h${String(m).padStart(2, '0')}`
+}

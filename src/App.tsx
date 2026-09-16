@@ -11,6 +11,7 @@ import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { ProgrammesScreen } from './screens/ProgrammesScreen'
 import { TemplateDetailScreen } from './screens/TemplateDetailScreen'
 import { WeeklyBreakdownScreen } from './screens/WeeklyBreakdownScreen'
+import { BilanScreen } from './screens/BilanScreen'
 import { DumbbellIcon } from './components/Icons'
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/exercices/:exerciseId" element={<ExerciseDetailScreen />} />
           <Route path="/programmes" element={<ProgrammesScreen />} />
           <Route path="/programmes/:templateId" element={<TemplateDetailScreen />} />
+          <Route path="/bilan/:workoutId" element={<BilanScreen />} />
         </Routes>
         <BottomNav />
       </div>

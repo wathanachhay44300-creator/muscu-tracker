@@ -1,11 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
-import { addExerciseToWorkout, updateWorkoutRpe } from '../lib/workoutActions'
+import { addExerciseToWorkout, finishWorkout, updateWorkoutRpe } from '../lib/workoutActions'
 import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
-import { PlusIcon } from './Icons'
+import { CheckIcon, PlusIcon } from './Icons'
 import type { Exercise } from '../types'
 
 interface WorkoutEditorProps {
@@ -17,6 +18,7 @@ const RPE_VALUES = Array.from({ length: 10 }, (_, i) => i + 1)
 export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   const detail = useWorkoutDetail(workoutId)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const navigate = useNavigate()
 
   if (!detail) return null
   const { workout, exercises } = detail
@@ -27,6 +29,11 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   async function handleSelectExercise(exercise: Exercise) {
     await addExerciseToWorkout(workoutId, exercise.id!)
     setPickerOpen(false)
+  }
+
+  async function handleFinish() {
+    if (!workout.finishedAt) await finishWorkout(workoutId)
+    navigate(`/bilan/${workoutId}`)
   }
 
   return (
@@ -106,6 +113,17 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
           onSelect={handleSelectExercise}
           onClose={() => setPickerOpen(false)}
         />
+      )}
+
+      {exercises.length > 0 && (
+        <button
+          type="button"
+          onClick={handleFinish}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 font-semibold text-white shadow-sm active:bg-emerald-700"
+        >
+          <CheckIcon className="h-5 w-5" />
+          {workout.finishedAt ? 'Voir le bilan' : 'Terminer la séance'}
+        </button>
       )}
     </div>
   )

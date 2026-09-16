@@ -65,6 +65,15 @@ export async function updateWorkoutRpe(workoutId: number, rpe: number | null): P
   await db.workouts.update(workoutId, { rpe })
 }
 
+/**
+ * Marks a session as done — purely a UX signal to close out the "in
+ * progress" state and unlock the duration in its summary. Data is already
+ * saved continuously as the user edits it, with or without this being called.
+ */
+export async function finishWorkout(workoutId: number): Promise<void> {
+  await db.workouts.update(workoutId, { finishedAt: Date.now() })
+}
+
 /** Deletes an entire workout and all its exercises/sets. */
 export async function deleteWorkout(workoutId: number): Promise<void> {
   await db.transaction('rw', db.workouts, db.workoutExercises, db.sets, async () => {
