@@ -173,3 +173,23 @@ export function MoonIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function SpeakerOnIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 9.5v5h4l5 4v-13l-5 4Z" />
+      <path d="M16.5 9a4.5 4.5 0 0 1 0 6" />
+      <path d="M19 6.5a8.5 8.5 0 0 1 0 11" />
+    </svg>
+  )
+}
+
+export function SpeakerOffIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 9.5v5h4l5 4v-13l-5 4Z" />
+      <path d="M15.5 10.5l4 4" />
+      <path d="M19.5 10.5l-4 4" />
+    </svg>
+  )
+}

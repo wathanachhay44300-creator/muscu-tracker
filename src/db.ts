@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie'
 import type {
+  AppPreferences,
   Exercise,
   PlannedSession,
   PlateCalculatorSettings,
@@ -19,7 +20,9 @@ class MuscuDB extends Dexie {
   workoutTemplates!: Table<WorkoutTemplate, number>
   templateExercises!: Table<TemplateExercise, number>
   plannedSessions!: Table<PlannedSession, number>
-  settings!: Table<PlateCalculatorSettings, string>
+  // A single keyed store shared by every singleton settings row (plate
+  // calculator preferences, app preferences, …), distinguished by `id`.
+  settings!: Table<PlateCalculatorSettings | AppPreferences, string>
 
   constructor() {
     super('muscu-tracker')

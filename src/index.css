@@ -231,3 +231,35 @@ a:active {
 .animate-slide-up {
   animation: slide-up-fade 200ms ease-out;
 }
+
+/* ---- Session-summary reward effects ----
+ * Confetti pieces and the PR glow below are purely decorative, so they're
+ * skipped outright (not just sped up) under reduced motion — see
+ * Confetti.tsx, which renders nothing in that case. */
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--confetti-drift, 0), 70vh) rotate(var(--confetti-rotate, 180deg));
+  }
+}
+.confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 1.5px;
+  opacity: 0;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  animation-fill-mode: forwards;
+}
+
+/* Static (non-animated) glow — a persistent filter costs nothing extra per
+ * frame, unlike animating it, so it's safe to leave on for the PR row. */
+.pr-star-glow {
+  filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.85));
+}

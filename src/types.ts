@@ -115,3 +115,10 @@ export interface PlateCalculatorSettings {
   barWeight: number
   plates: PlateOption[]
 }
+
+/** Singleton settings row for app-wide preferences (id is always fixed). */
+export interface AppPreferences {
+  id: 'appPreferences'
+  /** Short chime played when a personal record is revealed on the session summary. */
+  soundEnabled: boolean
+}

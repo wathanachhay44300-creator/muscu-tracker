@@ -1,5 +1,5 @@
 import { db } from '../db'
-import type { PlateCalculatorSettings } from '../types'
+import type { AppPreferences, PlateCalculatorSettings } from '../types'
 
 export const DEFAULT_BAR_WEIGHT = 20
 export const DEFAULT_PLATE_WEIGHTS = [20, 10, 5, 2.5, 1.25]
@@ -16,7 +16,7 @@ function defaultSettings(): PlateCalculatorSettings {
 
 export async function getPlateSettings(): Promise<PlateCalculatorSettings> {
   const existing = await db.settings.get(SETTINGS_ID)
-  return existing ?? defaultSettings()
+  return (existing as PlateCalculatorSettings | undefined) ?? defaultSettings()
 }
 
 export async function updateBarWeight(barWeight: number): Promise<void> {
@@ -28,4 +28,22 @@ export async function togglePlate(weight: number, enabled: boolean): Promise<voi
   const current = await getPlateSettings()
   const plates = current.plates.map((p) => (p.weight === weight ? { ...p, enabled } : p))
   await db.settings.put({ ...current, plates })
+}
+
+const PREFERENCES_ID = 'appPreferences' as const
+
+function defaultPreferences(): AppPreferences {
+  // Off by default: the app is often used in a gym, where an unexpected
+  // chime is more awkward than welcome — sound is opt-in.
+  return { id: PREFERENCES_ID, soundEnabled: false }
+}
+
+export async function getPreferences(): Promise<AppPreferences> {
+  const existing = await db.settings.get(PREFERENCES_ID)
+  return (existing as AppPreferences | undefined) ?? defaultPreferences()
+}
+
+export async function setSoundEnabled(soundEnabled: boolean): Promise<void> {
+  const current = await getPreferences()
+  await db.settings.put({ ...current, soundEnabled })
 }
