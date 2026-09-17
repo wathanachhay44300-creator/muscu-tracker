@@ -232,6 +232,37 @@ a:active {
   animation: slide-up-fade 200ms ease-out;
 }
 
+/* ---- Page-swipe transitions ----
+ * Used when changing day/month by swipe or arrow, so the new content
+ * visibly slides in from the side it logically came from. */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 220ms ease-out;
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-in-left {
+  animation: slide-in-left 220ms ease-out;
+}
+
 /* ---- Session-summary reward effects ----
  * Confetti pieces and the PR glow below are purely decorative, so they're
  * skipped outright (not just sped up) under reduced motion — see

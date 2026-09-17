@@ -24,6 +24,13 @@ export async function addExerciseToWorkout(
   return db.workoutExercises.add({ workoutId, exerciseId, order })
 }
 
+/** Persists a new exercise order for a workout, from a drag-and-drop reorder. */
+export async function reorderWorkoutExercises(workoutExerciseIds: number[]): Promise<void> {
+  await db.transaction('rw', db.workoutExercises, async () => {
+    await Promise.all(workoutExerciseIds.map((id, index) => db.workoutExercises.update(id, { order: index })))
+  })
+}
+
 /** Removes an exercise block (and its sets) from a workout. */
 export async function removeExerciseFromWorkout(workoutExerciseId: number): Promise<void> {
   await db.transaction('rw', db.workoutExercises, db.sets, async () => {

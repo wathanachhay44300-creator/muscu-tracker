@@ -1,21 +1,25 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTemplateDetail } from '../hooks/useTemplates'
+import { useOptimisticOrder } from '../hooks/useOptimisticOrder'
+import { useDragReorder } from '../hooks/useDragReorder'
 import {
   addExerciseToTemplate,
   countTemplateUsage,
   deleteTemplate,
   removeExerciseFromTemplate,
   renameTemplate,
+  reorderTemplateExercises,
   updateTargetSets,
 } from '../lib/templateActions'
 import { schedulePlannedSession, startWorkoutFromTemplate } from '../lib/planningActions'
 import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
 import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
-import { ChevronLeftIcon, PlusIcon, TrashIcon } from '../components/Icons'
+import { ChevronLeftIcon, GripIcon, PlusIcon, TrashIcon } from '../components/Icons'
 import { todayISO } from '../lib/date'
 import type { Exercise } from '../types'
+import type { TemplateExerciseWithDetails } from '../hooks/useTemplates'
 
 export function TemplateDetailScreen() {
   const { templateId } = useParams()
@@ -28,6 +32,17 @@ export function TemplateDetailScreen() {
   const [starting, setStarting] = useState(false)
   const [deleting, setDeleting] = useState<{ usageCount: number } | null>(null)
 
+  const exercises = detail?.exercises ?? []
+  const exerciseIds = exercises.map((te) => te.id!)
+  const [orderIds, setOrderIds] = useOptimisticOrder(exerciseIds)
+  const byId = new Map(exercises.map((te) => [te.id!, te]))
+  const orderedExercises = orderIds.map((eid) => byId.get(eid)).filter((te): te is TemplateExerciseWithDetails => !!te)
+
+  const dragReorder = useDragReorder(orderIds, (newOrder) => {
+    setOrderIds(newOrder)
+    reorderTemplateExercises(newOrder)
+  })
+
   if (!detail) {
     return (
       <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
@@ -36,7 +51,7 @@ export function TemplateDetailScreen() {
     )
   }
 
-  const { template, exercises } = detail
+  const { template } = detail
 
   async function handleSelectExercise(exercise: Exercise) {
     await addExerciseToTemplate(id!, exercise.id!)
@@ -88,14 +103,30 @@ export function TemplateDetailScreen() {
         </div>
       ) : (
         <div className="mb-4 space-y-2">
-          {exercises.map((te) => (
+          {orderedExercises.map((te) => {
+            const row = dragReorder.getRowProps(te.id!)
+            return (
             <div
               key={te.id}
-              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-surface px-4 py-3"
+              ref={row.containerProps.ref}
+              style={row.containerProps.style}
+              className={`flex items-center justify-between gap-2 rounded-xl border bg-surface px-4 py-3 ${
+                row.isDragging ? 'border-brand-300 shadow-lg' : 'border-slate-200'
+              }`}
             >
-              <div className="min-w-0">
-                <p className="truncate font-medium text-slate-900">{te.exercise.name}</p>
-                <p className="text-xs text-slate-400">{te.exercise.muscleGroup}</p>
+              <div className="flex min-w-0 items-center gap-1.5">
+                <button
+                  type="button"
+                  aria-label="Glisser pour réordonner"
+                  className="-ml-1 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-slate-300 active:cursor-grabbing active:text-slate-500"
+                  {...row.handleProps}
+                >
+                  <GripIcon className="h-5 w-5" />
+                </button>
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-slate-900">{te.exercise.name}</p>
+                  <p className="text-xs text-slate-400">{te.exercise.muscleGroup}</p>
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <div className="flex items-center overflow-hidden rounded-lg bg-slate-100">
@@ -129,7 +160,8 @@ export function TemplateDetailScreen() {
                 </button>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

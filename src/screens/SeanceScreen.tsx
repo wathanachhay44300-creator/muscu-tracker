@@ -6,6 +6,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { useWorkoutIdForDate } from '../hooks/useWorkout'
 import { usePlannedSessionForDate } from '../hooks/usePlannedSessions'
 import { useTemplates } from '../hooks/useTemplates'
+import { useSwipeNav, getSlideClass, type SwipeDirection } from '../hooks/useSwipeNav'
 import { getOrCreateWorkout } from '../lib/workoutActions'
 import { startWorkoutFromTemplate } from '../lib/planningActions'
 import { addDays, formatDateFr, relativeDateLabel, todayISO } from '../lib/date'
@@ -14,10 +15,21 @@ import { StartSessionPicker } from '../components/StartSessionPicker'
 export function SeanceScreen() {
   const { date: dateParam } = useParams()
   const [date, setDate] = useState(dateParam || todayISO())
+  const [enterDir, setEnterDir] = useState<SwipeDirection>(null)
   const workoutId = useWorkoutIdForDate(date)
   const planned = usePlannedSessionForDate(date)
   const templates = useTemplates()
   const [starting, setStarting] = useState(false)
+
+  function changeDate(newDate: string, dir: SwipeDirection) {
+    setEnterDir(dir)
+    setDate(newDate)
+  }
+
+  const swipe = useSwipeNav({
+    onSwipeLeft: () => changeDate(addDays(date, 1), 'left'),
+    onSwipeRight: () => changeDate(addDays(date, -1), 'right'),
+  })
 
   async function handleStart() {
     setStarting(true)
@@ -39,7 +51,7 @@ export function SeanceScreen() {
       <div className="mb-5 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => setDate((d) => addDays(d, -1))}
+          onClick={() => changeDate(addDays(date, -1), 'right')}
           className="rounded-full p-2 text-slate-400 active:bg-slate-100"
           aria-label="Jour précédent"
         >
@@ -55,7 +67,7 @@ export function SeanceScreen() {
 
         <button
           type="button"
-          onClick={() => setDate((d) => addDays(d, 1))}
+          onClick={() => changeDate(addDays(date, 1), 'left')}
           className="rounded-full p-2 text-slate-400 active:bg-slate-100"
           aria-label="Jour suivant"
         >
@@ -63,17 +75,21 @@ export function SeanceScreen() {
         </button>
       </div>
 
-      {workoutId ? (
-        <WorkoutEditor workoutId={workoutId} />
-      ) : (
-        <StartSessionPicker
-          templates={templates}
-          plannedTemplateId={planned?.session.templateId}
-          starting={starting}
-          onStartFromTemplate={handleStartFromTemplate}
-          onStartFree={handleStart}
-        />
-      )}
+      <div {...swipe.handlers} style={swipe.style} className="touch-pan-y">
+        <div key={date} className={getSlideClass(enterDir, swipe.reducedMotion)}>
+          {workoutId ? (
+            <WorkoutEditor workoutId={workoutId} />
+          ) : (
+            <StartSessionPicker
+              templates={templates}
+              plannedTemplateId={planned?.session.templateId}
+              starting={starting}
+              onStartFromTemplate={handleStartFromTemplate}
+              onStartFree={handleStart}
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
 }

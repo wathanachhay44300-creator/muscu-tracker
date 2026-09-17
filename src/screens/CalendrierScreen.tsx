@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkoutCalendarDates } from '../hooks/useWorkoutCalendar'
 import { computeWeeklyStreak } from '../lib/calendarActions'
+import { useSwipeNav, getSlideClass, type SwipeDirection } from '../hooks/useSwipeNav'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { addMonths, daysInMonth, formatMonthFr, isToday, monthStartOf, todayISO } from '../lib/date'
 
@@ -10,7 +11,18 @@ const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 export function CalendrierScreen() {
   const navigate = useNavigate()
   const [monthStart, setMonthStart] = useState(() => monthStartOf(todayISO()))
+  const [enterDir, setEnterDir] = useState<SwipeDirection>(null)
   const workouts = useWorkoutCalendarDates()
+
+  function changeMonth(delta: 1 | -1) {
+    setEnterDir(delta > 0 ? 'left' : 'right')
+    setMonthStart((v) => addMonths(v, delta))
+  }
+
+  const swipe = useSwipeNav({
+    onSwipeLeft: () => changeMonth(1),
+    onSwipeRight: () => changeMonth(-1),
+  })
 
   const workoutByDate = useMemo(() => {
     const map = new Map<string, number>()
@@ -50,7 +62,7 @@ export function CalendrierScreen() {
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => setMonthStart((v) => addMonths(v, -1))}
+          onClick={() => changeMonth(-1)}
           className="rounded-full p-2 text-slate-400 active:bg-slate-100"
           aria-label="Mois précédent"
         >
@@ -59,7 +71,7 @@ export function CalendrierScreen() {
         <p className="text-sm font-semibold capitalize text-slate-800">{formatMonthFr(monthStart)}</p>
         <button
           type="button"
-          onClick={() => setMonthStart((v) => addMonths(v, 1))}
+          onClick={() => changeMonth(1)}
           className="rounded-full p-2 text-slate-400 active:bg-slate-100"
           aria-label="Mois suivant"
         >
@@ -81,39 +93,41 @@ export function CalendrierScreen() {
         )}
       </div>
 
-      <div key={monthStart} className="animate-fade-in">
-        <div className="mb-1.5 grid grid-cols-7 text-center text-xs font-medium text-slate-400">
-          {WEEKDAY_LABELS.map((d) => (
-            <div key={d}>{d}</div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-y-1">
-          {cells.map((date, i) => {
-            if (!date) return <div key={i} className="aspect-square" />
-            const workoutId = workoutByDate.get(date)
-            const today = isToday(date)
-            const day = Number(date.slice(-2))
-            return (
-              <button
-                key={date}
-                type="button"
-                disabled={!workoutId}
-                onClick={() => workoutId && navigate(`/historique/${workoutId}`)}
-                className="flex aspect-square items-center justify-center"
-                aria-label={workoutId ? `${day} — séance enregistrée, voir le détail` : String(day)}
-              >
-                <span
-                  className={`flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors ${
-                    workoutId
-                      ? 'bg-brand-600 font-semibold text-white active:bg-brand-700'
-                      : 'font-medium text-slate-600'
-                  } ${today ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-surface' : ''}`}
+      <div {...swipe.handlers} style={swipe.style} className="touch-pan-y">
+        <div key={monthStart} className={getSlideClass(enterDir, swipe.reducedMotion)}>
+          <div className="mb-1.5 grid grid-cols-7 text-center text-xs font-medium text-slate-400">
+            {WEEKDAY_LABELS.map((d) => (
+              <div key={d}>{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-y-1">
+            {cells.map((date, i) => {
+              if (!date) return <div key={i} className="aspect-square" />
+              const workoutId = workoutByDate.get(date)
+              const today = isToday(date)
+              const day = Number(date.slice(-2))
+              return (
+                <button
+                  key={date}
+                  type="button"
+                  disabled={!workoutId}
+                  onClick={() => workoutId && navigate(`/historique/${workoutId}`)}
+                  className="flex aspect-square items-center justify-center"
+                  aria-label={workoutId ? `${day} — séance enregistrée, voir le détail` : String(day)}
                 >
-                  {day}
-                </span>
-              </button>
-            )
-          })}
+                  <span
+                    className={`flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors ${
+                      workoutId
+                        ? 'bg-brand-600 font-semibold text-white active:bg-brand-700'
+                        : 'font-medium text-slate-600'
+                    } ${today ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-surface' : ''}`}
+                  >
+                    {day}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type { WorkoutExerciseWithSets } from '../types'
 import { usePersonalRecords } from '../hooks/usePersonalRecords'
@@ -6,14 +7,31 @@ import { addSet, removeExerciseFromWorkout, removeSet, updateSet } from '../lib/
 import { formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats'
 import { relativeDateLabel } from '../lib/date'
 import { SetRow } from './SetRow'
-import { PlusIcon, TrashIcon } from './Icons'
+import { GripIcon, PlusIcon, TrashIcon } from './Icons'
 
 interface WorkoutExerciseCardProps {
   we: WorkoutExerciseWithSets
   workoutId: number
+  containerRef?: (el: HTMLElement | null) => void
+  containerStyle?: CSSProperties
+  isDragging?: boolean
+  dragHandleProps?: {
+    style: CSSProperties
+    onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void
+    onPointerMove: (e: ReactPointerEvent<HTMLElement>) => void
+    onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void
+    onPointerCancel: (e: ReactPointerEvent<HTMLElement>) => void
+  }
 }
 
-export function WorkoutExerciseCard({ we, workoutId }: WorkoutExerciseCardProps) {
+export function WorkoutExerciseCard({
+  we,
+  workoutId,
+  containerRef,
+  containerStyle,
+  isDragging,
+  dragHandleProps,
+}: WorkoutExerciseCardProps) {
   const records = usePersonalRecords(we.exerciseId)
   const lastTime = useLastPerformance(we.exerciseId, workoutId)
   const volume = totalVolume(we.sets)
@@ -28,16 +46,34 @@ export function WorkoutExerciseCard({ we, workoutId }: WorkoutExerciseCardProps)
   }
 
   return (
-    <div className="animate-fade-in rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
+    <div
+      ref={containerRef}
+      style={containerStyle}
+      className={`animate-fade-in rounded-2xl border bg-surface p-4 ${
+        isDragging ? 'border-brand-300 shadow-lg' : 'border-slate-200 shadow-sm'
+      }`}
+    >
       <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
-          <Link
-            to={`/exercices/${we.exercise.id}`}
-            className="text-base font-semibold text-slate-900 active:opacity-60"
-          >
-            {we.exercise.name}
-          </Link>
-          <p className="text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
+        <div className="flex min-w-0 items-start gap-1.5">
+          {dragHandleProps && (
+            <button
+              type="button"
+              aria-label="Glisser pour réordonner"
+              className="-ml-1.5 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-slate-300 active:cursor-grabbing active:text-slate-500"
+              {...dragHandleProps}
+            >
+              <GripIcon className="h-5 w-5" />
+            </button>
+          )}
+          <div className="min-w-0">
+            <Link
+              to={`/exercices/${we.exercise.id}`}
+              className="text-base font-semibold text-slate-900 active:opacity-60"
+            >
+              {we.exercise.name}
+            </Link>
+            <p className="text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
+          </div>
         </div>
         <button
           type="button"

@@ -47,6 +47,13 @@ export async function removeExerciseFromTemplate(templateExerciseId: number): Pr
   await db.templateExercises.delete(templateExerciseId)
 }
 
+/** Persists a new exercise order for a template, from a drag-and-drop reorder. */
+export async function reorderTemplateExercises(templateExerciseIds: number[]): Promise<void> {
+  await db.transaction('rw', db.templateExercises, async () => {
+    await Promise.all(templateExerciseIds.map((id, index) => db.templateExercises.update(id, { order: index })))
+  })
+}
+
 export async function updateTargetSets(templateExerciseId: number, targetSets: number): Promise<void> {
   await db.templateExercises.update(templateExerciseId, { targetSets: Math.max(1, targetSets) })
 }

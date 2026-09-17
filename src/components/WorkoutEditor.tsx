@@ -1,14 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
-import { addExerciseToWorkout, finishWorkout, updateWorkoutNotes, updateWorkoutRpe } from '../lib/workoutActions'
+import { useOptimisticOrder } from '../hooks/useOptimisticOrder'
+import { useDragReorder } from '../hooks/useDragReorder'
+import {
+  addExerciseToWorkout,
+  finishWorkout,
+  reorderWorkoutExercises,
+  updateWorkoutNotes,
+  updateWorkoutRpe,
+} from '../lib/workoutActions'
 import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { RestTimerWidget } from './RestTimerWidget'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
-import type { Exercise } from '../types'
+import type { Exercise, WorkoutExerciseWithSets } from '../types'
 
 interface WorkoutEditorProps {
   workoutId: number
@@ -34,8 +42,19 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
   useEffect(() => () => clearTimeout(notesTimeout.current), [])
 
+  const exercises = detail?.exercises ?? []
+  const exerciseIds = exercises.map((we) => we.id!)
+  const [orderIds, setOrderIds] = useOptimisticOrder(exerciseIds)
+  const byId = new Map(exercises.map((we) => [we.id!, we]))
+  const orderedExercises = orderIds.map((id) => byId.get(id)).filter((we): we is WorkoutExerciseWithSets => !!we)
+
+  const dragReorder = useDragReorder(orderIds, (newOrder) => {
+    setOrderIds(newOrder)
+    reorderWorkoutExercises(newOrder)
+  })
+
   if (!detail) return null
-  const { workout, exercises } = detail
+  const { workout } = detail
 
   const setCount = exercises.reduce((sum, we) => sum + we.sets.length, 0)
   const sessionVolume = totalVolume(exercises.flatMap((we) => we.sets))
@@ -81,9 +100,20 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         />
       )}
 
-      {exercises.map((we) => (
-        <WorkoutExerciseCard key={we.id} we={we} workoutId={workoutId} />
-      ))}
+      {orderedExercises.map((we) => {
+        const row = dragReorder.getRowProps(we.id!)
+        return (
+          <WorkoutExerciseCard
+            key={we.id}
+            we={we}
+            workoutId={workoutId}
+            containerRef={row.containerProps.ref}
+            containerStyle={row.containerProps.style}
+            isDragging={row.isDragging}
+            dragHandleProps={row.handleProps}
+          />
+        )
+      })}
 
       <button
         type="button"
