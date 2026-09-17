@@ -20,6 +20,17 @@ export function HistoriqueScreen() {
 
       <div className="mb-4 space-y-2.5">
         <Link
+          to="/historique/calendrier"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <CalendarIcon className="h-5 w-5 text-brand-500" />
+            <span className="font-medium text-slate-800">Calendrier</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
+
+        <Link
           to="/historique/semaine"
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >

@@ -11,6 +11,7 @@ import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { ProgrammesScreen } from './screens/ProgrammesScreen'
 import { TemplateDetailScreen } from './screens/TemplateDetailScreen'
 import { WeeklyBreakdownScreen } from './screens/WeeklyBreakdownScreen'
+import { CalendrierScreen } from './screens/CalendrierScreen'
 import { BilanScreen } from './screens/BilanScreen'
 import { CorpsScreen } from './screens/CorpsScreen'
 import { PhotosScreen } from './screens/PhotosScreen'
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/jour/:date" element={<SeanceScreen />} />
           <Route path="/historique" element={<HistoriqueScreen />} />
           <Route path="/historique/semaine" element={<WeeklyBreakdownScreen />} />
+          <Route path="/historique/calendrier" element={<CalendrierScreen />} />
           <Route path="/historique/:workoutId" element={<HistoriqueDetailScreen />} />
           <Route path="/exercices" element={<ExercicesScreen />} />
           <Route path="/exercices/:exerciseId" element={<ExerciseDetailScreen />} />

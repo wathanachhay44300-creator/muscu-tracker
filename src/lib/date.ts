@@ -24,6 +24,20 @@ const MONTHS_FR = [
   'nov',
   'déc',
 ]
+const MONTHS_FULL_FR = [
+  'janvier',
+  'février',
+  'mars',
+  'avril',
+  'mai',
+  'juin',
+  'juillet',
+  'août',
+  'septembre',
+  'octobre',
+  'novembre',
+  'décembre',
+]
 
 /** Formats an ISO yyyy-mm-dd date as "lun 14 sep 2026". */
 export function formatDateFr(iso: string, opts: { withYear?: boolean } = {}): string {
@@ -56,6 +70,32 @@ export function mondayOf(iso: string): string {
 
 export function isToday(iso: string): boolean {
   return iso === todayISO()
+}
+
+/** Adds (or subtracts) whole months, clamping the day if the target month is shorter. */
+export function addMonths(iso: string, delta: number): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const date = new Date(y, m - 1 + delta, 1)
+  const daysInTarget = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  date.setDate(Math.min(d, daysInTarget))
+  return dateToISO(date)
+}
+
+/** The first day (yyyy-mm-01) of the ISO month containing this date. */
+export function monthStartOf(iso: string): string {
+  return `${iso.slice(0, 7)}-01`
+}
+
+/** Number of days in the ISO month containing this date. */
+export function daysInMonth(iso: string): number {
+  const [y, m] = iso.split('-').map(Number)
+  return new Date(y, m, 0).getDate()
+}
+
+/** Formats an ISO date as its French month/year, e.g. "septembre 2026". */
+export function formatMonthFr(iso: string): string {
+  const [y, m] = iso.split('-').map(Number)
+  return `${MONTHS_FULL_FR[m - 1]} ${y}`
 }
 
 /** Human label: "Aujourd'hui", "Hier", "Demain", or the formatted date. */
