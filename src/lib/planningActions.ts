@@ -94,3 +94,32 @@ export async function startWorkoutFromTemplate(date: string, templateId: number)
   await db.plannedSessions.where('date').equals(date).delete()
   return workoutId
 }
+
+/**
+ * Quick-starts a session by copying another past session wholesale (every
+ * exercise, with the exact weights/reps it used) — for a one-off session
+ * you don't want to turn into a permanent program.
+ */
+export async function startWorkoutFromPreviousSession(date: string, sourceWorkoutId: number): Promise<number> {
+  const workoutId = await getOrCreateWorkout(date)
+  const links = await db.workoutExercises.where('workoutId').equals(sourceWorkoutId).sortBy('order')
+
+  for (const link of links) {
+    const alreadyPresent = await db.workoutExercises
+      .where('workoutId')
+      .equals(workoutId)
+      .and((we) => we.exerciseId === link.exerciseId)
+      .first()
+    if (alreadyPresent) continue
+
+    const newLinkId = await addExerciseToWorkout(workoutId, link.exerciseId)
+    const sets = await db.sets.where('workoutExerciseId').equals(link.id!).sortBy('order')
+    await Promise.all(
+      sets.map((s, i) =>
+        db.sets.add({ workoutExerciseId: newLinkId, weight: s.weight, reps: s.reps, order: i, createdAt: Date.now() }),
+      ),
+    )
+  }
+
+  return workoutId
+}

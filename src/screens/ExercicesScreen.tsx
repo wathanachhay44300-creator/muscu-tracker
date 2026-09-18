@@ -5,6 +5,8 @@ import { db } from '../db'
 import type { Exercise, MuscleGroup } from '../types'
 import { CreateExerciseForm, EditExerciseForm } from '../components/ExercisePickerSheet'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { countExerciseUsage, softDeleteExercise } from '../lib/exerciseActions'
 import {
   ChevronRightIcon,
@@ -20,6 +22,7 @@ export function ExercicesScreen() {
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Exercise | null>(null)
   const [deleting, setDeleting] = useState<{ exercise: Exercise; usageCount: number } | null>(null)
+  const pullToRefresh = usePullToRefresh()
 
   const exercises =
     useLiveQuery(() => db.exercises.orderBy('name').filter((e) => !e.deletedAt).toArray(), []) ?? []
@@ -50,7 +53,14 @@ export function ExercicesScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
+    <div
+      className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in"
+      onPointerDown={pullToRefresh.handlers.onPointerDown}
+      onPointerMove={pullToRefresh.handlers.onPointerMove}
+      onPointerUp={pullToRefresh.handlers.onPointerUp}
+      onPointerCancel={pullToRefresh.handlers.onPointerCancel}
+    >
+      <PullToRefreshIndicator pullY={pullToRefresh.pullY} refreshing={pullToRefresh.refreshing} />
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-slate-900">Exercices</h1>
         <button

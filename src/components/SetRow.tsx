@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LoadType, SetEntry } from '../types'
-import { DumbbellIcon, StarIcon, TrashIcon } from './Icons'
+import { useLongPress } from '../hooks/useLongPress'
+import { useSwipeToDelete } from '../hooks/useSwipeToDelete'
+import { usePreferences } from '../hooks/usePreferences'
+import { hapticMenuOpen } from '../lib/haptics'
+import { DumbbellIcon, StarIcon, TrashIcon, CopyIcon } from './Icons'
 import { PlateCalculatorSheet } from './PlateCalculatorSheet'
+import { ContextMenuSheet } from './ContextMenuSheet'
 
 /** The plate calculator only makes sense for these — the rest have no plates to pick. */
 const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
@@ -15,9 +20,10 @@ interface SetRowProps {
   onChangeWeight: (weight: number) => void
   onChangeReps: (reps: number) => void
   onRemove: () => void
+  onDuplicate: () => void
 }
 
-export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeReps, onRemove }: SetRowProps) {
+export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeReps, onRemove, onDuplicate }: SetRowProps) {
   // Local state is the source of truth while this row is being edited. It's
   // only re-synced from props when a *different* set is mounted into this row
   // (new set.id) — not on every set.weight/reps change — otherwise rapid
@@ -28,6 +34,8 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
   const [weightText, setWeightText] = useState(trimZero(set.weight))
   const [repsText, setRepsText] = useState(String(set.reps))
   const [calculatorOpen, setCalculatorOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const preferences = usePreferences()
 
   // Brief scale "pop" on the number when a stepper button changes it —
   // transform-only, so it stays cheap and GPU-composited.
@@ -35,6 +43,12 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
   const [repsPulse, setRepsPulse] = useState(false)
   const weightPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const repsPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const longPress = useLongPress(() => {
+    hapticMenuOpen(!!preferences?.hapticsEnabled)
+    setMenuOpen(true)
+  })
+  const swipe = useSwipeToDelete(onRemove)
 
   useEffect(() => {
     setWeight(set.weight)
@@ -97,105 +111,163 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
   }
 
   return (
-    <div className="animate-fade-in flex flex-wrap items-center gap-1">
-      <span
-        className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-          isPR ? 'bg-amber-100 text-amber-500' : 'text-slate-400'
-        }`}
-        title={isPR ? 'Nouveau record personnel' : undefined}
+    <div className="relative overflow-hidden rounded-xl">
+      <div
+        className="absolute inset-0 flex items-center justify-end bg-red-500 pr-4 transition-opacity"
+        style={{ opacity: swipe.revealProgress }}
+        aria-hidden="true"
       >
-        {isPR ? <StarIcon className="animate-pop-in h-3.5 w-3.5" /> : index + 1}
-      </span>
+        <TrashIcon className="h-5 w-5 text-white" />
+      </div>
 
-      <div className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-        <button
-          type="button"
-          onClick={() => stepWeight(-2.5)}
-          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
-          aria-label="Moins 2.5 kg"
-        >
-          −
-        </button>
-        <input
-          value={weightText}
-          onChange={(e) => setWeightText(e.target.value)}
-          onFocus={(e) => e.target.select()}
-          onBlur={(e) => commitWeight(e.target.value)}
-          inputMode="decimal"
-          className={`w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
-            weightPulse ? 'scale-110' : 'scale-100'
+      <div
+        data-swipe-to-delete
+        className="animate-fade-in relative flex flex-wrap items-center gap-1 rounded-xl bg-surface"
+        style={swipe.style}
+        onPointerDown={(e) => {
+          // Stop here so the exercise card's own long-press (for its context
+          // menu) never also sees this gesture — whichever level the press
+          // actually started at should be the only one reacting to it.
+          e.stopPropagation()
+          longPress.onPointerDown(e)
+          swipe.handlers.onPointerDown(e)
+        }}
+        onPointerMove={(e) => {
+          longPress.onPointerMove(e)
+          swipe.handlers.onPointerMove(e)
+        }}
+        onPointerUp={(e) => {
+          longPress.onPointerUp(e)
+          swipe.handlers.onPointerUp(e)
+        }}
+        onPointerCancel={(e) => {
+          longPress.onPointerCancel(e)
+          swipe.handlers.onPointerCancel(e)
+        }}
+        onClickCapture={longPress.onClickCapture}
+      >
+        <span
+          className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+            isPR ? 'bg-amber-100 text-amber-500' : 'text-slate-400'
           }`}
-          aria-label="Poids en kg"
-        />
+          title={isPR ? 'Nouveau record personnel' : undefined}
+        >
+          {isPR ? <StarIcon className="animate-pop-in h-3.5 w-3.5" /> : index + 1}
+        </span>
+
+        <div
+          data-no-long-press
+          data-no-swipe
+          className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+        >
+          <button
+            type="button"
+            onClick={() => stepWeight(-2.5)}
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            aria-label="Moins 2.5 kg"
+          >
+            −
+          </button>
+          <input
+            value={weightText}
+            onChange={(e) => setWeightText(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            onBlur={(e) => commitWeight(e.target.value)}
+            inputMode="decimal"
+            className={`w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
+              weightPulse ? 'scale-110' : 'scale-100'
+            }`}
+            aria-label="Poids en kg"
+          />
+          <button
+            type="button"
+            onClick={() => stepWeight(2.5)}
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            aria-label="Plus 2.5 kg"
+          >
+            +
+          </button>
+        </div>
+        {PLATE_CALC_LOAD_TYPES.includes(loadType) ? (
+          <button
+            type="button"
+            data-no-long-press
+            data-no-swipe
+            onClick={() => setCalculatorOpen(true)}
+            className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-brand-600"
+            aria-label="Calculateur de plaques"
+            title="Calculateur de plaques"
+          >
+            <DumbbellIcon className="h-2.5 w-2.5" />
+            kg
+          </button>
+        ) : (
+          <span className="shrink-0 text-[10px] font-medium text-slate-400">kg</span>
+        )}
+
+        <div
+          data-no-long-press
+          data-no-swipe
+          className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+        >
+          <button
+            type="button"
+            onClick={() => stepReps(-1)}
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            aria-label="Moins une répétition"
+          >
+            −
+          </button>
+          <input
+            value={repsText}
+            onChange={(e) => setRepsText(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            onBlur={(e) => commitReps(e.target.value)}
+            inputMode="numeric"
+            className={`w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
+              repsPulse ? 'scale-110' : 'scale-100'
+            }`}
+            aria-label="Répétitions"
+          />
+          <button
+            type="button"
+            onClick={() => stepReps(1)}
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            aria-label="Plus une répétition"
+          >
+            +
+          </button>
+        </div>
+        <span className="shrink-0 text-[10px] font-medium text-slate-400">reps</span>
+
         <button
           type="button"
-          onClick={() => stepWeight(2.5)}
-          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
-          aria-label="Plus 2.5 kg"
+          data-no-long-press
+          data-no-swipe
+          onClick={onRemove}
+          className="shrink-0 p-1 text-slate-300 active:text-red-500"
+          aria-label="Supprimer la série"
         >
-          +
+          <TrashIcon className="h-4 w-4" />
         </button>
       </div>
-      {PLATE_CALC_LOAD_TYPES.includes(loadType) ? (
-        <button
-          type="button"
-          onClick={() => setCalculatorOpen(true)}
-          className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-brand-600"
-          aria-label="Calculateur de plaques"
-          title="Calculateur de plaques"
-        >
-          <DumbbellIcon className="h-2.5 w-2.5" />
-          kg
-        </button>
-      ) : (
-        <span className="shrink-0 text-[10px] font-medium text-slate-400">kg</span>
-      )}
-
-      <div className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-        <button
-          type="button"
-          onClick={() => stepReps(-1)}
-          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
-          aria-label="Moins une répétition"
-        >
-          −
-        </button>
-        <input
-          value={repsText}
-          onChange={(e) => setRepsText(e.target.value)}
-          onFocus={(e) => e.target.select()}
-          onBlur={(e) => commitReps(e.target.value)}
-          inputMode="numeric"
-          className={`w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
-            repsPulse ? 'scale-110' : 'scale-100'
-          }`}
-          aria-label="Répétitions"
-        />
-        <button
-          type="button"
-          onClick={() => stepReps(1)}
-          className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
-          aria-label="Plus une répétition"
-        >
-          +
-        </button>
-      </div>
-      <span className="shrink-0 text-[10px] font-medium text-slate-400">reps</span>
-
-      <button
-        type="button"
-        onClick={onRemove}
-        className="shrink-0 p-1 text-slate-300 active:text-red-500"
-        aria-label="Supprimer la série"
-      >
-        <TrashIcon className="h-4 w-4" />
-      </button>
 
       {calculatorOpen && PLATE_CALC_LOAD_TYPES.includes(loadType) && (
         <PlateCalculatorSheet
           initialWeight={weight}
           loadType={loadType}
           onClose={() => setCalculatorOpen(false)}
+        />
+      )}
+
+      {menuOpen && (
+        <ContextMenuSheet
+          title={`Série ${index + 1}`}
+          actions={[
+            { label: 'Dupliquer la série', icon: CopyIcon, onSelect: onDuplicate },
+            { label: 'Supprimer la série', icon: TrashIcon, onSelect: onRemove, danger: true },
+          ]}
+          onClose={() => setMenuOpen(false)}
         />
       )}
     </div>

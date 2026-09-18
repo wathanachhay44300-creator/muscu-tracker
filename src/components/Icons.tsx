@@ -285,3 +285,46 @@ export function GripIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function CopyIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="8.5" y="8.5" width="12" height="12" rx="2" />
+      <path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3" />
+    </svg>
+  )
+}
+
+export function ShareIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="18" cy="5.5" r="2.5" />
+      <circle cx="6" cy="12" r="2.5" />
+      <circle cx="18" cy="18.5" r="2.5" />
+      <path d="M8.2 10.7l7.6-3.9" />
+      <path d="M8.2 13.3l7.6 3.9" />
+    </svg>
+  )
+}
+
+export function ArrowUturnLeftIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M8 8.5 4 12l4 3.5" />
+      <path d="M4 12h11a4.5 4.5 0 0 1 0 9h-2" />
+    </svg>
+  )
+}
+
+export function VibrationIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="8" y="4" width="8" height="16" rx="2" />
+      <path d="M8.5 17.5h7" />
+      <path d="M3.5 9v6" />
+      <path d="M1 10.5v3" />
+      <path d="M20.5 9v6" />
+      <path d="M23 10.5v3" />
+    </svg>
+  )
+}

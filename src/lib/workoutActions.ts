@@ -1,4 +1,5 @@
 import { db } from '../db'
+import type { SetEntry } from '../types'
 
 /** Gets today's/this date's workout id, creating it lazily if it doesn't exist yet. */
 export async function getOrCreateWorkout(date: string): Promise<number> {
@@ -39,8 +40,32 @@ export async function removeExerciseFromWorkout(workoutExerciseId: number): Prom
   })
 }
 
-/** Adds a new set, prefilled from the previous last set of that exercise block (fast re-entry). */
-export async function addSet(workoutExerciseId: number): Promise<number> {
+/** Duplicates an exercise block within the same workout, sets included, as a new block at the end. */
+export async function duplicateExerciseInWorkout(workoutExerciseId: number): Promise<number> {
+  const original = await db.workoutExercises.get(workoutExerciseId)
+  if (!original) throw new Error('Exercice introuvable')
+  const sets = await db.sets.where('workoutExerciseId').equals(workoutExerciseId).sortBy('order')
+  const links = await db.workoutExercises.where('workoutId').equals(original.workoutId).toArray()
+  const order = links.length ? Math.max(...links.map((l) => l.order)) + 1 : 0
+  const newLinkId = await db.workoutExercises.add({
+    workoutId: original.workoutId,
+    exerciseId: original.exerciseId,
+    order,
+  })
+  await Promise.all(
+    sets.map((s, i) =>
+      db.sets.add({ workoutExerciseId: newLinkId, weight: s.weight, reps: s.reps, order: i, createdAt: Date.now() }),
+    ),
+  )
+  return newLinkId
+}
+
+/** Adds a new set, prefilled from the previous last set of that exercise block (fast re-entry),
+ * or from `override` when given (e.g. accepting a progression suggestion). */
+export async function addSet(
+  workoutExerciseId: number,
+  override?: { weight: number; reps: number },
+): Promise<number> {
   const existing = await db.sets
     .where('workoutExerciseId')
     .equals(workoutExerciseId)
@@ -49,11 +74,27 @@ export async function addSet(workoutExerciseId: number): Promise<number> {
   const order = last ? last.order + 1 : 0
   return db.sets.add({
     workoutExerciseId,
-    weight: last?.weight ?? 0,
-    reps: last?.reps ?? 0,
+    weight: override?.weight ?? last?.weight ?? 0,
+    reps: override?.reps ?? last?.reps ?? 0,
     order,
     createdAt: Date.now(),
   })
+}
+
+/** Duplicates a set, inserting the copy right after the original. */
+export async function duplicateSet(setId: number): Promise<number> {
+  const original = await db.sets.get(setId)
+  if (!original) throw new Error('Série introuvable')
+  const newSetId = await db.sets.add({
+    workoutExerciseId: original.workoutExerciseId,
+    weight: original.weight,
+    reps: original.reps,
+    order: original.order + 0.5,
+    createdAt: Date.now(),
+  })
+  const siblings = await db.sets.where('workoutExerciseId').equals(original.workoutExerciseId).sortBy('order')
+  await Promise.all(siblings.map((s, i) => db.sets.update(s.id!, { order: i })))
+  return newSetId
 }
 
 export async function updateSet(
@@ -65,6 +106,12 @@ export async function updateSet(
 
 export async function removeSet(setId: number): Promise<void> {
   await db.sets.delete(setId)
+}
+
+/** Re-adds a set previously removed (used by the "Annuler" snackbar action). */
+export async function restoreSet(set: SetEntry): Promise<number> {
+  const { id: _id, ...rest } = set
+  return db.sets.add(rest)
 }
 
 /** Sets (or clears, with `null`) the overall perceived-difficulty rating for a session. */

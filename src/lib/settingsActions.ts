@@ -34,16 +34,23 @@ const PREFERENCES_ID = 'appPreferences' as const
 
 function defaultPreferences(): AppPreferences {
   // Off by default: the app is often used in a gym, where an unexpected
-  // chime is more awkward than welcome — sound is opt-in.
-  return { id: PREFERENCES_ID, soundEnabled: false }
+  // chime (or buzz) is more awkward than welcome — both are opt-in.
+  return { id: PREFERENCES_ID, soundEnabled: false, hapticsEnabled: false }
 }
 
 export async function getPreferences(): Promise<AppPreferences> {
   const existing = await db.settings.get(PREFERENCES_ID)
-  return (existing as AppPreferences | undefined) ?? defaultPreferences()
+  // Merged with defaults so a preferences row saved before a new field
+  // existed (e.g. hapticsEnabled) doesn't come back `undefined` for it.
+  return { ...defaultPreferences(), ...(existing as AppPreferences | undefined) }
 }
 
 export async function setSoundEnabled(soundEnabled: boolean): Promise<void> {
   const current = await getPreferences()
   await db.settings.put({ ...current, soundEnabled })
+}
+
+export async function setHapticsEnabled(hapticsEnabled: boolean): Promise<void> {
+  const current = await getPreferences()
+  await db.settings.put({ ...current, hapticsEnabled })
 }

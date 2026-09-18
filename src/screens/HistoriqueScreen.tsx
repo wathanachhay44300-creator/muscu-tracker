@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useWorkoutHistory } from '../hooks/useHistory'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { formatDateFr, relativeDateLabel } from '../lib/date'
 import { formatVolume } from '../lib/stats'
 import {
@@ -13,9 +15,17 @@ import {
 
 export function HistoriqueScreen() {
   const history = useWorkoutHistory()
+  const pullToRefresh = usePullToRefresh()
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
+    <div
+      className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in"
+      onPointerDown={pullToRefresh.handlers.onPointerDown}
+      onPointerMove={pullToRefresh.handlers.onPointerMove}
+      onPointerUp={pullToRefresh.handlers.onPointerUp}
+      onPointerCancel={pullToRefresh.handlers.onPointerCancel}
+    >
+      <PullToRefreshIndicator pullY={pullToRefresh.pullY} refreshing={pullToRefresh.refreshing} />
       <h1 className="mb-5 text-lg font-bold text-slate-900">Historique</h1>
 
       <div className="mb-4 space-y-2.5">

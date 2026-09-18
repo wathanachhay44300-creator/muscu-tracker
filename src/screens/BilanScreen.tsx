@@ -1,16 +1,27 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '../db'
 import { useWorkoutDetail } from '../hooks/useWorkout'
 import { useWorkoutComparison } from '../hooks/useWorkoutComparison'
 import { usePreferences } from '../hooks/usePreferences'
 import { useCountUp } from '../hooks/useCountUp'
 import { ExerciseComparisonCard } from '../components/ExerciseComparisonCard'
 import { Confetti } from '../components/Confetti'
-import { ClipboardIcon, SpeakerOffIcon, SpeakerOnIcon, StarIcon } from '../components/Icons'
+import {
+  ClipboardIcon,
+  ShareIcon,
+  SpeakerOffIcon,
+  SpeakerOnIcon,
+  StarIcon,
+  VibrationIcon,
+} from '../components/Icons'
 import { formatVolume, totalVolume } from '../lib/stats'
 import { formatDateFr, formatDuration } from '../lib/date'
-import { setSoundEnabled } from '../lib/settingsActions'
+import { setHapticsEnabled, setSoundEnabled } from '../lib/settingsActions'
 import { playRecordChime } from '../lib/sound'
+import { hapticSuccess } from '../lib/haptics'
+import { generateBilanImage, shareOrDownloadImage } from '../lib/shareImage'
 
 export function BilanScreen() {
   const { workoutId } = useParams()
@@ -18,7 +29,12 @@ export function BilanScreen() {
   const detail = useWorkoutDetail(id)
   const comparison = useWorkoutComparison(id)
   const preferences = usePreferences()
+  const template = useLiveQuery(
+    () => (detail?.workout.templateId ? db.workoutTemplates.get(detail.workout.templateId) : undefined),
+    [detail?.workout.templateId],
+  )
   const navigate = useNavigate()
+  const [sharing, setSharing] = useState(false)
 
   const hasPR = !!comparison && comparison.prExerciseNames.length > 0
   const chimePlayed = useRef(false)
@@ -27,6 +43,7 @@ export function BilanScreen() {
     if (chimePlayed.current) return
     if (!hasPR || !preferences) return
     if (preferences.soundEnabled) playRecordChime()
+    if (preferences.hapticsEnabled) hapticSuccess(true)
     chimePlayed.current = true
   }, [hasPR, preferences])
 
@@ -41,26 +58,71 @@ export function BilanScreen() {
   const { workout, exercises } = detail
   const setCount = exercises.reduce((sum, we) => sum + we.sets.length, 0)
   const volume = totalVolume(exercises.flatMap((we) => we.sets))
-  const durationMs = workout.finishedAt ? workout.finishedAt - workout.createdAt : null
+  const setTimestamps = exercises.flatMap((we) => we.sets.map((s) => s.createdAt))
+  const firstSetAt = setTimestamps.length ? Math.min(...setTimestamps) : null
+  const durationMs = workout.finishedAt && firstSetAt != null ? workout.finishedAt - firstSetAt : null
+
+  async function handleShare() {
+    setSharing(true)
+    try {
+      const blob = await generateBilanImage({
+        programName: template?.name ?? 'Séance libre',
+        date: formatDateFr(workout.date),
+        exerciseCount: exercises.length,
+        setCount,
+        volumeLabel: volume > 0 ? `${formatVolume(volume)} kg` : '—',
+        durationLabel: durationMs != null ? formatDuration(durationMs) : '—',
+        prNames: comparison?.prExerciseNames ?? [],
+      })
+      await shareOrDownloadImage(blob, `bilan-${workout.date}.png`, 'Mon bilan de séance')
+    } catch {
+      // Share can be cancelled by the user (AbortError) or unsupported — either way, nothing to recover from here.
+    } finally {
+      setSharing(false)
+    }
+  }
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       {hasPR && <Confetti />}
 
       <div className="relative mb-5 text-center">
-        <button
-          type="button"
-          onClick={() => setSoundEnabled(!preferences?.soundEnabled)}
-          className="absolute right-0 top-0 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 active:bg-slate-200"
-          aria-label={preferences?.soundEnabled ? 'Désactiver le son' : 'Activer le son'}
-          title={preferences?.soundEnabled ? 'Son activé' : 'Son désactivé'}
-        >
-          {preferences?.soundEnabled ? (
-            <SpeakerOnIcon className="h-4 w-4" />
-          ) : (
-            <SpeakerOffIcon className="h-4 w-4" />
-          )}
-        </button>
+        <div className="absolute right-0 top-0 flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={handleShare}
+            disabled={sharing}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 active:bg-slate-200 disabled:opacity-50"
+            aria-label="Partager le bilan"
+            title="Partager"
+          >
+            <ShareIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setHapticsEnabled(!preferences?.hapticsEnabled)}
+            className={`flex h-9 w-9 items-center justify-center rounded-full ${
+              preferences?.hapticsEnabled ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-500'
+            } active:bg-slate-200`}
+            aria-label={preferences?.hapticsEnabled ? 'Désactiver les vibrations' : 'Activer les vibrations'}
+            title={preferences?.hapticsEnabled ? 'Vibrations activées' : 'Vibrations désactivées'}
+          >
+            <VibrationIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSoundEnabled(!preferences?.soundEnabled)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 active:bg-slate-200"
+            aria-label={preferences?.soundEnabled ? 'Désactiver le son' : 'Activer le son'}
+            title={preferences?.soundEnabled ? 'Son activé' : 'Son désactivé'}
+          >
+            {preferences?.soundEnabled ? (
+              <SpeakerOnIcon className="h-4 w-4" />
+            ) : (
+              <SpeakerOffIcon className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         <ClipboardIcon className="mx-auto mb-2 h-9 w-9 text-brand-500" />
         <h1 className="text-lg font-bold text-slate-900">Bilan de la séance</h1>
         <p className="text-sm text-slate-400">{formatDateFr(workout.date)}</p>

@@ -15,6 +15,25 @@ export async function countTemplateUsage(templateId: number): Promise<number> {
   return db.plannedSessions.where('templateId').equals(templateId).count()
 }
 
+/** Duplicates a template and its exercise list, as a new independent program. */
+export async function duplicateTemplate(id: number): Promise<number> {
+  const source = await db.workoutTemplates.get(id)
+  if (!source) throw new Error('Programme introuvable')
+  const exercises = await db.templateExercises.where('templateId').equals(id).sortBy('order')
+  const newId = await db.workoutTemplates.add({ name: `${source.name} (copie)`, createdAt: Date.now() })
+  await Promise.all(
+    exercises.map((te) =>
+      db.templateExercises.add({
+        templateId: newId,
+        exerciseId: te.exerciseId,
+        order: te.order,
+        targetSets: te.targetSets,
+      }),
+    ),
+  )
+  return newId
+}
+
 /** Deletes a template, its exercise list, and any planned session using it. */
 export async function deleteTemplate(id: number): Promise<void> {
   await db.transaction(

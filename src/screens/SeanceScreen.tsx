@@ -2,13 +2,16 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { WorkoutEditor } from '../components/WorkoutEditor'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { DuplicateSessionSheet } from '../components/DuplicateSessionSheet'
+import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { useWorkoutIdForDate } from '../hooks/useWorkout'
 import { usePlannedSessionForDate } from '../hooks/usePlannedSessions'
 import { useTemplates } from '../hooks/useTemplates'
 import { useSwipeNav, getSlideClass, type SwipeDirection } from '../hooks/useSwipeNav'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { getOrCreateWorkout } from '../lib/workoutActions'
-import { startWorkoutFromTemplate } from '../lib/planningActions'
+import { startWorkoutFromPreviousSession, startWorkoutFromTemplate } from '../lib/planningActions'
 import { addDays, formatDateFr, relativeDateLabel, todayISO } from '../lib/date'
 import { StartSessionPicker } from '../components/StartSessionPicker'
 
@@ -20,6 +23,8 @@ export function SeanceScreen() {
   const planned = usePlannedSessionForDate(date)
   const templates = useTemplates()
   const [starting, setStarting] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
+  const pullToRefresh = usePullToRefresh()
 
   function changeDate(newDate: string, dir: SwipeDirection) {
     setEnterDir(dir)
@@ -43,8 +48,22 @@ export function SeanceScreen() {
     setStarting(false)
   }
 
+  async function handleDuplicatePrevious(sourceWorkoutId: number) {
+    setDuplicating(false)
+    setStarting(true)
+    await startWorkoutFromPreviousSession(date, sourceWorkoutId)
+    setStarting(false)
+  }
+
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
+    <div
+      className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in"
+      onPointerDown={pullToRefresh.handlers.onPointerDown}
+      onPointerMove={pullToRefresh.handlers.onPointerMove}
+      onPointerUp={pullToRefresh.handlers.onPointerUp}
+      onPointerCancel={pullToRefresh.handlers.onPointerCancel}
+    >
+      <PullToRefreshIndicator pullY={pullToRefresh.pullY} refreshing={pullToRefresh.refreshing} />
       <div className="mb-2 flex justify-end">
         <ThemeToggle />
       </div>
@@ -86,10 +105,15 @@ export function SeanceScreen() {
               starting={starting}
               onStartFromTemplate={handleStartFromTemplate}
               onStartFree={handleStart}
+              onDuplicatePrevious={() => setDuplicating(true)}
             />
           )}
         </div>
       </div>
+
+      {duplicating && (
+        <DuplicateSessionSheet onSelect={handleDuplicatePrevious} onClose={() => setDuplicating(false)} />
+      )}
     </div>
   )
 }

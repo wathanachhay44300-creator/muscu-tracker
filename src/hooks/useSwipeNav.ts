@@ -41,7 +41,7 @@ export function useSwipeNav({ onSwipeLeft, onSwipeRight, disabled }: SwipeNavOpt
 
   function onPointerDown(e: ReactPointerEvent<HTMLElement>) {
     if (disabled || !e.isPrimary) return
-    if ((e.target as HTMLElement).closest('[data-drag-handle]')) return
+    if ((e.target as HTMLElement).closest('[data-drag-handle],[data-swipe-to-delete]')) return
     startRef.current = { x: e.clientX, y: e.clientY }
     axisRef.current = null
   }

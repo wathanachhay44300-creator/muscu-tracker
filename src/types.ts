@@ -121,6 +121,8 @@ export interface AppPreferences {
   id: 'appPreferences'
   /** Short chime played when a personal record is revealed on the session summary. */
   soundEnabled: boolean
+  /** Light vibrations on set-added / long-press menu / PR, where supported. */
+  hapticsEnabled: boolean
 }
 
 /** One day's body-weight/measurements entry. All fields optional so the user

@@ -1,11 +1,32 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useTemplates } from '../hooks/useTemplates'
+import { useTemplates, type TemplateSummary } from '../hooks/useTemplates'
 import { usePlannedDates, useUpcomingPlannedSessions } from '../hooks/usePlannedSessions'
-import { createTemplate } from '../lib/templateActions'
+import {
+  countTemplateUsage,
+  createTemplate,
+  deleteTemplate,
+  duplicateTemplate,
+  renameTemplate,
+} from '../lib/templateActions'
 import { unschedulePlannedSession } from '../lib/planningActions'
 import { PlanningCalendar } from '../components/PlanningCalendar'
-import { ChevronRightIcon, ClipboardIcon, PlusIcon, TrashIcon, XIcon } from '../components/Icons'
+import { ContextMenuSheet } from '../components/ContextMenuSheet'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
+import { useLongPress } from '../hooks/useLongPress'
+import { usePreferences } from '../hooks/usePreferences'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { hapticMenuOpen } from '../lib/haptics'
+import {
+  ChevronRightIcon,
+  ClipboardIcon,
+  CopyIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+  XIcon,
+} from '../components/Icons'
 import { relativeDateLabel } from '../lib/date'
 
 const NAME_SUGGESTIONS = ['Push', 'Pull', 'Legs', 'Full Body', 'Haut du corps', 'Bas du corps']
@@ -16,6 +37,7 @@ export function ProgrammesScreen() {
   const upcoming = useUpcomingPlannedSessions()
   const [creating, setCreating] = useState(false)
   const navigate = useNavigate()
+  const pullToRefresh = usePullToRefresh()
 
   async function handleCreate(name: string) {
     const id = await createTemplate(name)
@@ -24,7 +46,14 @@ export function ProgrammesScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
+    <div
+      className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in"
+      onPointerDown={pullToRefresh.handlers.onPointerDown}
+      onPointerMove={pullToRefresh.handlers.onPointerMove}
+      onPointerUp={pullToRefresh.handlers.onPointerUp}
+      onPointerCancel={pullToRefresh.handlers.onPointerCancel}
+    >
+      <PullToRefreshIndicator pullY={pullToRefresh.pullY} refreshing={pullToRefresh.refreshing} />
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-slate-900">Programmes</h1>
         <button
@@ -47,20 +76,8 @@ export function ProgrammesScreen() {
         </div>
       ) : (
         <div className="mb-6 space-y-2.5">
-          {templates?.map(({ template, exerciseCount }) => (
-            <Link
-              key={template.id}
-              to={`/programmes/${template.id}`}
-              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
-            >
-              <div>
-                <p className="font-semibold text-slate-900">{template.name}</p>
-                <p className="text-xs text-slate-400">
-                  {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
-                </p>
-              </div>
-              <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
-            </Link>
+          {templates?.map((summary) => (
+            <TemplateListItem key={summary.template.id} summary={summary} />
           ))}
         </div>
       )}
@@ -98,6 +115,137 @@ export function ProgrammesScreen() {
       {creating && (
         <CreateTemplateSheet onCreate={handleCreate} onCancel={() => setCreating(false)} />
       )}
+    </div>
+  )
+}
+
+function TemplateListItem({ summary }: { summary: TemplateSummary }) {
+  const { template, exerciseCount } = summary
+  const preferences = usePreferences()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [renaming, setRenaming] = useState(false)
+  const [deleting, setDeleting] = useState<{ usageCount: number } | null>(null)
+
+  const longPress = useLongPress(() => {
+    hapticMenuOpen(!!preferences?.hapticsEnabled)
+    setMenuOpen(true)
+  })
+
+  async function handleDeleteClick() {
+    const usageCount = await countTemplateUsage(template.id!)
+    setDeleting({ usageCount })
+  }
+
+  return (
+    <>
+      <Link
+        to={`/programmes/${template.id}`}
+        className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        onPointerDown={longPress.onPointerDown}
+        onPointerMove={longPress.onPointerMove}
+        onPointerUp={longPress.onPointerUp}
+        onPointerCancel={longPress.onPointerCancel}
+        onClickCapture={longPress.onClickCapture}
+      >
+        <div>
+          <p className="font-semibold text-slate-900">{template.name}</p>
+          <p className="text-xs text-slate-400">
+            {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
+          </p>
+        </div>
+        <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
+      </Link>
+
+      {menuOpen && (
+        <ContextMenuSheet
+          title={template.name}
+          actions={[
+            { label: 'Renommer', icon: PencilIcon, onSelect: () => setRenaming(true) },
+            { label: 'Dupliquer', icon: CopyIcon, onSelect: () => duplicateTemplate(template.id!) },
+            { label: 'Supprimer', icon: TrashIcon, onSelect: handleDeleteClick, danger: true },
+          ]}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
+
+      {renaming && (
+        <RenameSheet
+          initialName={template.name}
+          onRename={(name) => {
+            renameTemplate(template.id!, name)
+            setRenaming(false)
+          }}
+          onCancel={() => setRenaming(false)}
+        />
+      )}
+
+      {deleting && (
+        <ConfirmDialog
+          title={`Supprimer « ${template.name} » ?`}
+          message={
+            deleting.usageCount > 0
+              ? `Ce programme a ${deleting.usageCount} séance${deleting.usageCount > 1 ? 's' : ''} planifiée${deleting.usageCount > 1 ? 's' : ''} à venir : elle${deleting.usageCount > 1 ? 's seront' : ' sera'} annulée${deleting.usageCount > 1 ? 's' : ''}. Vos séances déjà réalisées ne sont pas concernées.`
+              : 'Cette action est définitive.'
+          }
+          confirmLabel="Supprimer"
+          danger
+          onConfirm={() => {
+            deleteTemplate(template.id!)
+            setDeleting(null)
+          }}
+          onCancel={() => setDeleting(null)}
+        />
+      )}
+    </>
+  )
+}
+
+function RenameSheet({
+  initialName,
+  onRename,
+  onCancel,
+}: {
+  initialName: string
+  onRename: (name: string) => void
+  onCancel: () => void
+}) {
+  const [name, setName] = useState(initialName)
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
+      onClick={onCancel}
+    >
+      <div
+        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="mb-3 text-base font-semibold text-slate-900">Renommer le programme</h2>
+        <input
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onFocus={(e) => e.target.select()}
+          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base outline-none focus:border-brand-400"
+        />
+        <div className="mt-5 flex gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 rounded-xl bg-slate-100 py-3 font-medium text-slate-600 active:bg-slate-200"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            onClick={() => name.trim() && onRename(name.trim())}
+            disabled={!name.trim()}
+            className="flex-1 rounded-xl bg-brand-600 py-3 font-medium text-white disabled:opacity-40 active:bg-brand-700"
+          >
+            Renommer
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

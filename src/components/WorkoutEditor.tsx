@@ -14,6 +14,7 @@ import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { RestTimerWidget } from './RestTimerWidget'
+import { SessionTimer } from './SessionTimer'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
 import type { Exercise, WorkoutExerciseWithSets } from '../types'
@@ -58,6 +59,8 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
   const setCount = exercises.reduce((sum, we) => sum + we.sets.length, 0)
   const sessionVolume = totalVolume(exercises.flatMap((we) => we.sets))
+  const setTimestamps = exercises.flatMap((we) => we.sets.map((s) => s.createdAt))
+  const firstSetAt = setTimestamps.length ? Math.min(...setTimestamps) : null
 
   function handleNotesChange(value: string) {
     setNotes(value)
@@ -77,6 +80,8 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
   return (
     <div className="space-y-4">
+      {firstSetAt != null && !workout.finishedAt && <SessionTimer startedAt={firstSetAt} />}
+
       {exercises.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-center">
           <p className="text-slate-500">Aucun exercice pour l'instant.</p>

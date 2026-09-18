@@ -1,4 +1,4 @@
-import { CheckIcon, DumbbellIcon } from './Icons'
+import { CheckIcon, CopyIcon, DumbbellIcon } from './Icons'
 import type { TemplateSummary } from '../hooks/useTemplates'
 
 interface StartSessionPickerProps {
@@ -7,6 +7,7 @@ interface StartSessionPickerProps {
   starting: boolean
   onStartFromTemplate: (templateId: number) => void
   onStartFree: () => void
+  onDuplicatePrevious: () => void
 }
 
 /**
@@ -20,6 +21,7 @@ export function StartSessionPicker({
   starting,
   onStartFromTemplate,
   onStartFree,
+  onDuplicatePrevious,
 }: StartSessionPickerProps) {
   const hasTemplates = templates && templates.length > 0
 
@@ -73,6 +75,16 @@ export function StartSessionPicker({
         }
       >
         Séance libre
+      </button>
+
+      <button
+        type="button"
+        onClick={onDuplicatePrevious}
+        disabled={starting}
+        className="flex w-full items-center justify-center gap-1.5 rounded-2xl bg-slate-100 px-6 py-3 font-medium text-slate-600 active:bg-slate-200 disabled:opacity-50"
+      >
+        <CopyIcon className="h-4 w-4" />
+        Dupliquer une séance précédente
       </button>
     </div>
   )

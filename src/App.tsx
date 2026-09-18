@@ -17,6 +17,7 @@ import { CorpsScreen } from './screens/CorpsScreen'
 import { PhotosScreen } from './screens/PhotosScreen'
 import { DonneesScreen } from './screens/DonneesScreen'
 import { DumbbellIcon } from './components/Icons'
+import { SnackbarProvider } from './contexts/SnackbarContext'
 
 export default function App() {
   const [ready, setReady] = useState(false)
@@ -37,25 +38,27 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-dvh bg-slate-50">
-        <Routes>
-          <Route path="/" element={<SeanceScreen />} />
-          <Route path="/jour/:date" element={<SeanceScreen />} />
-          <Route path="/historique" element={<HistoriqueScreen />} />
-          <Route path="/historique/semaine" element={<WeeklyBreakdownScreen />} />
-          <Route path="/historique/calendrier" element={<CalendrierScreen />} />
-          <Route path="/historique/:workoutId" element={<HistoriqueDetailScreen />} />
-          <Route path="/exercices" element={<ExercicesScreen />} />
-          <Route path="/exercices/:exerciseId" element={<ExerciseDetailScreen />} />
-          <Route path="/programmes" element={<ProgrammesScreen />} />
-          <Route path="/programmes/:templateId" element={<TemplateDetailScreen />} />
-          <Route path="/bilan/:workoutId" element={<BilanScreen />} />
-          <Route path="/corps" element={<CorpsScreen />} />
-          <Route path="/photos" element={<PhotosScreen />} />
-          <Route path="/donnees" element={<DonneesScreen />} />
-        </Routes>
-        <BottomNav />
-      </div>
+      <SnackbarProvider>
+        <div className="min-h-dvh bg-slate-50">
+          <Routes>
+            <Route path="/" element={<SeanceScreen />} />
+            <Route path="/jour/:date" element={<SeanceScreen />} />
+            <Route path="/historique" element={<HistoriqueScreen />} />
+            <Route path="/historique/semaine" element={<WeeklyBreakdownScreen />} />
+            <Route path="/historique/calendrier" element={<CalendrierScreen />} />
+            <Route path="/historique/:workoutId" element={<HistoriqueDetailScreen />} />
+            <Route path="/exercices" element={<ExercicesScreen />} />
+            <Route path="/exercices/:exerciseId" element={<ExerciseDetailScreen />} />
+            <Route path="/programmes" element={<ProgrammesScreen />} />
+            <Route path="/programmes/:templateId" element={<TemplateDetailScreen />} />
+            <Route path="/bilan/:workoutId" element={<BilanScreen />} />
+            <Route path="/corps" element={<CorpsScreen />} />
+            <Route path="/photos" element={<PhotosScreen />} />
+            <Route path="/donnees" element={<DonneesScreen />} />
+          </Routes>
+          <BottomNav />
+        </div>
+      </SnackbarProvider>
     </HashRouter>
   )
 }
