@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
+import { usePreferences } from '../hooks/usePreferences'
+import { hapticSuccess } from '../lib/haptics'
 import { useOptimisticOrder } from '../hooks/useOptimisticOrder'
 import { useDragReorder } from '../hooks/useDragReorder'
 import {
@@ -13,7 +15,6 @@ import {
 import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
-import { RestTimerWidget } from './RestTimerWidget'
 import { SessionTimer } from './SessionTimer'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
@@ -29,6 +30,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   const detail = useWorkoutDetail(workoutId)
   const [pickerOpen, setPickerOpen] = useState(false)
   const navigate = useNavigate()
+  const preferences = usePreferences()
 
   const [notes, setNotes] = useState('')
   const notesLoadedFor = useRef<number | null>(null)
@@ -75,6 +77,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
   async function handleFinish() {
     if (!workout.finishedAt) await finishWorkout(workoutId)
+    hapticSuccess(!!preferences?.hapticsEnabled)
     navigate(`/bilan/${workoutId}`)
   }
 
@@ -192,7 +195,6 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         </button>
       )}
 
-      <RestTimerWidget />
     </div>
   )
 }

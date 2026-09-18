@@ -8,12 +8,15 @@ export interface WorkoutSummary {
   exerciseCount: number
   setCount: number
   volume: number
+  /** Program the session was started from, or 'Séance libre'. */
+  title: string
 }
 
 /** All workouts, most recent first, with a light summary of each. */
 export function useWorkoutHistory(): WorkoutSummary[] | undefined {
   return useLiveQuery(async () => {
     const workouts = await db.workouts.orderBy('date').reverse().toArray()
+    workouts.sort((a, b) => (a.date === b.date ? b.createdAt - a.createdAt : 0))
     return Promise.all(
       workouts.map(async (workout) => {
         const links = await db.workoutExercises.where('workoutId').equals(workout.id!).toArray()
@@ -24,7 +27,9 @@ export function useWorkoutHistory(): WorkoutSummary[] | undefined {
           setCount += sets.length
           volume += totalVolume(sets)
         }
-        return { workout, exerciseCount: links.length, setCount, volume }
+        const template = workout.templateId ? await db.workoutTemplates.get(workout.templateId) : undefined
+        const title = template?.name ?? 'Séance libre'
+        return { title, workout, exerciseCount: links.length, setCount, volume }
       }),
     )
   }, [])

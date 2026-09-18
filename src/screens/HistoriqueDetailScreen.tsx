@@ -4,7 +4,9 @@ import { useWorkoutDetail } from '../hooks/useWorkout'
 import { deleteWorkout } from '../lib/workoutActions'
 import { WorkoutEditor } from '../components/WorkoutEditor'
 import { ChevronLeftIcon, TrashIcon } from '../components/Icons'
-import { formatDateFr, relativeDateLabel } from '../lib/date'
+import { formatDateLong } from '../lib/date'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '../db'
 
 export function HistoriqueDetailScreen() {
   const { workoutId } = useParams()
@@ -12,6 +14,10 @@ export function HistoriqueDetailScreen() {
   const detail = useWorkoutDetail(id)
   const navigate = useNavigate()
   const [confirming, setConfirming] = useState(false)
+  const template = useLiveQuery(
+    () => (detail?.workout.templateId ? db.workoutTemplates.get(detail.workout.templateId) : undefined),
+    [detail?.workout.templateId],
+  )
 
   if (!detail) {
     return (
@@ -39,9 +45,9 @@ export function HistoriqueDetailScreen() {
         </button>
         <div>
           <h1 className="text-lg font-bold text-slate-900">
-            {relativeDateLabel(detail.workout.date)}
+            {template?.name ?? 'Séance libre'}
           </h1>
-          <p className="text-xs text-slate-400">{formatDateFr(detail.workout.date)}</p>
+          <p className="text-sm font-medium text-slate-600">{formatDateLong(detail.workout.date)}</p>
         </div>
       </div>
 

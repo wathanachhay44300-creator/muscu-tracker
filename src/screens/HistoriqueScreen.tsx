@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useWorkoutHistory } from '../hooks/useHistory'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
-import { formatDateFr, relativeDateLabel } from '../lib/date'
+import { formatDateLong } from '../lib/date'
 import { formatVolume } from '../lib/stats'
 import {
   CalendarIcon,
@@ -11,6 +11,7 @@ import {
   ChevronRightIcon,
   DownloadIcon,
   ScaleIcon,
+  SettingsIcon,
 } from '../components/Icons'
 
 export function HistoriqueScreen() {
@@ -83,6 +84,17 @@ export function HistoriqueScreen() {
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
         </Link>
+
+        <Link
+          to="/reglages"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <SettingsIcon className="h-5 w-5 text-brand-500" />
+            <span className="font-medium text-slate-800">Réglages (vibrations, notifications)</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
       </div>
 
       {history && history.length === 0 && (
@@ -96,15 +108,15 @@ export function HistoriqueScreen() {
       )}
 
       <div className="space-y-2.5">
-        {history?.map(({ workout, exerciseCount, setCount, volume }) => (
+        {history?.map(({ workout, exerciseCount, setCount, volume, title }) => (
           <Link
             key={workout.id}
             to={`/historique/${workout.id}`}
             className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
           >
             <div>
-              <p className="font-semibold text-slate-900">{relativeDateLabel(workout.date)}</p>
-              <p className="text-xs text-slate-400">{formatDateFr(workout.date)}</p>
+              <p className="font-semibold text-slate-900">{title}</p>
+              <p className="text-sm font-medium text-slate-600">{formatDateLong(workout.date)}</p>
               <p className="mt-1 text-sm text-slate-500">
                 {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''} · {setCount} série
                 {setCount > 1 ? 's' : ''}

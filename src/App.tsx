@@ -17,6 +17,8 @@ import { CorpsScreen } from './screens/CorpsScreen'
 import { PhotosScreen } from './screens/PhotosScreen'
 import { DonneesScreen } from './screens/DonneesScreen'
 import { DumbbellIcon } from './components/Icons'
+import { RestTimerWidget } from './components/RestTimerWidget'
+import { ReglagesScreen } from './screens/ReglagesScreen'
 import { SnackbarProvider } from './contexts/SnackbarContext'
 
 export default function App() {
@@ -54,8 +56,10 @@ export default function App() {
             <Route path="/bilan/:workoutId" element={<BilanScreen />} />
             <Route path="/corps" element={<CorpsScreen />} />
             <Route path="/photos" element={<PhotosScreen />} />
+            <Route path="/reglages" element={<ReglagesScreen />} />
             <Route path="/donnees" element={<DonneesScreen />} />
           </Routes>
+          <RestTimerWidget />
           <BottomNav />
         </div>
       </SnackbarProvider>

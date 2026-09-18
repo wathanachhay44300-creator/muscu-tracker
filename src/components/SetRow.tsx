@@ -113,8 +113,8 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
   return (
     <div className="relative overflow-hidden rounded-xl">
       <div
-        className="absolute inset-0 flex items-center justify-end bg-red-500 pr-4 transition-opacity"
-        style={{ opacity: swipe.revealProgress }}
+        ref={swipe.revealRef}
+        className="absolute inset-0 flex items-center justify-end bg-red-500 pr-4 opacity-0"
         aria-hidden="true"
       >
         <TrashIcon className="h-5 w-5 text-white" />
@@ -122,8 +122,8 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
 
       <div
         data-swipe-to-delete
+        ref={swipe.contentRef}
         className="animate-fade-in relative flex flex-wrap items-center gap-1 rounded-xl bg-surface"
-        style={swipe.style}
         onPointerDown={(e) => {
           // Stop here so the exercise card's own long-press (for its context
           // menu) never also sees this gesture — whichever level the press

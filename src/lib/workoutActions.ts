@@ -1,9 +1,24 @@
 import { db } from '../db'
-import type { SetEntry } from '../types'
+import type { SetEntry, Workout, WorkoutExercise } from '../types'
+import { todayISO } from './date'
 
-/** Gets today's/this date's workout id, creating it lazily if it doesn't exist yet. */
+/**
+ * The workout to show/edit for a date: the most recent one. A session that
+ * was already finished *today* is treated as done — the Séance screen goes
+ * back to the start screen so a new session can begin (it stays reachable
+ * from the history). Past days keep showing their session as before.
+ */
+export async function getWorkoutForDate(date: string): Promise<Workout | undefined> {
+  const rows = await db.workouts.where('date').equals(date).sortBy('createdAt')
+  const latest = rows[rows.length - 1]
+  if (!latest) return undefined
+  if (latest.finishedAt && date === todayISO()) return undefined
+  return latest
+}
+
+/** Gets this date's current workout id, creating one if there's none (or today's last one is finished). */
 export async function getOrCreateWorkout(date: string): Promise<number> {
-  const existing = await db.workouts.where('date').equals(date).first()
+  const existing = await getWorkoutForDate(date)
   if (existing?.id) return existing.id
   return db.workouts.add({ date, createdAt: Date.now() })
 }
@@ -38,6 +53,19 @@ export async function removeExerciseFromWorkout(workoutExerciseId: number): Prom
     await db.sets.where('workoutExerciseId').equals(workoutExerciseId).delete()
     await db.workoutExercises.delete(workoutExerciseId)
   })
+}
+
+/** Re-adds an exercise block and its sets after removal (the "Annuler" snackbar action). */
+export async function restoreExercise(link: WorkoutExercise, sets: SetEntry[]): Promise<number> {
+  const { id: _id, ...linkRest } = link
+  const newId = await db.workoutExercises.add(linkRest)
+  await Promise.all(
+    sets.map((s) => {
+      const { id: _sid, ...rest } = s
+      return db.sets.add({ ...rest, workoutExerciseId: newId })
+    }),
+  )
+  return newId
 }
 
 /** Duplicates an exercise block within the same workout, sets included, as a new block at the end. */

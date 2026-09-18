@@ -5,6 +5,7 @@ import { usePersonalRecords } from '../hooks/usePersonalRecords'
 import { useLastPerformance } from '../hooks/useLastPerformance'
 import { usePreferences } from '../hooks/usePreferences'
 import { useLongPress } from '../hooks/useLongPress'
+import { useSwipeToDelete } from '../hooks/useSwipeToDelete'
 import { useSnackbar } from '../contexts/SnackbarContext'
 import {
   addSet,
@@ -12,6 +13,7 @@ import {
   duplicateSet,
   removeExerciseFromWorkout,
   removeSet,
+  restoreExercise,
   restoreSet,
   updateSet,
 } from '../lib/workoutActions'
@@ -73,6 +75,15 @@ export function WorkoutExerciseCard({
     hapticLight(!!preferences?.hapticsEnabled)
   }
 
+  async function handleRemoveExercise() {
+    const link = { id: we.id, workoutId: we.workoutId, exerciseId: we.exerciseId, order: we.order }
+    const sets = [...we.sets]
+    await removeExerciseFromWorkout(we.id!)
+    showSnackbar('Exercice supprimé', () => restoreExercise(link, sets))
+  }
+
+  const swipe = useSwipeToDelete(handleRemoveExercise)
+
   async function handleRemoveSet(setId: number) {
     const removed = we.sets.find((s) => s.id === setId)
     await removeSet(setId)
@@ -85,15 +96,36 @@ export function WorkoutExerciseCard({
     <div
       ref={containerRef}
       style={containerStyle}
-      className={`animate-fade-in rounded-2xl border bg-surface p-4 ${
+      className={`animate-fade-in rounded-2xl border bg-surface ${
         isDragging ? 'border-brand-300 shadow-lg' : 'border-slate-200 shadow-sm'
       }`}
-      onPointerDown={longPress.onPointerDown}
-      onPointerMove={longPress.onPointerMove}
-      onPointerUp={longPress.onPointerUp}
-      onPointerCancel={longPress.onPointerCancel}
+      onPointerDown={(e) => {
+        longPress.onPointerDown(e)
+        swipe.handlers.onPointerDown(e)
+      }}
+      onPointerMove={(e) => {
+        longPress.onPointerMove(e)
+        swipe.handlers.onPointerMove(e)
+      }}
+      onPointerUp={(e) => {
+        longPress.onPointerUp(e)
+        swipe.handlers.onPointerUp(e)
+      }}
+      onPointerCancel={(e) => {
+        longPress.onPointerCancel(e)
+        swipe.handlers.onPointerCancel(e)
+      }}
       onClickCapture={longPress.onClickCapture}
     >
+      <div className="relative overflow-hidden rounded-2xl">
+      <div
+        ref={swipe.revealRef}
+        className="absolute inset-0 flex items-center justify-end bg-red-500 pr-6 opacity-0"
+        aria-hidden="true"
+      >
+        <TrashIcon className="h-6 w-6 text-white" />
+      </div>
+      <div ref={swipe.contentRef} data-swipe-to-delete className="relative bg-surface p-4">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-start gap-1.5">
           {dragHandleProps && (
@@ -116,15 +148,6 @@ export function WorkoutExerciseCard({
             <p className="text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
           </div>
         </div>
-        <button
-          type="button"
-          data-no-long-press
-          onClick={() => removeExerciseFromWorkout(we.id!)}
-          className="shrink-0 p-1.5 text-slate-300 active:text-red-500"
-          aria-label="Supprimer cet exercice de la séance"
-        >
-          <TrashIcon className="h-5 w-5" />
-        </button>
       </div>
 
       {lastTime && (
@@ -140,6 +163,7 @@ export function WorkoutExerciseCard({
         <button
           type="button"
           data-no-long-press
+          data-no-swipe
           onClick={() => handleAddSet({ weight: suggestion.weight, reps: suggestion.reps })}
           className="mb-3 flex w-full items-center justify-between gap-2 rounded-lg bg-emerald-50 px-2.5 py-2 text-left text-xs text-emerald-700 active:bg-emerald-100"
         >
@@ -170,6 +194,7 @@ export function WorkoutExerciseCard({
       <button
         type="button"
         data-no-long-press
+        data-no-swipe
         onClick={() => handleAddSet()}
         className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-brand-600 active:bg-slate-100"
       >
@@ -183,6 +208,9 @@ export function WorkoutExerciseCard({
         </p>
       )}
 
+      </div>
+      </div>
+
       {menuOpen && (
         <ContextMenuSheet
           title={we.exercise.name}
@@ -195,7 +223,7 @@ export function WorkoutExerciseCard({
             {
               label: 'Supprimer de la séance',
               icon: TrashIcon,
-              onSelect: () => removeExerciseFromWorkout(we.id!),
+              onSelect: handleRemoveExercise,
               danger: true,
             },
           ]}

@@ -93,7 +93,7 @@ export function CalendrierScreen() {
         )}
       </div>
 
-      <div {...swipe.handlers} style={swipe.style} className="touch-pan-y">
+      <div ref={swipe.ref} {...swipe.handlers} className="touch-pan-y">
         <div key={monthStart} className={getSlideClass(enterDir, swipe.reducedMotion)}>
           <div className="mb-1.5 grid grid-cols-7 text-center text-xs font-medium text-slate-400">
             {WEEKDAY_LABELS.map((d) => (

@@ -94,7 +94,7 @@ export function SeanceScreen() {
         </button>
       </div>
 
-      <div {...swipe.handlers} style={swipe.style} className="touch-pan-y">
+      <div ref={swipe.ref} {...swipe.handlers} className="touch-pan-y">
         <div key={date} className={getSlideClass(enterDir, swipe.reducedMotion)}>
           {workoutId ? (
             <WorkoutEditor workoutId={workoutId} />

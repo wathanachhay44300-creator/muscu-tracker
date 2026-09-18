@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePreferences } from './usePreferences'
 import { playTimerDoneChime } from '../lib/sound'
+import { hapticSuccess } from '../lib/haptics'
+import { requestNotificationPermission, showRestOverNotification } from '../lib/notifications'
 
 const STORAGE_KEY = 'muscu-tracker:restTimer'
+/** A timer that expired longer ago than this while the app was away isn't announced on return. */
+const STALE_DONE_MS = 15_000
 
 type TimerState =
   | { status: 'running'; endTime: number; totalMs: number }
@@ -23,21 +27,26 @@ function persist(state: TimerState): void {
     if (state) localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     else localStorage.removeItem(STORAGE_KEY)
   } catch {
-    // Storage unavailable (private mode, quota) — timer just won't survive a reload.
+    // Storage unavailable — the timer just won't survive a reload.
   }
 }
 
 /**
- * A rest-timer countdown that survives the tab being backgrounded: it stores
- * an absolute `endTime` (not a running interval, which mobile browsers can
- * throttle or pause) and recomputes the remaining time from the wall clock
- * whenever the tab becomes visible again.
+ * Rest countdown that survives backgrounding: it stores an absolute
+ * `endTime` and recomputes from the wall clock. Completion (sound, haptics,
+ * native notification) is driven by a dedicated timeout scheduled for
+ * `endTime` — not by the UI tick — so it still fires when the tab is
+ * hidden, and once more on return if the timeout was throttled.
  */
 export function useRestTimer() {
   const [state, setState] = useState<TimerState>(() => readStored())
   const [now, setNow] = useState(() => Date.now())
-  const donePlayedRef = useRef(false)
+  const announcedRef = useRef<number | null>(null)
   const preferences = usePreferences()
+  const prefsRef = useRef(preferences)
+  useEffect(() => {
+    prefsRef.current = preferences
+  }, [preferences])
 
   useEffect(() => {
     if (state?.status !== 'running') return
@@ -46,12 +55,30 @@ export function useRestTimer() {
   }, [state])
 
   useEffect(() => {
+    function announce(endTime: number) {
+      if (announcedRef.current === endTime) return
+      announcedRef.current = endTime
+      if (Date.now() - endTime > STALE_DONE_MS) return
+      const prefs = prefsRef.current
+      if (prefs?.soundEnabled) playTimerDoneChime()
+      hapticSuccess(!!prefs?.hapticsEnabled)
+      void showRestOverNotification(!!prefs?.hapticsEnabled)
+    }
+
+    if (state?.status !== 'running') return
+    const { endTime } = state
+    const timeout = setTimeout(() => announce(endTime), Math.max(0, endTime - Date.now()))
     function onVisible() {
-      if (document.visibilityState === 'visible') setNow(Date.now())
+      if (document.visibilityState !== 'visible') return
+      setNow(Date.now())
+      if (Date.now() >= endTime) announce(endTime)
     }
     document.addEventListener('visibilitychange', onVisible)
-    return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [])
+    return () => {
+      clearTimeout(timeout)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [state])
 
   const remainingMs =
     state == null ? 0 : state.status === 'running' ? Math.max(0, state.endTime - now) : state.remainingMs
@@ -60,20 +87,12 @@ export function useRestTimer() {
   const isPaused = state?.status === 'paused'
   const isDone = state?.status === 'running' && remainingMs === 0
 
-  useEffect(() => {
-    if (isDone && !donePlayedRef.current) {
-      donePlayedRef.current = true
-      if (preferences?.soundEnabled) playTimerDoneChime()
-      navigator.vibrate?.([200, 100, 200])
-    }
-    if (!isDone) donePlayedRef.current = false
-  }, [isDone, preferences])
-
   function start(durationMs: number) {
-    const start = Date.now()
-    const next: TimerState = { status: 'running', endTime: start + durationMs, totalMs: durationMs }
+    void requestNotificationPermission()
+    const t = Date.now()
+    const next: TimerState = { status: 'running', endTime: t + durationMs, totalMs: durationMs }
     setState(next)
-    setNow(start)
+    setNow(t)
     persist(next)
   }
 
@@ -89,9 +108,9 @@ export function useRestTimer() {
   function resume() {
     setState((s) => {
       if (s?.status !== 'paused') return s
-      const start = Date.now()
-      const next: TimerState = { status: 'running', endTime: start + s.remainingMs, totalMs: s.totalMs }
-      setNow(start)
+      const t = Date.now()
+      const next: TimerState = { status: 'running', endTime: t + s.remainingMs, totalMs: s.totalMs }
+      setNow(t)
       persist(next)
       return next
     })
@@ -107,6 +126,7 @@ export function useRestTimer() {
       persist(next)
       return next
     })
+    setNow(Date.now())
   }
 
   function reset() {

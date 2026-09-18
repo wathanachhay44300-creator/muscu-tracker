@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
+import { getWorkoutForDate } from '../lib/workoutActions'
 import type { Workout, WorkoutExerciseWithSets } from '../types'
 
 export interface WorkoutDetail {
@@ -28,6 +29,6 @@ export function useWorkoutDetail(workoutId: number | undefined): WorkoutDetail |
 
 /** Finds the workout for a given date, if one already exists. */
 export function useWorkoutIdForDate(date: string): number | undefined {
-  const workout = useLiveQuery(() => db.workouts.where('date').equals(date).first(), [date])
+  const workout = useLiveQuery(() => getWorkoutForDate(date), [date])
   return workout?.id
 }

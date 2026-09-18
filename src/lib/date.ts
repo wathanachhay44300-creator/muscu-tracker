@@ -114,3 +114,9 @@ export function formatDuration(ms: number): string {
   const m = totalMinutes % 60
   return h === 0 ? `${m} min` : `${h}h${String(m).padStart(2, '0')}`
 }
+
+/** Formats an ISO date in full, e.g. "18 septembre 2026". */
+export function formatDateLong(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return `${d} ${MONTHS_FULL_FR[m - 1]} ${y}`
+}
