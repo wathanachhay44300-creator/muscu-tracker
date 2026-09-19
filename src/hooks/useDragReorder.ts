@@ -168,6 +168,7 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
       onPointerMove: (e: ReactPointerEvent<HTMLElement>) => void
       onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void
       onPointerCancel: (e: ReactPointerEvent<HTMLElement>) => void
+      onContextMenu: (e: React.MouseEvent<HTMLElement>) => void
     }
   } {
     const isDragging = draggingId === id
@@ -187,6 +188,7 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
         onPointerMove: handlePointerMove,
         onPointerUp: handlePointerUp,
         onPointerCancel: handlePointerUp,
+        onContextMenu: (e) => e.preventDefault(),
       },
     }
   }

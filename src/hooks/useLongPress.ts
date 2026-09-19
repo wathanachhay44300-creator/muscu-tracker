@@ -52,7 +52,13 @@ export function useLongPress(onLongPress: () => void, disabled = false) {
     }
   }
 
+  // Long-press fires `contextmenu` on some browsers (and Android): the app's own menu replaces it.
+  function onContextMenu(e: React.MouseEvent<HTMLElement>) {
+    e.preventDefault()
+  }
+
   return {
+    onContextMenu,
     onPointerDown,
     onPointerMove,
     onPointerUp,

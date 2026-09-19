@@ -145,6 +145,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           swipe.handlers.onPointerCancel(e)
         }}
         onClickCapture={longPress.onClickCapture}
+        onContextMenu={longPress.onContextMenu}
       >
         <span
           className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${

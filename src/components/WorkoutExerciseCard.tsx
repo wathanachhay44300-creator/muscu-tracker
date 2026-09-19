@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { WorkoutExerciseWithSets } from '../types'
 import { usePersonalRecords } from '../hooks/usePersonalRecords'
 import { useLastPerformance } from '../hooks/useLastPerformance'
@@ -53,6 +53,7 @@ export function WorkoutExerciseCard({
   const lastTime = useLastPerformance(we.exerciseId, workoutId)
   const preferences = usePreferences()
   const { showSnackbar } = useSnackbar()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [noteOpen, setNoteOpen] = useState(false)
   const [noteText, setNoteText] = useState(we.note ?? '')
@@ -127,6 +128,7 @@ export function WorkoutExerciseCard({
         swipe.handlers.onPointerCancel(e)
       }}
       onClickCapture={longPress.onClickCapture}
+      onContextMenu={longPress.onContextMenu}
     >
       <div className="relative overflow-hidden rounded-2xl">
       <div
@@ -150,12 +152,13 @@ export function WorkoutExerciseCard({
             </button>
           )}
           <div className="min-w-0">
-            <Link
-              to={`/exercices/${we.exercise.id}`}
-              className="font-display text-base text-slate-900 active:opacity-60"
+            <button
+              type="button"
+              onClick={() => navigate(`/exercices/${we.exercise.id}`)}
+              className="font-display text-base text-slate-900 active:opacity-60 text-left"
             >
               {we.exercise.name}
-            </Link>
+            </button>
             <p className="text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
             {lastTime?.note && (
               <p className="mt-1 text-xs italic text-amber-600">

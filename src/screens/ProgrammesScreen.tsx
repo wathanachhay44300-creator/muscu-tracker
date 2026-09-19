@@ -123,6 +123,7 @@ export function ProgrammesScreen() {
 function TemplateListItem({ summary }: { summary: TemplateSummary }) {
   const { template, exerciseCount } = summary
   const preferences = usePreferences()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [renaming, setRenaming] = useState(false)
   const [deleting, setDeleting] = useState<{ usageCount: number } | null>(null)
@@ -139,9 +140,14 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
 
   return (
     <>
-      <Link
-        to={`/programmes/${template.id}`}
-        className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+      {/* A div (not <a>): Safari would show its link-preview menu on long-press. */}
+      <div
+        role="link"
+        tabIndex={0}
+        onClick={() => navigate(`/programmes/${template.id}`)}
+        onKeyDown={(e) => e.key === 'Enter' && navigate(`/programmes/${template.id}`)}
+        onContextMenu={longPress.onContextMenu}
+        className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         onPointerDown={longPress.onPointerDown}
         onPointerMove={longPress.onPointerMove}
         onPointerUp={longPress.onPointerUp}
@@ -155,7 +161,7 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
           </p>
         </div>
         <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
-      </Link>
+      </div>
 
       {menuOpen && (
         <ContextMenuSheet

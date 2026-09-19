@@ -185,6 +185,7 @@ input[type='number']::-webkit-inner-spin-button {
 }
 
 * {
+  -webkit-touch-callout: none; /* no native iOS link/image callout on long-press */
   -webkit-user-select: none;
   user-select: none;
 }
