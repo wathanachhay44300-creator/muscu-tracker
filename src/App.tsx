@@ -33,7 +33,7 @@ export default function App() {
   if (!ready) {
     return (
       <div className="flex h-dvh flex-col items-center justify-center gap-3 bg-slate-50">
-        <DumbbellIcon className="h-8 w-8 animate-pulse text-brand-400" />
+        <DumbbellIcon className="h-8 w-8 animate-pulse text-accent" />
       </div>
     )
   }

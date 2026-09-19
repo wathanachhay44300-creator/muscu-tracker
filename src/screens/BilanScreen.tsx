@@ -7,6 +7,7 @@ import { useWorkoutComparison } from '../hooks/useWorkoutComparison'
 import { usePreferences } from '../hooks/usePreferences'
 import { useCountUp } from '../hooks/useCountUp'
 import { ExerciseComparisonCard } from '../components/ExerciseComparisonCard'
+import { AngkorSilhouette } from '../components/AngkorSilhouette'
 import { Confetti } from '../components/Confetti'
 import {
   ClipboardIcon,
@@ -86,7 +87,8 @@ export function BilanScreen() {
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
       {hasPR && <Confetti />}
 
-      <div className="relative mb-5 text-center">
+      <div className="relative isolate mb-5 text-center">
+        <AngkorSilhouette className="inset-x-0 bottom-0 h-20 w-full" />
         <div className="absolute right-0 top-0 flex items-center gap-1.5">
           <button
             type="button"
@@ -102,7 +104,7 @@ export function BilanScreen() {
             type="button"
             onClick={() => setHapticsEnabled(!preferences?.hapticsEnabled)}
             className={`flex h-9 w-9 items-center justify-center rounded-full ${
-              preferences?.hapticsEnabled ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-500'
+              preferences?.hapticsEnabled ? 'bg-brand-50 text-accent' : 'bg-slate-100 text-slate-500'
             } active:bg-slate-200`}
             aria-label={preferences?.hapticsEnabled ? 'Désactiver les vibrations' : 'Activer les vibrations'}
             title={preferences?.hapticsEnabled ? 'Vibrations activées' : 'Vibrations désactivées'}
@@ -123,7 +125,7 @@ export function BilanScreen() {
             )}
           </button>
         </div>
-        <ClipboardIcon className="mx-auto mb-2 h-9 w-9 text-brand-500" />
+        <ClipboardIcon className="mx-auto mb-2 h-9 w-9 text-accent" />
         <h1 className="text-lg font-bold text-slate-900">Bilan de la séance</h1>
         <p className="text-sm text-slate-400">{formatDateFr(workout.date)}</p>
       </div>

@@ -10,7 +10,7 @@ interface ConfettiPiece {
   drift: number
 }
 
-const COLORS = ['#4f46e5', '#f59e0b', '#10b981', '#38bdf8', '#f472b6']
+const COLORS = ['#8b1e1e', '#c9a227', '#e0b64a', '#b04a40', '#f3e9d7']
 const PIECE_COUNT = 26
 
 function prefersReducedMotion(): boolean {

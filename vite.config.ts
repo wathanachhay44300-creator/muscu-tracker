@@ -19,8 +19,8 @@ export default defineConfig({
         name: 'Muscu Tracker',
         short_name: 'Muscu',
         description: 'Suivi de musculation hors-ligne, rapide et sans compte.',
-        theme_color: '#4f46e5',
-        background_color: '#f8fafc',
+        theme_color: '#8b1e1e',
+        background_color: '#f3e9d7',
         display: 'standalone',
         orientation: 'portrait',
         start_url: base,
@@ -46,6 +46,23 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // Cormorant Garamond comes from Google Fonts: cache it so titles stay serif offline.
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'google-fonts-css' },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-files',
+              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
     }),
   ],

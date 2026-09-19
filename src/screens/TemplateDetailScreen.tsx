@@ -133,7 +133,7 @@ export function TemplateDetailScreen() {
                   <button
                     type="button"
                     onClick={() => updateTargetSets(te.id!, te.targetSets - 1)}
-                    className="px-2.5 py-1.5 text-slate-500 active:text-brand-600"
+                    className="px-2.5 py-1.5 text-slate-500 active:text-accent"
                     aria-label="Moins de séries"
                   >
                     −
@@ -144,7 +144,7 @@ export function TemplateDetailScreen() {
                   <button
                     type="button"
                     onClick={() => updateTargetSets(te.id!, te.targetSets + 1)}
-                    className="px-2.5 py-1.5 text-slate-500 active:text-brand-600"
+                    className="px-2.5 py-1.5 text-slate-500 active:text-accent"
                     aria-label="Plus de séries"
                   >
                     +
@@ -168,7 +168,7 @@ export function TemplateDetailScreen() {
       <button
         type="button"
         onClick={() => setPickerOpen(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 py-3.5 font-semibold text-brand-600 active:bg-slate-200"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 py-3.5 font-semibold text-accent active:bg-slate-200"
       >
         <PlusIcon className="h-5 w-5" />
         Ajouter un exercice

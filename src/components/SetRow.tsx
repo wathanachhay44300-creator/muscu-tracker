@@ -163,7 +163,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <button
             type="button"
             onClick={() => stepWeight(-2.5)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
             aria-label="Moins 2.5 kg"
           >
             −
@@ -182,7 +182,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <button
             type="button"
             onClick={() => stepWeight(2.5)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
             aria-label="Plus 2.5 kg"
           >
             +
@@ -194,7 +194,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
             data-no-long-press
             data-no-swipe
             onClick={() => setCalculatorOpen(true)}
-            className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-brand-600"
+            className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-accent"
             aria-label="Calculateur de plaques"
             title="Calculateur de plaques"
           >
@@ -213,7 +213,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <button
             type="button"
             onClick={() => stepReps(-1)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
             aria-label="Moins une répétition"
           >
             −
@@ -232,7 +232,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <button
             type="button"
             onClick={() => stepReps(1)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-brand-600"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
             aria-label="Plus une répétition"
           >
             +

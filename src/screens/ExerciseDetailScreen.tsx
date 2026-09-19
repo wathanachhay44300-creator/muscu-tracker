@@ -107,14 +107,14 @@ export function ExerciseDetailScreen() {
                   <button
                     type="button"
                     onClick={() => setMetric('weight')}
-                    className={`rounded-md px-2.5 py-1 ${metric === 'weight' ? 'bg-surface text-brand-600 shadow-sm' : 'text-slate-500'}`}
+                    className={`rounded-md px-2.5 py-1 ${metric === 'weight' ? 'bg-surface text-accent shadow-sm' : 'text-slate-500'}`}
                   >
                     Poids max
                   </button>
                   <button
                     type="button"
                     onClick={() => setMetric('volume')}
-                    className={`rounded-md px-2.5 py-1 ${metric === 'volume' ? 'bg-surface text-brand-600 shadow-sm' : 'text-slate-500'}`}
+                    className={`rounded-md px-2.5 py-1 ${metric === 'volume' ? 'bg-surface text-accent shadow-sm' : 'text-slate-500'}`}
                   >
                     Volume
                   </button>

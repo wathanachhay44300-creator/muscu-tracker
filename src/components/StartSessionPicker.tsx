@@ -54,7 +54,7 @@ export function StartSessionPicker({
                 </p>
               </div>
               {plannedTemplateId === template.id && (
-                <span className="flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-600">
+                <span className="flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-accent">
                   <CheckIcon className="h-3.5 w-3.5" />
                   Planifiée
                 </span>

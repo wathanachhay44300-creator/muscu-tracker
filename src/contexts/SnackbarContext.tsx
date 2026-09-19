@@ -43,13 +43,13 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
           key={snackbar.id}
           className="animate-slide-up pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center px-4"
         >
-          <div className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">
+          <div className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-slate-200 bg-[#2b1b12] px-4 py-3 text-sm text-[#f3e9d7] shadow-lg">
             <span>{snackbar.message}</span>
             {snackbar.onUndo && (
               <button
                 type="button"
                 onClick={handleUndo}
-                className="shrink-0 font-semibold text-brand-300 active:opacity-70"
+                className="shrink-0 font-semibold text-amber-500 active:opacity-70"
               >
                 Annuler
               </button>

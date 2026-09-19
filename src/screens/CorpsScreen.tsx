@@ -44,7 +44,7 @@ export function CorpsScreen() {
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <ScaleIcon className="h-5 w-5 text-brand-500" />
+        <ScaleIcon className="h-5 w-5 text-accent" />
         <h1 className="text-lg font-bold text-slate-900">Poids &amp; mensurations</h1>
       </div>
 

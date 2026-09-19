@@ -31,19 +31,19 @@ export async function generateBilanImage(data: BilanShareData): Promise<Blob> {
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas 2D context unavailable')
 
-  ctx.fillStyle = '#f8fafc'
+  ctx.fillStyle = '#f3e9d7'
   ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
-  ctx.fillStyle = '#4f46e5'
+  ctx.fillStyle = '#8b1e1e'
   ctx.fillRect(0, 0, WIDTH, 170)
   ctx.fillStyle = '#ffffff'
   ctx.font = '600 44px system-ui, sans-serif'
   ctx.fillText('💪 Muscu Tracker', 60, 105)
 
-  ctx.fillStyle = '#0f172a'
+  ctx.fillStyle = '#2b1b12'
   ctx.font = '700 60px system-ui, sans-serif'
   wrapText(ctx, data.programName, 60, 280, WIDTH - 120, 68)
-  ctx.fillStyle = '#64748b'
+  ctx.fillStyle = '#7f5f43'
   ctx.font = '400 34px system-ui, sans-serif'
   ctx.fillText(data.date, 60, 345)
 
@@ -63,13 +63,13 @@ export async function generateBilanImage(data: BilanShareData): Promise<Blob> {
     const row = Math.floor(i / 2)
     const x = 60 + col * (cellW + gapX)
     const y = gridTop + row * (cellH + gapY)
-    ctx.fillStyle = '#ffffff'
+    ctx.fillStyle = '#fffbf3'
     roundRect(ctx, x, y, cellW, cellH, 28)
     ctx.fill()
-    ctx.fillStyle = '#0f172a'
+    ctx.fillStyle = '#2b1b12'
     ctx.font = '700 52px system-ui, sans-serif'
     ctx.fillText(value, x + 32, y + 70)
-    ctx.fillStyle = '#94a3b8'
+    ctx.fillStyle = '#7f5f43'
     ctx.font = '400 30px system-ui, sans-serif'
     ctx.fillText(label, x + 32, y + 112)
   })
@@ -77,10 +77,10 @@ export async function generateBilanImage(data: BilanShareData): Promise<Blob> {
   let nextY = gridTop + 2 * (cellH + gapY) + 20
   if (data.prNames.length > 0) {
     const bannerH = 130
-    ctx.fillStyle = '#fffbeb'
+    ctx.fillStyle = '#fbf3d9'
     roundRect(ctx, 60, nextY, WIDTH - 120, bannerH, 28)
     ctx.fill()
-    ctx.fillStyle = '#b45309'
+    ctx.fillStyle = '#86660b'
     ctx.font = '700 36px system-ui, sans-serif'
     const prText =
       data.prNames.length === 1
@@ -90,7 +90,7 @@ export async function generateBilanImage(data: BilanShareData): Promise<Blob> {
     nextY += bannerH + 20
   }
 
-  ctx.fillStyle = '#cbd5e1'
+  ctx.fillStyle = '#b39670'
   ctx.font = '400 26px system-ui, sans-serif'
   ctx.fillText('Suivi avec Muscu Tracker', 60, HEIGHT - 50)
 

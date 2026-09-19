@@ -44,7 +44,7 @@ export function HistoriqueScreen() {
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >
           <div className="flex items-center gap-2.5">
-            <CalendarIcon className="h-5 w-5 text-brand-500" />
+            <CalendarIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Calendrier</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
@@ -55,7 +55,7 @@ export function HistoriqueScreen() {
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >
           <div className="flex items-center gap-2.5">
-            <ChartIcon className="h-5 w-5 text-brand-500" />
+            <ChartIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Répartition par muscle (semaine)</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
@@ -66,7 +66,7 @@ export function HistoriqueScreen() {
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >
           <div className="flex items-center gap-2.5">
-            <ScaleIcon className="h-5 w-5 text-brand-500" />
+            <ScaleIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Poids &amp; mensurations</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
@@ -77,7 +77,7 @@ export function HistoriqueScreen() {
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >
           <div className="flex items-center gap-2.5">
-            <CameraIcon className="h-5 w-5 text-brand-500" />
+            <CameraIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Photos de progression</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
@@ -88,7 +88,7 @@ export function HistoriqueScreen() {
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >
           <div className="flex items-center gap-2.5">
-            <DownloadIcon className="h-5 w-5 text-brand-500" />
+            <DownloadIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Export / import des données</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
@@ -99,7 +99,7 @@ export function HistoriqueScreen() {
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
         >
           <div className="flex items-center gap-2.5">
-            <SettingsIcon className="h-5 w-5 text-brand-500" />
+            <SettingsIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Réglages (vibrations, notifications)</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />

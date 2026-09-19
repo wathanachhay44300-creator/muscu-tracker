@@ -95,13 +95,13 @@ export function ExercicesScreen() {
                 className={`flex items-center gap-1 pr-2 ${i > 0 ? 'border-t border-slate-100' : ''}`}
               >
                 <Link to={`/exercices/${ex.id}`} className="flex flex-1 items-center justify-between py-3 pl-4 active:bg-slate-50">
-                  <span className="text-base text-slate-900">{ex.name}</span>
+                  <span className="font-display text-base text-slate-900">{ex.name}</span>
                   <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
                 </Link>
                 <button
                   type="button"
                   onClick={() => setEditing(ex)}
-                  className="shrink-0 p-2 text-slate-300 active:text-brand-600"
+                  className="shrink-0 p-2 text-slate-300 active:text-accent"
                   aria-label={`Renommer ${ex.name}`}
                 >
                   <PencilIcon className="h-4 w-4" />

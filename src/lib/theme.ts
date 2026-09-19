@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'muscu-tracker:theme'
-const LIGHT_THEME_COLOR = '#4f46e5'
-const DARK_THEME_COLOR = '#0f172a'
+const LIGHT_THEME_COLOR = '#8b1e1e'
+const DARK_THEME_COLOR = '#241712'
 
 export type ThemeChoice = 'light' | 'dark'
 

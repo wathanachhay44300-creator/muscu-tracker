@@ -74,7 +74,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
             <button
               type="button"
               onClick={() => setCreating(true)}
-              className="mt-4 flex w-full items-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-3 text-brand-700"
+              className="mt-4 flex w-full items-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-3 text-accent"
             >
               <PlusIcon className="h-5 w-5" />
               <span className="font-medium">Créer un exercice personnalisé</span>

@@ -1,24 +1,53 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* Khmer theme — accent: deep red, secondary: gold. `brand-*` is the red scale. */
+  --color-brand-50: #f7e6de;
+  --color-brand-100: #eed0c3;
+  --color-brand-200: #e0b0a0;
+  --color-brand-300: #c98577;
+  --color-brand-400: #b04a40;
+  --color-brand-500: #a32a2a;
+  --color-brand-600: #8b1e1e;
+  --color-brand-700: #6f1717;
 
-  /* Card/sheet background. Distinct from `white` (kept literal, e.g. for
-   * text on colored buttons) so it can invert independently in dark mode. */
-  --color-surface: #ffffff;
+  /* Red used for accent *text* and icons. Same as brand-600 in light mode;
+   * lifted in dark mode where #8B1E1E would be illegible on dark cards. */
+  --color-accent: #8b1e1e;
+
+  /* Page background (sand). Cards/sheets use `surface`. */
+  --color-page: #f3e9d7;
+  --color-surface: #fffbf3;
+
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+
+  /* Warm sandstone scale replacing Tailwind's cool slate. */
+  --color-slate-50: #f6eedf; /* input fields */
+  --color-slate-100: #efe2c8; /* chips, pressed states */
+  --color-slate-200: #e7d5b5; /* borders */
+  --color-slate-300: #b39670; /* placeholders, decorative icons */
+  --color-slate-400: #7f5f43; /* secondary text (≈ #8A6A4E, darkened to reach WCAG AA on sand) */
+  --color-slate-500: #6e5038;
+  --color-slate-600: #5a4030;
+  --color-slate-700: #46301f;
+  --color-slate-800: #38251a;
+  --color-slate-900: #2b1b12; /* primary text */
+
+  /* Gold replaces amber. 500 is the personal-record star: #C9A227. */
+  --color-amber-50: #fbf3d9;
+  --color-amber-100: #f3e4b0;
+  --color-amber-200: #e6d089;
+  --color-amber-500: #c9a227;
+  --color-amber-600: #86660b;
+  --color-amber-700: #6b5209;
 }
 
 /* ---- Theme ----
- * Dark mode works by overriding the underlying Tailwind color variables
- * rather than adding `dark:` classes everywhere: every existing bg-slate-*,
- * text-slate-*, bg-amber-50, etc. utility across the app already resolves
- * through these custom properties, so re-pointing them here re-themes the
- * whole app from one place. Two triggers, matching the spec:
+ * Dark mode works by overriding the underlying color variables rather than
+ * adding `dark:` classes everywhere: every existing bg-slate-*, text-slate-*,
+ * bg-amber-50, etc. utility across the app already resolves through these
+ * custom properties, so re-pointing them here re-themes the whole app from
+ * one place. Two triggers:
  *  - no explicit choice: follow the OS via prefers-color-scheme
  *  - explicit choice (data-theme attribute, set by the theme toggle and
  *    persisted to localStorage): wins regardless of the OS setting
@@ -30,30 +59,37 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --color-surface: #1e293b;
+    --color-page: #241712;
+    --color-surface: #2e1f17;
 
-    --color-slate-50: #0f172a;
-    --color-slate-100: #334155;
-    --color-slate-200: #475569;
-    --color-slate-300: #64748b;
-    --color-slate-600: #cbd5e1;
-    --color-slate-700: #e2e8f0;
-    --color-slate-800: #f1f5f9;
-    --color-slate-900: #f8fafc;
+    --color-slate-50: #241712;
+    --color-slate-100: #3d2b21;
+    --color-slate-200: #4f3a2c;
+    --color-slate-300: #8a715d;
+    --color-slate-400: #b79f86;
+    --color-slate-500: #c7b39c;
+    --color-slate-600: #d9c8b0;
+    --color-slate-700: #e6d8c1;
+    --color-slate-800: #f0e4cf;
+    --color-slate-900: #f3e9d7;
 
-    --color-brand-50: #312e81;
-    --color-brand-300: #6366f1;
-    --color-brand-700: #818cf8;
+    --color-brand-50: #42201b;
+    --color-brand-300: #a8463d;
+    --color-brand-400: #c9564b;
+    --color-brand-500: #b32b2b;
+    --color-brand-600: #a82626;
+    --color-brand-700: #c9564b;
+    --color-accent: #e0625b;
 
     --color-red-50: #3f1212;
     --color-red-200: #7f1d1d;
     --color-red-700: #f87171;
 
-    --color-amber-50: #451a03;
-    --color-amber-100: #78350f;
-    --color-amber-200: #92400e;
-    --color-amber-600: #fbbf24;
-    --color-amber-700: #fde68a;
+    --color-amber-50: #3a2c10;
+    --color-amber-100: #4d3a12;
+    --color-amber-200: #6b5216;
+    --color-amber-600: #e3c04e;
+    --color-amber-700: #f0d98a;
 
     --color-emerald-600: #34d399;
   }
@@ -61,30 +97,37 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-surface: #1e293b;
+  --color-page: #241712;
+  --color-surface: #2e1f17;
 
-  --color-slate-50: #0f172a;
-  --color-slate-100: #334155;
-  --color-slate-200: #475569;
-  --color-slate-300: #64748b;
-  --color-slate-600: #cbd5e1;
-  --color-slate-700: #e2e8f0;
-  --color-slate-800: #f1f5f9;
-  --color-slate-900: #f8fafc;
+  --color-slate-50: #241712;
+  --color-slate-100: #3d2b21;
+  --color-slate-200: #4f3a2c;
+  --color-slate-300: #8a715d;
+  --color-slate-400: #b79f86;
+  --color-slate-500: #c7b39c;
+  --color-slate-600: #d9c8b0;
+  --color-slate-700: #e6d8c1;
+  --color-slate-800: #f0e4cf;
+  --color-slate-900: #f3e9d7;
 
-  --color-brand-50: #312e81;
-  --color-brand-300: #6366f1;
-  --color-brand-700: #818cf8;
+  --color-brand-50: #42201b;
+  --color-brand-300: #a8463d;
+  --color-brand-400: #c9564b;
+  --color-brand-500: #b32b2b;
+  --color-brand-600: #a82626;
+  --color-brand-700: #c9564b;
+  --color-accent: #e0625b;
 
   --color-red-50: #3f1212;
   --color-red-200: #7f1d1d;
   --color-red-700: #f87171;
 
-  --color-amber-50: #451a03;
-  --color-amber-100: #78350f;
-  --color-amber-200: #92400e;
-  --color-amber-600: #fbbf24;
-  --color-amber-700: #fde68a;
+  --color-amber-50: #3a2c10;
+  --color-amber-100: #4d3a12;
+  --color-amber-200: #6b5216;
+  --color-amber-600: #e3c04e;
+  --color-amber-700: #f0d98a;
 
   --color-emerald-600: #34d399;
 }
@@ -96,10 +139,31 @@ body,
 }
 
 body {
-  background-color: var(--color-slate-50);
+  background-color: var(--color-page);
   color: var(--color-slate-900);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+}
+
+/* Display serif for screen titles and exercise names (Cormorant Garamond
+ * runs small, so sizes are nudged up). Body text stays on the system font. */
+h1,
+h2,
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+h1 {
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+h2 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+.font-display {
+  font-size: 1.15em;
+  line-height: 1.2;
 }
 
 /* Safe-area aware padding helpers for iOS notch / home indicator */

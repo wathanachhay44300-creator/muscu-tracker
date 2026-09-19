@@ -152,7 +152,7 @@ export function WorkoutExerciseCard({
           <div className="min-w-0">
             <Link
               to={`/exercices/${we.exercise.id}`}
-              className="text-base font-semibold text-slate-900 active:opacity-60"
+              className="font-display text-base text-slate-900 active:opacity-60"
             >
               {we.exercise.name}
             </Link>
@@ -163,7 +163,7 @@ export function WorkoutExerciseCard({
               </p>
             )}
             {!noteOpen && noteText.trim() && (
-              <p className="mt-1 whitespace-pre-wrap text-xs text-brand-600">{noteText}</p>
+              <p className="mt-1 whitespace-pre-wrap text-xs text-accent">{noteText}</p>
             )}
           </div>
         </div>
@@ -175,7 +175,7 @@ export function WorkoutExerciseCard({
           aria-label="Note sur cet exercice"
           aria-expanded={noteOpen}
           className={`shrink-0 rounded-lg p-1.5 active:bg-slate-100 ${
-            noteText.trim() ? 'text-brand-600' : 'text-slate-300'
+            noteText.trim() ? 'text-accent' : 'text-slate-300'
           }`}
         >
           <NoteIcon className="h-5 w-5" />
@@ -241,7 +241,7 @@ export function WorkoutExerciseCard({
         data-no-long-press
         data-no-swipe
         onClick={() => handleAddSet()}
-        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-brand-600 active:bg-slate-100"
+        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-accent active:bg-slate-100"
       >
         <PlusIcon className="h-4 w-4" />
         Ajouter une série

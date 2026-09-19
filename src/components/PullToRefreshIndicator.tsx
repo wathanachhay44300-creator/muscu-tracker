@@ -18,7 +18,7 @@ export function PullToRefreshIndicator({ pullY, refreshing }: PullToRefreshIndic
       aria-hidden="true"
     >
       <RefreshIcon
-        className={`h-5 w-5 text-brand-500 ${refreshing ? 'animate-spin' : ''}`}
+        className={`h-5 w-5 text-accent ${refreshing ? 'animate-spin' : ''}`}
         style={{ opacity: progress, transform: refreshing ? undefined : `rotate(${progress * 180}deg)` }}
       />
     </div>

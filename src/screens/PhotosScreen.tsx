@@ -40,7 +40,7 @@ export function PhotosScreen() {
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <CameraIcon className="h-5 w-5 text-brand-500" />
+        <CameraIcon className="h-5 w-5 text-accent" />
         <h1 className="text-lg font-bold text-slate-900">Photos de progression</h1>
       </div>
 
