@@ -341,3 +341,14 @@ export function SettingsIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function NoteIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M5 4.5h14a1 1 0 0 1 1 1V15l-5 5H5a1 1 0 0 1-1-1v-13.5a1 1 0 0 1 1-1Z" />
+      <path d="M15 20v-4a1 1 0 0 1 1-1h4" />
+      <path d="M8 9h8" />
+      <path d="M8 12.5h5" />
+    </svg>
+  )
+}

@@ -28,7 +28,7 @@ export function useWorkoutHistory(): WorkoutSummary[] | undefined {
           volume += totalVolume(sets)
         }
         const template = workout.templateId ? await db.workoutTemplates.get(workout.templateId) : undefined
-        const title = template?.name ?? 'Séance libre'
+        const title = workout.title ?? template?.name ?? 'Séance libre'
         return { title, workout, exerciseCount: links.length, setCount, volume }
       }),
     )

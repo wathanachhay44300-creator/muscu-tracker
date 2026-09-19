@@ -147,6 +147,16 @@ export async function updateWorkoutRpe(workoutId: number, rpe: number | null): P
   await db.workouts.update(workoutId, { rpe })
 }
 
+/** Sets a custom title for one session; an empty title reverts to the program name / "Séance libre". */
+export async function updateWorkoutTitle(workoutId: number, title: string): Promise<void> {
+  await db.workouts.update(workoutId, { title: title.trim() ? title.trim() : undefined })
+}
+
+/** Sets (or clears) the note attached to an exercise within one session. */
+export async function updateExerciseNote(workoutExerciseId: number, note: string): Promise<void> {
+  await db.workoutExercises.update(workoutExerciseId, { note: note.trim() ? note : undefined })
+}
+
 /** Sets the free-text note for a session (fatigue, sommeil, douleurs, contexte…). */
 export async function updateWorkoutNotes(workoutId: number, notes: string): Promise<void> {
   await db.workouts.update(workoutId, { notes: notes.trim() ? notes : undefined })

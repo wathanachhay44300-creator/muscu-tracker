@@ -45,6 +45,8 @@ export interface Workout {
   date: string
   createdAt: number
   notes?: string
+  /** Custom title for this session only (never touches the program's name). */
+  title?: string
   /** Overall perceived difficulty for the whole session, 1-10. */
   rpe?: number | null
   /** Set when the session was started from a template — used to find the
@@ -61,6 +63,8 @@ export interface WorkoutExercise {
   workoutId: number
   exerciseId: number
   order: number
+  /** Free-text note on this exercise for this session (shown next time). */
+  note?: string
 }
 
 export interface SetEntry {

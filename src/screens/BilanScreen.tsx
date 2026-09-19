@@ -66,7 +66,7 @@ export function BilanScreen() {
     setSharing(true)
     try {
       const blob = await generateBilanImage({
-        programName: template?.name ?? 'Séance libre',
+        programName: workout.title ?? template?.name ?? 'Séance libre',
         date: formatDateFr(workout.date),
         exerciseCount: exercises.length,
         setCount,

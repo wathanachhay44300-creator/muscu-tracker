@@ -1,4 +1,12 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ContextMenuSheet } from '../components/ContextMenuSheet'
+import { RenameSheet } from '../components/RenameSheet'
+import { useLongPress } from '../hooks/useLongPress'
+import { usePreferences } from '../hooks/usePreferences'
+import { hapticMenuOpen } from '../lib/haptics'
+import { updateWorkoutTitle } from '../lib/workoutActions'
+import type { WorkoutSummary } from '../hooks/useHistory'
 import { useWorkoutHistory } from '../hooks/useHistory'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
@@ -10,6 +18,7 @@ import {
   ChartIcon,
   ChevronRightIcon,
   DownloadIcon,
+  PencilIcon,
   ScaleIcon,
   SettingsIcon,
 } from '../components/Icons'
@@ -108,25 +117,68 @@ export function HistoriqueScreen() {
       )}
 
       <div className="space-y-2.5">
-        {history?.map(({ workout, exerciseCount, setCount, volume, title }) => (
-          <Link
-            key={workout.id}
-            to={`/historique/${workout.id}`}
-            className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
-          >
-            <div>
-              <p className="font-semibold text-slate-900">{title}</p>
-              <p className="text-sm font-medium text-slate-600">{formatDateLong(workout.date)}</p>
-              <p className="mt-1 text-sm text-slate-500">
-                {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''} · {setCount} série
-                {setCount > 1 ? 's' : ''}
-                {volume > 0 && <> · {formatVolume(volume)} kg</>}
-              </p>
-            </div>
-            <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
-          </Link>
+        {history?.map((summary) => (
+          <HistoryListItem key={summary.workout.id} summary={summary} />
         ))}
       </div>
     </div>
+  )
+}
+
+function HistoryListItem({ summary }: { summary: WorkoutSummary }) {
+  const { workout, exerciseCount, setCount, volume, title } = summary
+  const preferences = usePreferences()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [renaming, setRenaming] = useState(false)
+  const longPress = useLongPress(() => {
+    hapticMenuOpen(!!preferences?.hapticsEnabled)
+    setMenuOpen(true)
+  })
+
+  return (
+    <>
+      <Link
+        to={`/historique/${workout.id}`}
+        className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        onPointerDown={longPress.onPointerDown}
+        onPointerMove={longPress.onPointerMove}
+        onPointerUp={longPress.onPointerUp}
+        onPointerCancel={longPress.onPointerCancel}
+        onClickCapture={longPress.onClickCapture}
+      >
+        <div>
+          <p className="font-semibold text-slate-900">{title}</p>
+          <p className="text-sm font-medium text-slate-600">{formatDateLong(workout.date)}</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''} · {setCount} série
+            {setCount > 1 ? 's' : ''}
+            {volume > 0 && <> · {formatVolume(volume)} kg</>}
+          </p>
+        </div>
+        <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
+      </Link>
+
+      {menuOpen && (
+        <ContextMenuSheet
+          title={title}
+          actions={[{ label: 'Renommer', icon: PencilIcon, onSelect: () => setRenaming(true) }]}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
+
+      {renaming && (
+        <RenameSheet
+          title="Renommer la séance"
+          initialName={title}
+          allowEmpty
+          placeholder="Séance libre"
+          onRename={(name) => {
+            updateWorkoutTitle(workout.id!, name)
+            setRenaming(false)
+          }}
+          onCancel={() => setRenaming(false)}
+        />
+      )}
+    </>
   )
 }

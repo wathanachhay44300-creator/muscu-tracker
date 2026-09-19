@@ -5,6 +5,8 @@ import { setVolume } from './stats'
 export interface LastPerformance {
   date: string
   sets: SetEntry[]
+  /** Note left on this exercise during that session, if any. */
+  note?: string
 }
 
 /**
@@ -37,7 +39,7 @@ export async function getLastPerformance(
     const hasData = sets.some((s) => s.weight > 0 || s.reps > 0)
     if (!hasData) continue
     if (!best || workout.date > best.date) {
-      best = { date: workout.date, sets }
+      best = { date: workout.date, sets, note: link.note?.trim() ? link.note : undefined }
     }
   }
   return best

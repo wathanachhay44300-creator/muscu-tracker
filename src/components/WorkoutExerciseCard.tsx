@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type { WorkoutExerciseWithSets } from '../types'
 import { usePersonalRecords } from '../hooks/usePersonalRecords'
@@ -15,6 +15,7 @@ import {
   removeSet,
   restoreExercise,
   restoreSet,
+  updateExerciseNote,
   updateSet,
 } from '../lib/workoutActions'
 import { getSuggestedProgression } from '../lib/progression'
@@ -23,7 +24,7 @@ import { formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats
 import { relativeDateLabel } from '../lib/date'
 import { SetRow } from './SetRow'
 import { ContextMenuSheet } from './ContextMenuSheet'
-import { CopyIcon, GripIcon, PlusIcon, TrashIcon } from './Icons'
+import { CopyIcon, GripIcon, NoteIcon, PlusIcon, TrashIcon } from './Icons'
 
 interface WorkoutExerciseCardProps {
   we: WorkoutExerciseWithSets
@@ -53,6 +54,16 @@ export function WorkoutExerciseCard({
   const preferences = usePreferences()
   const { showSnackbar } = useSnackbar()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [noteOpen, setNoteOpen] = useState(false)
+  const [noteText, setNoteText] = useState(we.note ?? '')
+  const noteTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(noteTimeout.current), [])
+
+  function handleNoteChange(value: string) {
+    setNoteText(value)
+    clearTimeout(noteTimeout.current)
+    noteTimeout.current = setTimeout(() => updateExerciseNote(we.id!, value), 400)
+  }
   const volume = totalVolume(we.sets)
   const suggestion = we.sets.length === 0 ? getSuggestedProgression(lastTime) : null
 
@@ -76,7 +87,7 @@ export function WorkoutExerciseCard({
   }
 
   async function handleRemoveExercise() {
-    const link = { id: we.id, workoutId: we.workoutId, exerciseId: we.exerciseId, order: we.order }
+    const link = { id: we.id, workoutId: we.workoutId, exerciseId: we.exerciseId, order: we.order, note: we.note }
     const sets = [...we.sets]
     await removeExerciseFromWorkout(we.id!)
     showSnackbar('Exercice supprimé', () => restoreExercise(link, sets))
@@ -146,9 +157,43 @@ export function WorkoutExerciseCard({
               {we.exercise.name}
             </Link>
             <p className="text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
+            {lastTime?.note && (
+              <p className="mt-1 text-xs italic text-amber-600">
+                Dernière fois : {lastTime.note}
+              </p>
+            )}
+            {!noteOpen && noteText.trim() && (
+              <p className="mt-1 whitespace-pre-wrap text-xs text-brand-600">{noteText}</p>
+            )}
           </div>
         </div>
+        <button
+          type="button"
+          data-no-long-press
+          data-no-swipe
+          onClick={() => setNoteOpen((v) => !v)}
+          aria-label="Note sur cet exercice"
+          aria-expanded={noteOpen}
+          className={`shrink-0 rounded-lg p-1.5 active:bg-slate-100 ${
+            noteText.trim() ? 'text-brand-600' : 'text-slate-300'
+          }`}
+        >
+          <NoteIcon className="h-5 w-5" />
+        </button>
       </div>
+
+      {noteOpen && (
+        <textarea
+          data-no-long-press
+          data-no-swipe
+          autoFocus
+          value={noteText}
+          onChange={(e) => handleNoteChange(e.target.value)}
+          placeholder="Note (ressenti, douleur, forme…)"
+          rows={2}
+          className="mb-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-brand-400"
+        />
+      )}
 
       {lastTime && (
         <p className="mb-3 rounded-lg bg-slate-50 px-2.5 py-2 text-xs text-slate-500">

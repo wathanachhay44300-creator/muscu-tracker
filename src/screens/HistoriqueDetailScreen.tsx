@@ -45,7 +45,7 @@ export function HistoriqueDetailScreen() {
         </button>
         <div>
           <h1 className="text-lg font-bold text-slate-900">
-            {template?.name ?? 'Séance libre'}
+            {detail.workout.title ?? template?.name ?? 'Séance libre'}
           </h1>
           <p className="text-sm font-medium text-slate-600">{formatDateLong(detail.workout.date)}</p>
         </div>

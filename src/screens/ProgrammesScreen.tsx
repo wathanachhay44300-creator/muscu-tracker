@@ -12,6 +12,7 @@ import {
 import { unschedulePlannedSession } from '../lib/planningActions'
 import { PlanningCalendar } from '../components/PlanningCalendar'
 import { ContextMenuSheet } from '../components/ContextMenuSheet'
+import { RenameSheet } from '../components/RenameSheet'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { useLongPress } from '../hooks/useLongPress'
@@ -170,6 +171,7 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
 
       {renaming && (
         <RenameSheet
+          title="Renommer le programme"
           initialName={template.name}
           onRename={(name) => {
             renameTemplate(template.id!, name)
@@ -197,56 +199,6 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
         />
       )}
     </>
-  )
-}
-
-function RenameSheet({
-  initialName,
-  onRename,
-  onCancel,
-}: {
-  initialName: string
-  onRename: (name: string) => void
-  onCancel: () => void
-}) {
-  const [name, setName] = useState(initialName)
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
-      onClick={onCancel}
-    >
-      <div
-        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Renommer le programme</h2>
-        <input
-          autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onFocus={(e) => e.target.select()}
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base outline-none focus:border-brand-400"
-        />
-        <div className="mt-5 flex gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 rounded-xl bg-slate-100 py-3 font-medium text-slate-600 active:bg-slate-200"
-          >
-            Annuler
-          </button>
-          <button
-            type="button"
-            onClick={() => name.trim() && onRename(name.trim())}
-            disabled={!name.trim()}
-            className="flex-1 rounded-xl bg-brand-600 py-3 font-medium text-white disabled:opacity-40 active:bg-brand-700"
-          >
-            Renommer
-          </button>
-        </div>
-      </div>
-    </div>
   )
 }
 
