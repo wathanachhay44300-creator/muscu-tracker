@@ -61,7 +61,7 @@ export function ExerciseDetailScreen() {
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-lg font-bold text-slate-900">{exercise.name}</h1>
+          <h1 className="font-exercise text-lg text-slate-900">{exercise.name}</h1>
           <p className="text-xs font-medium text-slate-400">
             {exercise.muscleGroup}
             {exercise.deletedAt && ' · Supprimé de la bibliothèque'}

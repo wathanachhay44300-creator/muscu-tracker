@@ -16,7 +16,7 @@ export function ExerciseComparisonCard({ we, comparison, style }: ExerciseCompar
 
   return (
     <div className="animate-fade-in rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm" style={style}>
-      <p className="font-display text-base text-slate-900">{we.exercise.name}</p>
+      <p className="font-exercise text-[0.95rem] text-slate-900">{we.exercise.name}</p>
       <p className="mb-2.5 text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
 
       {!hasHistory && (

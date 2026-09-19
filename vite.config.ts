@@ -46,7 +46,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
-        // Libre Baskerville comes from Google Fonts: cache it so titles stay serif offline.
+        // Libre Baskerville and Manrope come from Google Fonts: cache it so titles stay serif offline.
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

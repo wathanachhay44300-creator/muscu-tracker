@@ -91,7 +91,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
                       key={ex.id}
                       type="button"
                       onClick={() => onSelect(ex)}
-                      className={`block w-full px-4 py-3 text-left text-base text-slate-900 active:bg-slate-50 ${
+                      className={`font-exercise block w-full px-4 py-3 text-left text-base text-slate-900 active:bg-slate-50 ${
                         i > 0 ? 'border-t border-slate-100' : ''
                       }`}
                     >

@@ -155,7 +155,7 @@ export function WorkoutExerciseCard({
             <button
               type="button"
               onClick={() => navigate(`/exercices/${we.exercise.id}`)}
-              className="font-display text-base text-slate-900 active:opacity-60 text-left"
+              className="font-exercise text-[0.95rem] text-slate-900 active:opacity-60 text-left"
             >
               {we.exercise.name}
             </button>
