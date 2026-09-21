@@ -54,7 +54,7 @@ export function ProgrammesScreen() {
       onPointerUp={pullToRefresh.handlers.onPointerUp}
       onPointerCancel={pullToRefresh.handlers.onPointerCancel}
     >
-      <PullToRefreshIndicator pullY={pullToRefresh.pullY} refreshing={pullToRefresh.refreshing} />
+      <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-slate-900">Programmes</h1>
         <button

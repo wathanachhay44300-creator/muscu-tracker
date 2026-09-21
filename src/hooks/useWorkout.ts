@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { getWorkoutForDate } from '../lib/workoutActions'
@@ -10,6 +11,11 @@ export interface WorkoutDetail {
 
 /** Loads a workout with all its exercises and sets, live-updating on any change. */
 export function useWorkoutDetail(workoutId: number | undefined): WorkoutDetail | undefined {
+  // Every query run builds fresh objects; reusing the previous ones when their
+  // content is unchanged lets memoized exercise cards skip re-rendering when
+  // only a sibling exercise was edited.
+  const previous = useRef<WorkoutDetail | undefined>(undefined)
+
   return useLiveQuery(async () => {
     if (!workoutId) return undefined
     const workout = await db.workouts.get(workoutId)
@@ -23,7 +29,15 @@ export function useWorkoutDetail(workoutId: number | undefined): WorkoutDetail |
         return { ...link, exercise: exercise!, sets }
       }),
     )
-    return { workout, exercises }
+    const prev = previous.current?.workout.id === workoutId ? previous.current : undefined
+    const prevById = new Map(prev?.exercises.map((we) => [we.id!, we]))
+    const stable = exercises.map((we) => {
+      const old = prevById.get(we.id!)
+      return old && JSON.stringify(old) === JSON.stringify(we) ? old : we
+    })
+    const detail = { workout, exercises: stable }
+    previous.current = detail
+    return detail
   }, [workoutId])
 }
 

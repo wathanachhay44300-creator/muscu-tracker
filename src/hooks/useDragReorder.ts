@@ -11,6 +11,8 @@ interface DragState {
   order: number[]
   index: number
   tops: Map<number, number>
+  /** Measured once when the drag starts, so pointer moves never force layout. */
+  heights: Map<number, number>
 }
 
 interface PendingState {
@@ -37,6 +39,7 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
   const [draggingId, setDraggingId] = useState<number | null>(null)
   const [shifts, setShifts] = useState<Map<number, number>>(new Map())
   const itemRefs = useRef<Map<number, HTMLElement>>(new Map())
+  const shiftsRef = useRef<Map<number, number>>(new Map())
   const dragRef = useRef<DragState | null>(null)
   const pendingRef = useRef<PendingState | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -55,7 +58,12 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
     if (!container) return
     const rect = container.getBoundingClientRect()
     const tops = new Map<number, number>()
-    for (const [itemId, el] of itemRefs.current) tops.set(itemId, el.getBoundingClientRect().top)
+    const heights = new Map<number, number>()
+    for (const [itemId, el] of itemRefs.current) {
+      const r = el.getBoundingClientRect()
+      tops.set(itemId, r.top)
+      heights.set(itemId, r.height)
+    }
     const pending = pendingRef.current
     dragRef.current = {
       id,
@@ -65,6 +73,7 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
       order: [...idsRef.current],
       index: idsRef.current.indexOf(id),
       tops,
+      heights,
     }
     setDraggingId(id)
   }
@@ -81,16 +90,24 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
     for (const otherId of drag.order) {
       if (otherId === drag.id) continue
       const otherTop = drag.tops.get(otherId)
-      const otherEl = itemRefs.current.get(otherId)
-      if (otherTop == null || !otherEl) continue
-      const otherMid = otherTop + otherEl.getBoundingClientRect().height / 2
+      const otherHeight = drag.heights.get(otherId)
+      if (otherTop == null || otherHeight == null) continue
+      const otherMid = otherTop + otherHeight / 2
       if (otherTop > drag.startTop && draggedCurrentMid > otherMid) {
         newShifts.set(otherId, -drag.height)
       } else if (otherTop < drag.startTop && draggedCurrentMid < otherMid) {
         newShifts.set(otherId, drag.height)
       }
     }
-    setShifts(newShifts)
+    // Only touch React state when the set of displaced items actually changed
+    // (a few times per drag), not on every pointer move.
+    const prev = shiftsRef.current
+    let changed = prev.size !== newShifts.size
+    if (!changed) for (const [k, v] of newShifts) if (prev.get(k) !== v) changed = true
+    if (changed) {
+      shiftsRef.current = newShifts
+      setShifts(newShifts)
+    }
   }
 
   function finishDrag() {
@@ -99,7 +116,7 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
 
     let movedUp = 0
     let movedDown = 0
-    for (const shift of shifts.values()) {
+    for (const shift of shiftsRef.current.values()) {
       if (shift < 0) movedUp++
       else if (shift > 0) movedDown++
     }
@@ -109,6 +126,7 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
     if (el) el.style.transform = ''
     dragRef.current = null
     setDraggingId(null)
+    shiftsRef.current = new Map()
     setShifts(new Map())
 
     if (newIndex !== drag.index) {
@@ -158,40 +176,73 @@ export function useDragReorder(ids: number[], onReorder: (newIds: number[]) => v
     finishDrag()
   }
 
-  function getRowProps(id: number): {
-    isDragging: boolean
-    containerProps: { ref: (el: HTMLElement | null) => void; style: CSSProperties }
-    handleProps: {
-      'data-drag-handle': true
-      style: CSSProperties
-      onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void
-      onPointerMove: (e: ReactPointerEvent<HTMLElement>) => void
-      onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void
-      onPointerCancel: (e: ReactPointerEvent<HTMLElement>) => void
-      onContextMenu: (e: React.MouseEvent<HTMLElement>) => void
+  // Handlers are recreated every render (they close over hook state), so the
+  // per-row props handed to consumers go through a "latest" ref: their
+  // identity stays stable, which lets memoized row components skip re-rendering
+  // while another row is being dragged or edited.
+  const latest = useRef({ registerRef, handlePointerDown, handlePointerMove, handlePointerUp })
+  useEffect(() => {
+    latest.current = { registerRef, handlePointerDown, handlePointerMove, handlePointerUp }
+  })
+  const rowCache = useRef(new Map<number, RowCacheEntry>())
+
+  function getRowProps(id: number): RowProps {
+    let entry = rowCache.current.get(id)
+    if (!entry) {
+      entry = {
+        ref: (el) => latest.current.registerRef(id, el),
+        handleProps: {
+          'data-drag-handle': true,
+          style: { touchAction: 'none' },
+          onPointerDown: (e) => latest.current.handlePointerDown(id, e),
+          onPointerMove: (e) => latest.current.handlePointerMove(e),
+          onPointerUp: () => latest.current.handlePointerUp(),
+          onPointerCancel: () => latest.current.handlePointerUp(),
+          onContextMenu: (e) => e.preventDefault(),
+        },
+        styleKey: '',
+        style: {},
+      }
+      rowCache.current.set(id, entry)
     }
-  } {
     const isDragging = draggingId === id
     const shift = shifts.get(id) ?? 0
+    const styleKey = isDragging ? 'drag' : String(shift)
+    if (entry.styleKey !== styleKey) {
+      entry.styleKey = styleKey
+      entry.style = isDragging
+        ? { position: 'relative', zIndex: 10 }
+        : { position: 'relative', zIndex: 0, transform: `translateY(${shift}px)`, transition: 'transform 200ms ease' }
+    }
     return {
       isDragging,
-      containerProps: {
-        ref: (el) => registerRef(id, el),
-        style: isDragging
-          ? { position: 'relative', zIndex: 10 }
-          : { position: 'relative', zIndex: 0, transform: `translateY(${shift}px)`, transition: 'transform 200ms ease' },
-      },
-      handleProps: {
-        'data-drag-handle': true,
-        style: { touchAction: 'none' },
-        onPointerDown: (e) => handlePointerDown(id, e),
-        onPointerMove: handlePointerMove,
-        onPointerUp: handlePointerUp,
-        onPointerCancel: handlePointerUp,
-        onContextMenu: (e) => e.preventDefault(),
-      },
+      containerProps: { ref: entry.ref, style: entry.style },
+      handleProps: entry.handleProps,
     }
   }
 
   return { draggingId, getRowProps }
+}
+
+interface HandleProps {
+  'data-drag-handle': true
+  style: CSSProperties
+  onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void
+  onPointerMove: (e: ReactPointerEvent<HTMLElement>) => void
+  onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void
+  onPointerCancel: (e: ReactPointerEvent<HTMLElement>) => void
+  onContextMenu: (e: React.MouseEvent<HTMLElement>) => void
+}
+
+interface RowProps {
+  isDragging: boolean
+  containerProps: { ref: (el: HTMLElement | null) => void; style: CSSProperties }
+  handleProps: HandleProps
+}
+
+interface RowCacheEntry {
+  ref: (el: HTMLElement | null) => void
+  handleProps: HandleProps
+  styleKey: string
+  style: CSSProperties
 }

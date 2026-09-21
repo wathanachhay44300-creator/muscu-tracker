@@ -14,11 +14,24 @@ const SETTLE_PX = 48
  * an optional `onRefresh` still runs if the caller has something to do.
  */
 export function usePullToRefresh(onRefresh?: () => void | Promise<void>) {
-  const [pullY, setPullY] = useState(0)
+  // The pull distance is written straight to the indicator's DOM node
+  // (transform/opacity only), so dragging never re-renders the screen.
+  const indicatorRef = useRef<HTMLDivElement>(null)
   const [refreshing, setRefreshing] = useState(false)
   const startRef = useRef<{ x: number; y: number } | null>(null)
   const axisRef = useRef<'x' | 'y' | null>(null)
   const lastDyRef = useRef(0)
+
+  function paint(y: number, animate: boolean) {
+    const el = indicatorRef.current
+    if (!el) return
+    const progress = Math.min(1, y / SETTLE_PX)
+    el.style.transition = animate ? 'transform 200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease' : 'none'
+    el.style.transform = `translate3d(-50%, ${y - 48}px, 0)`
+    el.style.opacity = String(progress)
+    const icon = el.firstElementChild as HTMLElement | null
+    if (icon) icon.style.transform = `rotate(${progress * 180}deg)`
+  }
 
   function onPointerDown(e: ReactPointerEvent<HTMLElement>) {
     if (refreshing || !e.isPrimary) return
@@ -39,7 +52,7 @@ export function usePullToRefresh(onRefresh?: () => void | Promise<void>) {
     if (axisRef.current !== 'y' || dy <= 0) return
     e.preventDefault()
     lastDyRef.current = dy
-    setPullY(Math.min(MAX_PULL_PX, dy * RESISTANCE))
+    paint(Math.min(MAX_PULL_PX, dy * RESISTANCE), false)
   }
 
   async function endGesture() {
@@ -52,15 +65,15 @@ export function usePullToRefresh(onRefresh?: () => void | Promise<void>) {
 
     if (wasVertical && finalDy >= PULL_THRESHOLD_PX) {
       setRefreshing(true)
-      setPullY(SETTLE_PX)
+      paint(SETTLE_PX, true)
       await Promise.all([onRefresh?.(), new Promise((resolve) => setTimeout(resolve, 500))])
       setRefreshing(false)
     }
-    setPullY(0)
+    paint(0, true)
   }
 
   return {
-    pullY,
+    indicatorRef,
     refreshing,
     handlers: {
       onPointerDown,

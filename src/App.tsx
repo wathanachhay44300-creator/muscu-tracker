@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { ensureSeedData } from './db'
 import { migrateLegacyExerciseData } from './lib/migrations'
@@ -7,19 +7,21 @@ import { SeanceScreen } from './screens/SeanceScreen'
 import { HistoriqueScreen } from './screens/HistoriqueScreen'
 import { HistoriqueDetailScreen } from './screens/HistoriqueDetailScreen'
 import { ExercicesScreen } from './screens/ExercicesScreen'
-import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { ProgrammesScreen } from './screens/ProgrammesScreen'
-import { TemplateDetailScreen } from './screens/TemplateDetailScreen'
-import { WeeklyBreakdownScreen } from './screens/WeeklyBreakdownScreen'
-import { CalendrierScreen } from './screens/CalendrierScreen'
-import { BilanScreen } from './screens/BilanScreen'
-import { CorpsScreen } from './screens/CorpsScreen'
-import { PhotosScreen } from './screens/PhotosScreen'
-import { DonneesScreen } from './screens/DonneesScreen'
 import { DumbbellIcon } from './components/Icons'
 import { RestTimerWidget } from './components/RestTimerWidget'
-import { ReglagesScreen } from './screens/ReglagesScreen'
 import { SnackbarProvider } from './contexts/SnackbarContext'
+
+// Rarely-opened screens are split out of the main bundle (still precached by the service worker, so they open offline).
+const ExerciseDetailScreen = lazy(() => import('./screens/ExerciseDetailScreen').then((m) => ({ default: m.ExerciseDetailScreen })))
+const TemplateDetailScreen = lazy(() => import('./screens/TemplateDetailScreen').then((m) => ({ default: m.TemplateDetailScreen })))
+const WeeklyBreakdownScreen = lazy(() => import('./screens/WeeklyBreakdownScreen').then((m) => ({ default: m.WeeklyBreakdownScreen })))
+const CalendrierScreen = lazy(() => import('./screens/CalendrierScreen').then((m) => ({ default: m.CalendrierScreen })))
+const BilanScreen = lazy(() => import('./screens/BilanScreen').then((m) => ({ default: m.BilanScreen })))
+const CorpsScreen = lazy(() => import('./screens/CorpsScreen').then((m) => ({ default: m.CorpsScreen })))
+const PhotosScreen = lazy(() => import('./screens/PhotosScreen').then((m) => ({ default: m.PhotosScreen })))
+const DonneesScreen = lazy(() => import('./screens/DonneesScreen').then((m) => ({ default: m.DonneesScreen })))
+const ReglagesScreen = lazy(() => import('./screens/ReglagesScreen').then((m) => ({ default: m.ReglagesScreen })))
 
 export default function App() {
   const [ready, setReady] = useState(false)
@@ -32,7 +34,7 @@ export default function App() {
 
   if (!ready) {
     return (
-      <div className="flex h-dvh flex-col items-center justify-center gap-3 bg-slate-50">
+      <div className="flex h-dvh flex-col items-center justify-center gap-3 bg-page">
         <DumbbellIcon className="h-8 w-8 animate-pulse text-accent" />
       </div>
     )
@@ -41,7 +43,8 @@ export default function App() {
   return (
     <HashRouter>
       <SnackbarProvider>
-        <div className="min-h-dvh bg-slate-50">
+        <div className="min-h-dvh bg-page">
+          <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<SeanceScreen />} />
             <Route path="/jour/:date" element={<SeanceScreen />} />
@@ -59,6 +62,7 @@ export default function App() {
             <Route path="/reglages" element={<ReglagesScreen />} />
             <Route path="/donnees" element={<DonneesScreen />} />
           </Routes>
+          </Suspense>
           <RestTimerWidget />
           <BottomNav />
         </div>

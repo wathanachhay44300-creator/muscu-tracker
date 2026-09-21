@@ -76,10 +76,7 @@ export function SeanceScreen() {
       onPointerUp={pullToRefresh.handlers.onPointerUp}
       onPointerCancel={pullToRefresh.handlers.onPointerCancel}
     >
-      <PullToRefreshIndicator
-        pullY={pullToRefresh.pullY}
-        refreshing={pullToRefresh.refreshing}
-      />
+      <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
       <div className="relative isolate">
         <AngkorSilhouette className="inset-x-0 bottom-0 h-24 w-full" />
         <div className="mb-2 flex justify-end">

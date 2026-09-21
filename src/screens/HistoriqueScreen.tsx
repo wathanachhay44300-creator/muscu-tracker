@@ -35,7 +35,7 @@ export function HistoriqueScreen() {
       onPointerUp={pullToRefresh.handlers.onPointerUp}
       onPointerCancel={pullToRefresh.handlers.onPointerCancel}
     >
-      <PullToRefreshIndicator pullY={pullToRefresh.pullY} refreshing={pullToRefresh.refreshing} />
+      <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
       <h1 className="mb-5 text-lg font-bold text-slate-900">Historique</h1>
 
       <div className="mb-4 space-y-2.5">
@@ -145,7 +145,7 @@ function HistoryListItem({ summary }: { summary: WorkoutSummary }) {
         onClick={() => navigate(`/historique/${workout.id}`)}
         onKeyDown={(e) => e.key === 'Enter' && navigate(`/historique/${workout.id}`)}
         onContextMenu={longPress.onContextMenu}
-        className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50 [content-visibility:auto] [contain-intrinsic-size:auto_84px]"
         onPointerDown={longPress.onPointerDown}
         onPointerMove={longPress.onPointerMove}
         onPointerUp={longPress.onPointerUp}

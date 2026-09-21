@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { memo, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { WorkoutExerciseWithSets } from '../types'
 import { usePersonalRecords } from '../hooks/usePersonalRecords'
@@ -41,7 +41,7 @@ interface WorkoutExerciseCardProps {
   }
 }
 
-export function WorkoutExerciseCard({
+export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
   we,
   workoutId,
   containerRef,
@@ -280,4 +280,4 @@ export function WorkoutExerciseCard({
       )}
     </div>
   )
-}
+})
