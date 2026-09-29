@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { formatDateFr } from '../lib/date'
 
 export interface ChartPoint {
   date: string
   value: number
+  /** Highlighted with a star marker — this session set a personal record. */
+  isPR?: boolean
 }
 
 interface ProgressChartProps {
@@ -19,6 +22,10 @@ const PAD_BOTTOM = 24
 
 /** Minimal hand-rolled SVG line chart — no charting library needed for a single series. */
 export function ProgressChart({ points, unit }: ProgressChartProps) {
+  // Tapped point takes over the floating value label; defaults to the most
+  // recent point so there's always something shown at a glance.
+  const [selected, setSelected] = useState<number | null>(null)
+
   if (points.length < 2) return null
 
   const values = points.map((p) => p.value)
@@ -36,13 +43,16 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
   const path = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ')
   const areaPath = `${path} L${coords[coords.length - 1].x.toFixed(1)},${(PAD_TOP + innerH).toFixed(1)} L${coords[0].x.toFixed(1)},${(PAD_TOP + innerH).toFixed(1)} Z`
 
-  const last = coords[coords.length - 1]
+  const activeIndex = selected ?? coords.length - 1
+  const active = coords[activeIndex]
+  // Keep the floating label inside the chart: flip it below the point when
+  // there isn't enough headroom above, and clamp it away from the edges.
+  const labelBelow = active.y < PAD_TOP + 10
+  const labelY = labelBelow ? active.y + 16 : active.y - 8
+  const labelAnchor = active.x < PAD_X + 24 ? 'start' : active.x > WIDTH - PAD_X - 24 ? 'end' : 'middle'
 
   return (
-    <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label="Graphique de progression">
-      <text x={PAD_X} y={12} fontSize="10" fill="var(--color-slate-400)" fontWeight="600">
-        {formatVal(maxV)} {unit}
-      </text>
+    <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full touch-manipulation" role="img" aria-label="Graphique de progression">
       <path d={areaPath} fill="var(--color-brand-50)" />
       <path
         d={path}
@@ -53,18 +63,44 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
         strokeLinejoin="round"
       />
       {coords.map((c, i) => (
-        <circle
+        <g
           key={i}
-          cx={c.x}
-          cy={c.y}
-          r={i === coords.length - 1 ? 3.5 : 2.5}
-          fill={i === coords.length - 1 ? 'var(--color-brand-600)' : 'var(--color-surface)'}
-          stroke="var(--color-brand-600)"
-          strokeWidth="1.5"
-        />
+          onClick={() => setSelected(i)}
+          className="cursor-pointer"
+          role="button"
+          aria-label={`${formatDateFr(c.date, { withYear: false })} : ${formatVal(c.value)} ${unit}`}
+        >
+          {/* Generous invisible hit target — the visible dot is tiny on a phone screen. */}
+          <circle cx={c.x} cy={c.y} r={12} fill="transparent" />
+          {c.isPR ? (
+            <path
+              d={starPath(c.x, c.y, i === activeIndex ? 6.5 : 5.5)}
+              fill="var(--color-amber-500)"
+              stroke="var(--color-surface)"
+              strokeWidth={1.2}
+              strokeLinejoin="round"
+            />
+          ) : (
+            <circle
+              cx={c.x}
+              cy={c.y}
+              r={i === activeIndex ? 4 : 2.5}
+              fill={i === activeIndex ? 'var(--color-brand-600)' : 'var(--color-surface)'}
+              stroke="var(--color-brand-600)"
+              strokeWidth="1.5"
+            />
+          )}
+        </g>
       ))}
-      <text x={last.x} y={last.y - 8} fontSize="10" fill="var(--color-brand-600)" fontWeight="700" textAnchor="end">
-        {formatVal(last.value)} {unit}
+      <text
+        x={active.x}
+        y={labelY}
+        fontSize="10"
+        fill="var(--color-brand-600)"
+        fontWeight="700"
+        textAnchor={labelAnchor}
+      >
+        {formatVal(active.value)} {unit}
       </text>
       <text x={PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--color-slate-400)">
         {formatDateFr(points[0].date, { withYear: false })}
@@ -78,4 +114,18 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
 
 function formatVal(n: number): string {
   return Number.isInteger(n) ? String(n) : n.toFixed(1)
+}
+
+/** SVG path for a 5-point star centered at (cx, cy) with outer radius r. */
+function starPath(cx: number, cy: number, r: number): string {
+  const inner = r * 0.42
+  const pts: string[] = []
+  for (let i = 0; i < 10; i++) {
+    const angle = (Math.PI / 5) * i - Math.PI / 2
+    const radius = i % 2 === 0 ? r : inner
+    const x = cx + radius * Math.cos(angle)
+    const y = cy + radius * Math.sin(angle)
+    pts.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
+  }
+  return pts.join(' ') + ' Z'
 }

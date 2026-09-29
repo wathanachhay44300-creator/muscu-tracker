@@ -171,14 +171,56 @@ export async function finishWorkout(workoutId: number): Promise<void> {
   await db.workouts.update(workoutId, { finishedAt: Date.now() })
 }
 
-/** Deletes an entire workout and all its exercises/sets. */
-export async function deleteWorkout(workoutId: number): Promise<void> {
-  await db.transaction('rw', db.workouts, db.workoutExercises, db.sets, async () => {
+export interface WorkoutSnapshot {
+  workout: Workout
+  exercises: (WorkoutExercise & { sets: SetEntry[] })[]
+}
+
+/**
+ * Deletes an entire workout and all its exercises/sets, returning a snapshot
+ * that fully restores it (workout row, exercises and sets, and — since the
+ * calendar and history are just live queries over these tables — its
+ * training day reappears on its own). Backs the "Annuler" snackbar wherever
+ * a session can be deleted.
+ */
+export async function deleteWorkoutWithUndo(workoutId: number): Promise<WorkoutSnapshot> {
+  return db.transaction('rw', db.workouts, db.workoutExercises, db.sets, async () => {
+    const workout = await db.workouts.get(workoutId)
+    if (!workout) throw new Error('Séance introuvable')
     const links = await db.workoutExercises.where('workoutId').equals(workoutId).toArray()
+    const exercises = await Promise.all(
+      links.map(async (link) => ({
+        ...link,
+        sets: await db.sets.where('workoutExerciseId').equals(link.id!).sortBy('order'),
+      })),
+    )
     for (const link of links) {
       await db.sets.where('workoutExerciseId').equals(link.id!).delete()
     }
     await db.workoutExercises.where('workoutId').equals(workoutId).delete()
     await db.workouts.delete(workoutId)
+    return { workout, exercises }
   })
+}
+
+/** Re-creates a workout (and its exercises/sets) from a snapshot taken by
+ * `deleteWorkoutWithUndo` — the "Annuler" snackbar action. New ids are
+ * assigned throughout; nothing else references a workout by id across a
+ * delete, so that's invisible to the rest of the app. */
+export async function restoreWorkoutSnapshot(snapshot: WorkoutSnapshot): Promise<number> {
+  const { id: _id, ...workoutRest } = snapshot.workout
+  const newWorkoutId = await db.workouts.add(workoutRest)
+  await Promise.all(
+    snapshot.exercises.map(async (we) => {
+      const { id: _lid, sets, workoutId: _oldWorkoutId, ...linkRest } = we
+      const newLinkId = await db.workoutExercises.add({ ...linkRest, workoutId: newWorkoutId })
+      await Promise.all(
+        sets.map((s) => {
+          const { id: _sid, workoutExerciseId: _oldLinkId, ...rest } = s
+          return db.sets.add({ ...rest, workoutExerciseId: newLinkId })
+        }),
+      )
+    }),
+  )
+  return newWorkoutId
 }

@@ -127,6 +127,16 @@ export function StarIcon(props: IconProps) {
   )
 }
 
+/** Outline counterpart to the solid `StarIcon`, used for the "not a favorite
+ * yet" state of the favorite toggle. */
+export function StarOutlineIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 2.5l2.9 6.1 6.6.7-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.1 1.3-6.6-4.9-4.6 6.6-.7Z" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function ClipboardIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

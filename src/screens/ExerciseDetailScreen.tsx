@@ -21,14 +21,16 @@ export function ExerciseDetailScreen() {
     if (!history) return []
     return [...history.entries]
       .reverse() // chronological, oldest first
-      .map((entry) => ({
-        date: entry.workout.date,
-        value:
+      .map((entry) => {
+        const value =
+          metric === 'weight' ? Math.max(...entry.sets.map((s) => s.weight)) : totalVolume(entry.sets)
+        const isPR =
           metric === 'weight'
-            ? Math.max(...entry.sets.map((s) => s.weight))
-            : totalVolume(entry.sets),
-      }))
-  }, [history, metric])
+            ? !!records && records.bestWeight > 0 && value === records.bestWeight
+            : !!records && records.bestVolume > 0 && value === records.bestVolume
+        return { date: entry.workout.date, value, isPR }
+      })
+  }, [history, metric, records])
 
   if (!history) {
     return (
@@ -99,7 +101,16 @@ export function ExerciseDetailScreen() {
             </div>
           )}
 
-          {chartPoints.length >= 2 && (
+          {entries.length < 2 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-center">
+              <p className="text-sm font-medium text-slate-500">
+                Pas encore assez de données pour un graphique
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                Reviens après ta prochaine séance sur cet exercice.
+              </p>
+            </div>
+          ) : (
             <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-semibold text-slate-700">Progression</p>
@@ -121,6 +132,7 @@ export function ExerciseDetailScreen() {
                 </div>
               </div>
               <ProgressChart points={chartPoints} unit="kg" />
+              <p className="mt-1 text-center text-[11px] text-slate-400">Touchez un point pour voir sa valeur</p>
             </div>
           )}
 

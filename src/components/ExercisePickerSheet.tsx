@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { renameExercise } from '../lib/exerciseActions'
+import { useExerciseLibrary } from '../hooks/useExerciseLibrary'
+import { renameExercise, setExerciseFavorite } from '../lib/exerciseActions'
 import { guessLoadType } from '../lib/loadType'
 import { LOAD_TYPES, MUSCLE_GROUPS, type Exercise, type LoadType, type MuscleGroup } from '../types'
-import { SearchIcon, XIcon, PlusIcon } from './Icons'
+import { SearchIcon, XIcon, PlusIcon, StarIcon, StarOutlineIcon } from './Icons'
 
 interface ExercisePickerSheetProps {
   onSelect: (exercise: Exercise) => void
@@ -16,10 +16,10 @@ interface ExercisePickerSheetProps {
 export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: ExercisePickerSheetProps) {
   const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
+  const library = useExerciseLibrary()
+  const exercises = library?.all ?? []
 
-  const exercises =
-    useLiveQuery(() => db.exercises.orderBy('name').filter((e) => !e.deletedAt).toArray(), []) ?? []
-
+  const searching = query.trim().length > 0
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     const list = q ? exercises.filter((e) => e.name.toLowerCase().includes(q)) : exercises
@@ -27,14 +27,28 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
     return list.filter((e) => !excluded.has(e.id!))
   }, [exercises, query, excludeIds])
 
+  const favorites = useMemo(
+    () => (searching ? filtered.filter((e) => e.favoritedAt) : (library?.favorites ?? []).filter((e) => !excludeIds.includes(e.id!))),
+    [searching, filtered, library, excludeIds],
+  )
+  const recent = useMemo(() => {
+    if (searching || !library) return []
+    const byId = new Map(exercises.map((e) => [e.id!, e]))
+    const excluded = new Set(excludeIds)
+    return library.recentIds.map((id) => byId.get(id)).filter((e): e is Exercise => !!e && !excluded.has(e.id!))
+  }, [searching, library, exercises, excludeIds])
+
+  const shortcutIds = new Set([...favorites, ...recent].map((e) => e.id!))
+  const rest = searching ? filtered : filtered.filter((e) => !shortcutIds.has(e.id!))
   const grouped = useMemo(() => {
     const map = new Map<MuscleGroup, Exercise[]>()
-    for (const ex of filtered) {
+    for (const ex of rest) {
       if (!map.has(ex.muscleGroup)) map.set(ex.muscleGroup, [])
       map.get(ex.muscleGroup)!.push(ex)
     }
     return map
-  }, [filtered])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rest])
 
   return (
     <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
@@ -80,26 +94,15 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
               <span className="font-medium">Créer un exercice personnalisé</span>
             </button>
 
+            {favorites.length > 0 && (
+              <PickerSection title="Favoris" list={favorites} onSelect={onSelect} />
+            )}
+            {recent.length > 0 && (
+              <PickerSection title="Utilisés récemment" list={recent} onSelect={onSelect} />
+            )}
+
             {[...grouped.entries()].map(([group, list]) => (
-              <div key={group} className="mt-5">
-                <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  {group}
-                </h3>
-                <div className="overflow-hidden rounded-xl border border-slate-200">
-                  {list.map((ex, i) => (
-                    <button
-                      key={ex.id}
-                      type="button"
-                      onClick={() => onSelect(ex)}
-                      className={`font-exercise block w-full px-4 py-3 text-left text-base text-slate-900 active:bg-slate-50 ${
-                        i > 0 ? 'border-t border-slate-100' : ''
-                      }`}
-                    >
-                      {ex.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <PickerSection key={group} title={group} list={list} onSelect={onSelect} />
             ))}
 
             {filtered.length === 0 && (
@@ -109,6 +112,47 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
             )}
           </>
         )}
+      </div>
+    </div>
+  )
+}
+
+function PickerSection({
+  title,
+  list,
+  onSelect,
+}: {
+  title: string
+  list: Exercise[]
+  onSelect: (exercise: Exercise) => void
+}) {
+  return (
+    <div className="mt-5">
+      <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h3>
+      <div className="overflow-hidden rounded-xl border border-slate-200">
+        {list.map((ex, i) => (
+          <div key={ex.id} className={`flex items-center ${i > 0 ? 'border-t border-slate-100' : ''}`}>
+            <button
+              type="button"
+              onClick={() => onSelect(ex)}
+              className="font-exercise flex-1 px-4 py-3 text-left text-base text-slate-900 active:bg-slate-50"
+            >
+              {ex.name}
+            </button>
+            <button
+              type="button"
+              onClick={() => setExerciseFavorite(ex.id!, !ex.favoritedAt)}
+              aria-label={ex.favoritedAt ? `Retirer ${ex.name} des favoris` : `Ajouter ${ex.name} aux favoris`}
+              className="shrink-0 p-2 pr-3 active:opacity-70"
+            >
+              {ex.favoritedAt ? (
+                <StarIcon className="h-4 w-4 text-amber-500" />
+              ) : (
+                <StarOutlineIcon className="h-4 w-4 text-slate-300" />
+              )}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   )

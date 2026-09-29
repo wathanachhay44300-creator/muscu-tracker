@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
-import { deleteWorkout } from '../lib/workoutActions'
+import { deleteWorkoutWithUndo, restoreWorkoutSnapshot } from '../lib/workoutActions'
+import { useSnackbar } from '../contexts/SnackbarContext'
 import { WorkoutEditor } from '../components/WorkoutEditor'
 import { ChevronLeftIcon, TrashIcon } from '../components/Icons'
 import { formatDateLong } from '../lib/date'
@@ -13,6 +14,7 @@ export function HistoriqueDetailScreen() {
   const id = workoutId ? Number(workoutId) : undefined
   const detail = useWorkoutDetail(id)
   const navigate = useNavigate()
+  const { showSnackbar } = useSnackbar()
   const [confirming, setConfirming] = useState(false)
   const template = useLiveQuery(
     () => (detail?.workout.templateId ? db.workoutTemplates.get(detail.workout.templateId) : undefined),
@@ -28,8 +30,9 @@ export function HistoriqueDetailScreen() {
   }
 
   async function handleDelete() {
-    await deleteWorkout(id!)
+    const snapshot = await deleteWorkoutWithUndo(id!)
     navigate('/historique')
+    showSnackbar('Séance supprimée', () => restoreWorkoutSnapshot(snapshot))
   }
 
   return (
@@ -57,7 +60,7 @@ export function HistoriqueDetailScreen() {
         {confirming ? (
           <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
             <p className="mb-3 text-sm font-medium text-red-700">
-              Supprimer définitivement cette séance et toutes ses séries ?
+              Supprimer cette séance et toutes ses séries ?
             </p>
             <div className="flex gap-2">
               <button

@@ -37,6 +37,9 @@ export interface Exercise {
    * name) is kept so past sessions that used it still display correctly —
    * it's just hidden from the picker and the exercise list. */
   deletedAt?: number
+  /** When the exercise was marked as a favorite; undefined when it isn't
+   * one. Doubles as the sort key so the most recently favorited comes first. */
+  favoritedAt?: number
 }
 
 export interface Workout {

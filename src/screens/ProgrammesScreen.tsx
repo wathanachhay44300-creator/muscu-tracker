@@ -12,14 +12,15 @@ import {
 import { unschedulePlannedSession } from '../lib/planningActions'
 import { PlanningCalendar } from '../components/PlanningCalendar'
 import { ContextMenuSheet } from '../components/ContextMenuSheet'
-import { RenameSheet } from '../components/RenameSheet'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { useLongPress } from '../hooks/useLongPress'
+import { useInlineRename } from '../hooks/useInlineRename'
 import { usePreferences } from '../hooks/usePreferences'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { hapticMenuOpen } from '../lib/haptics'
 import {
+  CheckIcon,
   ChevronRightIcon,
   ClipboardIcon,
   CopyIcon,
@@ -125,8 +126,8 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
   const preferences = usePreferences()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [renaming, setRenaming] = useState(false)
   const [deleting, setDeleting] = useState<{ usageCount: number } | null>(null)
+  const rename = useInlineRename(template.name, (name) => renameTemplate(template.id!, name))
 
   const longPress = useLongPress(() => {
     hapticMenuOpen(!!preferences?.hapticsEnabled)
@@ -140,50 +141,89 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
 
   return (
     <>
-      {/* A div (not <a>): Safari would show its link-preview menu on long-press. */}
-      <div
-        role="link"
-        tabIndex={0}
-        onClick={() => navigate(`/programmes/${template.id}`)}
-        onKeyDown={(e) => e.key === 'Enter' && navigate(`/programmes/${template.id}`)}
-        onContextMenu={longPress.onContextMenu}
-        className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
-        onPointerDown={longPress.onPointerDown}
-        onPointerMove={longPress.onPointerMove}
-        onPointerUp={longPress.onPointerUp}
-        onPointerCancel={longPress.onPointerCancel}
-        onClickCapture={longPress.onClickCapture}
-      >
-        <div>
-          <p className="font-semibold text-slate-900">{template.name}</p>
-          <p className="text-xs text-slate-400">
-            {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
-          </p>
+      {rename.editing ? (
+        <div className="flex items-center gap-1.5 rounded-2xl border-2 border-brand-400 bg-surface px-3 py-2.5 shadow-sm">
+          <input
+            autoFocus
+            data-no-long-press
+            data-no-swipe
+            value={rename.value}
+            onChange={(e) => rename.setValue(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            onKeyDown={rename.onKeyDown}
+            onBlur={rename.onBlur}
+            className="min-w-0 flex-1 bg-transparent px-1 text-base font-semibold text-slate-900 outline-none"
+          />
+          {/* onMouseDown (not onClick) fires before the input's blur, so these
+           * read as an explicit choice rather than losing to the blur-commit. */}
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={rename.commit}
+            aria-label="Valider le renommage"
+            className="shrink-0 rounded-full p-1.5 text-accent active:bg-slate-100"
+          >
+            <CheckIcon className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={rename.cancel}
+            aria-label="Annuler le renommage"
+            className="shrink-0 rounded-full p-1.5 text-slate-400 active:bg-slate-100"
+          >
+            <XIcon className="h-5 w-5" />
+          </button>
         </div>
-        <ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-300" />
-      </div>
+      ) : (
+        // A div (not <a>): Safari would show its link-preview menu on long-press.
+        <div
+          role="link"
+          tabIndex={0}
+          onClick={() => navigate(`/programmes/${template.id}`)}
+          onKeyDown={(e) => e.key === 'Enter' && navigate(`/programmes/${template.id}`)}
+          onContextMenu={longPress.onContextMenu}
+          className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+          onPointerDown={longPress.onPointerDown}
+          onPointerMove={longPress.onPointerMove}
+          onPointerUp={longPress.onPointerUp}
+          onPointerCancel={longPress.onPointerCancel}
+          onClickCapture={longPress.onClickCapture}
+        >
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-slate-900">{template.name}</p>
+            <p className="text-xs text-slate-400">
+              {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-0.5">
+            <button
+              type="button"
+              data-no-long-press
+              data-no-swipe
+              onClick={(e) => {
+                e.stopPropagation()
+                rename.start()
+              }}
+              aria-label={`Renommer ${template.name}`}
+              className="rounded-full p-1.5 text-slate-300 active:bg-slate-100 active:text-accent"
+            >
+              <PencilIcon className="h-4 w-4" />
+            </button>
+            <ChevronRightIcon className="h-5 w-5 text-slate-300" />
+          </div>
+        </div>
+      )}
 
       {menuOpen && (
         <ContextMenuSheet
           title={template.name}
           actions={[
-            { label: 'Renommer', icon: PencilIcon, onSelect: () => setRenaming(true) },
+            { label: 'Renommer', icon: PencilIcon, onSelect: rename.start },
             { label: 'Dupliquer', icon: CopyIcon, onSelect: () => duplicateTemplate(template.id!) },
             { label: 'Supprimer', icon: TrashIcon, onSelect: handleDeleteClick, danger: true },
           ]}
           onClose={() => setMenuOpen(false)}
-        />
-      )}
-
-      {renaming && (
-        <RenameSheet
-          title="Renommer le programme"
-          initialName={template.name}
-          onRename={(name) => {
-            renameTemplate(template.id!, name)
-            setRenaming(false)
-          }}
-          onCancel={() => setRenaming(false)}
         />
       )}
 

@@ -23,3 +23,12 @@ export async function renameExercise(
 ): Promise<void> {
   await db.exercises.update(exerciseId, patch)
 }
+
+/** Renames an exercise without touching its other fields (inline rename). */
+export async function renameExerciseName(exerciseId: number, name: string): Promise<void> {
+  await db.exercises.update(exerciseId, { name })
+}
+
+export async function setExerciseFavorite(exerciseId: number, isFavorite: boolean): Promise<void> {
+  await db.exercises.update(exerciseId, { favoritedAt: isFavorite ? Date.now() : undefined })
+}
