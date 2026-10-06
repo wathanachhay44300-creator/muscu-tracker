@@ -20,7 +20,6 @@ const WeeklyBreakdownScreen = lazy(() => import('./screens/WeeklyBreakdownScreen
 const CalendrierScreen = lazy(() => import('./screens/CalendrierScreen').then((m) => ({ default: m.CalendrierScreen })))
 const BilanScreen = lazy(() => import('./screens/BilanScreen').then((m) => ({ default: m.BilanScreen })))
 const CorpsScreen = lazy(() => import('./screens/CorpsScreen').then((m) => ({ default: m.CorpsScreen })))
-const PhotosScreen = lazy(() => import('./screens/PhotosScreen').then((m) => ({ default: m.PhotosScreen })))
 const DonneesScreen = lazy(() => import('./screens/DonneesScreen').then((m) => ({ default: m.DonneesScreen })))
 const SuiviScreen = lazy(() => import('./screens/SuiviScreen').then((m) => ({ default: m.SuiviScreen })))
 const ReglagesScreen = lazy(() => import('./screens/ReglagesScreen').then((m) => ({ default: m.ReglagesScreen })))
@@ -60,7 +59,6 @@ export default function App() {
             <Route path="/programmes/:templateId" element={<TemplateDetailScreen />} />
             <Route path="/bilan/:workoutId" element={<BilanScreen />} />
             <Route path="/corps" element={<CorpsScreen />} />
-            <Route path="/photos" element={<PhotosScreen />} />
             <Route path="/suivi" element={<SuiviScreen />} />
             <Route path="/reglages" element={<ReglagesScreen />} />
             <Route path="/donnees" element={<DonneesScreen />} />

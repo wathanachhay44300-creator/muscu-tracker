@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
 import { deleteWorkoutWithUndo, restoreWorkoutSnapshot } from '../lib/workoutActions'
 import { useSnackbar } from '../contexts/SnackbarContext'
@@ -14,6 +14,7 @@ export function HistoriqueDetailScreen() {
   const id = workoutId ? Number(workoutId) : undefined
   const detail = useWorkoutDetail(id)
   const navigate = useNavigate()
+  const location = useLocation()
   const { showSnackbar } = useSnackbar()
   const [confirming, setConfirming] = useState(false)
   const template = useLiveQuery(
@@ -40,7 +41,8 @@ export function HistoriqueDetailScreen() {
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => navigate('/historique')}
+          // Back to wherever the session was opened from (history list or calendar).
+          onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/historique'))}
           className="rounded-full p-2 -ml-2 text-slate-400 active:bg-slate-100"
           aria-label="Retour à l'historique"
         >

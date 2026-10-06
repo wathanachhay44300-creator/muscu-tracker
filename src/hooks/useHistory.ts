@@ -10,6 +10,8 @@ export interface WorkoutSummary {
   volume: number
   /** Program the session was started from, or 'Séance libre'. */
   title: string
+  /** Exercises done in the session, for the history's exercise filter. */
+  exerciseIds: number[]
 }
 
 /** All workouts, most recent first, with a light summary of each. */
@@ -23,10 +25,12 @@ export function useWorkoutHistory(): WorkoutSummary[] | undefined {
       db.sets.toArray(),
       db.workoutTemplates.toArray(),
     ])
-    const linkCount = new Map<number, number>()
+    const exercisesByWorkout = new Map<number, number[]>()
     const workoutOfLink = new Map<number, number>()
     for (const link of links) {
-      linkCount.set(link.workoutId, (linkCount.get(link.workoutId) ?? 0) + 1)
+      const ids = exercisesByWorkout.get(link.workoutId)
+      if (ids) ids.push(link.exerciseId)
+      else exercisesByWorkout.set(link.workoutId, [link.exerciseId])
       workoutOfLink.set(link.id!, link.workoutId)
     }
     const setsByWorkout = new Map<number, SetEntry[]>()
@@ -44,7 +48,8 @@ export function useWorkoutHistory(): WorkoutSummary[] | undefined {
       return {
         title: workout.title ?? template ?? 'Séance libre',
         workout,
-        exerciseCount: linkCount.get(workout.id!) ?? 0,
+        exerciseIds: exercisesByWorkout.get(workout.id!) ?? [],
+        exerciseCount: exercisesByWorkout.get(workout.id!)?.length ?? 0,
         setCount: wSets.length,
         volume: totalVolume(wSets),
       }

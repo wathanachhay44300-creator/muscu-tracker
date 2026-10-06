@@ -77,12 +77,11 @@ export function DonneesScreen() {
       </div>
 
       {summary && (
-        <div className="mb-5 grid grid-cols-3 gap-2.5">
+        <div className="mb-5 grid grid-cols-2 gap-2.5">
           <SummaryTile label="Séances" value={summary.workouts} />
           <SummaryTile label="Exercices" value={summary.exercises} />
           <SummaryTile label="Programmes" value={summary.templates} />
           <SummaryTile label="Mesures" value={summary.bodyMeasurements} />
-          <SummaryTile label="Photos" value={summary.photos} />
         </div>
       )}
 
@@ -100,7 +99,7 @@ export function DonneesScreen() {
         <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
           <p className="mb-1 text-sm font-semibold text-slate-700">Sauvegarde complète (JSON)</p>
           <p className="mb-3 text-xs text-slate-400">
-            Toutes vos données (séances, exercices, programmes, mesures, pas, poids, calories, objectif, photos). À conserver pour restaurer plus
+            Toutes vos données (séances, exercices, programmes, mesures, pas, poids, calories, objectif). À conserver pour restaurer plus
             tard, sur cet appareil ou un autre.
           </p>
           <button
@@ -117,7 +116,7 @@ export function DonneesScreen() {
         <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
           <p className="mb-1 text-sm font-semibold text-slate-700">Historique (CSV)</p>
           <p className="mb-3 text-xs text-slate-400">
-            Le détail des séries de vos séances, pour l'ouvrir dans un tableur. Ne contient ni les photos ni les
+            Le détail des séries de vos séances, pour l'ouvrir dans un tableur. Ne contient pas les
             mensurations.
           </p>
           <button
@@ -155,7 +154,7 @@ export function DonneesScreen() {
       {pendingFile && (
         <ConfirmDialog
           title="Remplacer toutes les données ?"
-          message={`Le fichier « ${pendingFile.name} » va remplacer définitivement toutes vos données actuelles (séances, exercices, programmes, mesures, photos). Cette action est irréversible.`}
+          message={`Le fichier « ${pendingFile.name} » va remplacer définitivement toutes vos données actuelles (séances, exercices, programmes, mesures). Cette action est irréversible.`}
           confirmLabel="Remplacer"
           danger
           onConfirm={handleConfirmImport}

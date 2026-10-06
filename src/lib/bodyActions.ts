@@ -37,3 +37,12 @@ export async function getBodyMeasurements(): Promise<BodyMeasurement[]> {
 export async function deleteBodyMeasurement(id: number): Promise<void> {
   await db.bodyMeasurements.delete(id)
 }
+
+const MEASUREMENT_KEYS = ['chest', 'waist', 'hips', 'arms', 'thighs'] as const
+
+/** Removes only the tape measurements of a day, leaving its weight / steps / calories untouched. */
+export async function clearMeasurementFields(date: string): Promise<void> {
+  const patch: Partial<MeasurementFields> = {}
+  for (const k of MEASUREMENT_KEYS) patch[k] = undefined
+  await upsertBodyMeasurement(date, patch)
+}

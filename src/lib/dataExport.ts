@@ -15,14 +15,6 @@ import type {
 
 const EXPORT_VERSION = 1
 
-interface ExportedPhoto {
-  id?: number
-  date: string
-  createdAt: number
-  blobBase64: string
-  blobType: string
-}
-
 interface ExportData {
   version: number
   exportedAt: number
@@ -35,7 +27,6 @@ interface ExportData {
   plannedSessions: PlannedSession[]
   settings: (PlateCalculatorSettings | AppPreferences)[]
   bodyMeasurements: BodyMeasurement[]
-  progressPhotos: ExportedPhoto[]
 }
 
 export function downloadBlob(blob: Blob, filename: string): void {
@@ -49,41 +40,21 @@ export function downloadBlob(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url)
 }
 
-async function blobToBase64(blob: Blob): Promise<string> {
-  const buffer = await blob.arrayBuffer()
-  const bytes = new Uint8Array(buffer)
-  let binary = ''
-  const chunkSize = 0x8000
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize))
-  }
-  return btoa(binary)
-}
-
-function base64ToBlob(base64: string, type: string): Blob {
-  const binary = atob(base64)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
-  return new Blob([bytes], { type })
-}
-
 export interface DataSummary {
   workouts: number
   exercises: number
   templates: number
   bodyMeasurements: number
-  photos: number
 }
 
 export async function getDataSummary(): Promise<DataSummary> {
-  const [workouts, exercises, templates, bodyMeasurements, photos] = await Promise.all([
+  const [workouts, exercises, templates, bodyMeasurements] = await Promise.all([
     db.workouts.count(),
     db.exercises.count(),
     db.workoutTemplates.count(),
     db.bodyMeasurements.count(),
-    db.progressPhotos.count(),
   ])
-  return { workouts, exercises, templates, bodyMeasurements, photos }
+  return { workouts, exercises, templates, bodyMeasurements }
 }
 
 /** Exports every table as a single JSON file the user can save anywhere, for
@@ -99,7 +70,6 @@ export async function exportAllDataJSON(): Promise<void> {
     plannedSessions,
     settings,
     bodyMeasurements,
-    photos,
   ] = await Promise.all([
     db.exercises.toArray(),
     db.workouts.toArray(),
@@ -110,18 +80,7 @@ export async function exportAllDataJSON(): Promise<void> {
     db.plannedSessions.toArray(),
     db.settings.toArray(),
     db.bodyMeasurements.toArray(),
-    db.progressPhotos.toArray(),
   ])
-
-  const progressPhotos: ExportedPhoto[] = await Promise.all(
-    photos.map(async (p) => ({
-      id: p.id,
-      date: p.date,
-      createdAt: p.createdAt,
-      blobBase64: await blobToBase64(p.blob),
-      blobType: p.blob.type || 'image/jpeg',
-    })),
-  )
 
   const data: ExportData = {
     version: EXPORT_VERSION,
@@ -135,14 +94,15 @@ export async function exportAllDataJSON(): Promise<void> {
     plannedSessions,
     settings,
     bodyMeasurements,
-    progressPhotos,
   }
 
   downloadBlob(new Blob([JSON.stringify(data)], { type: 'application/json' }), `muscu-tracker-${todayISO()}.json`)
 }
 
-/** Replaces ALL local data with the contents of a previously exported JSON
- * file. Destructive and irreversible — the caller must confirm with the
+/** Replaces all local data (except stored progress photos, which are no
+ * longer part of the app and are left untouched) with the contents of a
+ * previously exported JSON file; a `progressPhotos` field in an old backup is
+ * simply ignored. Destructive and irreversible — the caller must confirm with the
  * user before calling this. */
 export async function importDataJSON(file: File): Promise<void> {
   const text = await file.text()
@@ -156,15 +116,6 @@ export async function importDataJSON(file: File): Promise<void> {
     throw new Error('Ce fichier n’est pas un export Muscu Tracker valide.')
   }
 
-  const progressPhotos = await Promise.all(
-    (data.progressPhotos ?? []).map(async (p) => ({
-      id: p.id,
-      date: p.date,
-      createdAt: p.createdAt,
-      blob: base64ToBlob(p.blobBase64, p.blobType),
-    })),
-  )
-
   await db.transaction(
     'rw',
     [
@@ -177,7 +128,6 @@ export async function importDataJSON(file: File): Promise<void> {
       db.plannedSessions,
       db.settings,
       db.bodyMeasurements,
-      db.progressPhotos,
     ],
     async () => {
       await Promise.all([
@@ -190,7 +140,6 @@ export async function importDataJSON(file: File): Promise<void> {
         db.plannedSessions.clear(),
         db.settings.clear(),
         db.bodyMeasurements.clear(),
-        db.progressPhotos.clear(),
       ])
       await Promise.all([
         db.exercises.bulkPut(data.exercises ?? []),
@@ -202,7 +151,6 @@ export async function importDataJSON(file: File): Promise<void> {
         db.plannedSessions.bulkPut(data.plannedSessions ?? []),
         db.settings.bulkPut(data.settings ?? []),
         db.bodyMeasurements.bulkPut(data.bodyMeasurements ?? []),
-        db.progressPhotos.bulkPut(progressPhotos),
       ])
     },
   )

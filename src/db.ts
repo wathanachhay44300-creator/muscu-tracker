@@ -71,6 +71,8 @@ class MuscuDB extends Dexie {
       settings: 'id',
     })
     // v5: Phase 4 — body measurements over time and local progress photos.
+    // (The photos feature was later removed from the UI; the store is kept so
+    // photos already on the device are never deleted.)
     this.version(5).stores({
       exercises: '++id, name, muscleGroup, isCustom',
       workouts: '++id, date, templateId',
