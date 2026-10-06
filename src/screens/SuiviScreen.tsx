@@ -3,22 +3,28 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useBodyMeasurementForDate, useBodyMeasurements } from '../hooks/useBodyMeasurements'
 import { usePreferences } from '../hooks/usePreferences'
 import { upsertBodyMeasurement } from '../lib/bodyActions'
+import { ClipboardImport } from '../components/ClipboardImport'
 import { TrackingChart } from '../components/TrackingChart'
 import { ActivityIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { addDays, formatDateFr, relativeDateLabel, todayISO } from '../lib/date'
 import {
   adviceFor,
   buildColumns,
+  calorieTarget,
   computeTrend,
+  estimateMaintenance,
   formatInt,
   formatKg,
   formatSigned,
   mapByDate,
-  mean,
   parseNumber,
+  roundTo,
+  stepsShift,
   targetRate,
   validValue,
   weeklySummaries,
+  type MaintenanceEstimate,
+  type StepsShift,
   type TrackedField,
 } from '../lib/tracking'
 import type { BodyMeasurement, WeightGoal } from '../types'
@@ -56,11 +62,11 @@ export function SuiviScreen() {
   const periodHasData = columns.some((c) => c.weight != null || c.steps != null || c.calories != null)
   const weeks = useMemo(() => weeklySummaries(byDate, start, today), [byDate, start, today])
   const trend = useMemo(() => computeTrend(byDate, today), [byDate, today])
-
-  const recent = useMemo(() => {
-    const days = Array.from({ length: 14 }, (_, i) => byDate.get(addDays(today, -i)))
-    return { steps: mean(days.map((d) => d?.steps)), calories: mean(days.map((d) => d?.calories)) }
-  }, [byDate, today])
+  const estimate = useMemo(
+    () => estimateMaintenance(byDate, today, trend.status === 'ok' ? trend.kgPerWeek : 0),
+    [byDate, today, trend],
+  )
+  const shift = useMemo(() => stepsShift(byDate, today), [byDate, today])
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
@@ -114,6 +120,10 @@ export function SuiviScreen() {
 
       <DailyForm key={date} date={date} entry={entry} />
 
+      <div className="mt-3">
+        <ClipboardImport />
+      </div>
+
       {/* Period + chart */}
       <div className="mt-6 rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between gap-2">
@@ -158,8 +168,9 @@ export function SuiviScreen() {
           <div className="rounded-xl bg-slate-50 px-3.5 py-3">
             <p className="text-sm font-semibold text-slate-700">Pas encore assez de données</p>
             <p className="mt-0.5 text-xs text-slate-500">
-              Il faut au moins {trend.needed} jours avec un poids saisi sur les 3 dernières semaines pour
-              estimer la tendance ({trend.days}/{trend.needed} pour l'instant).
+              Il faut au moins {trend.needed} jours avec un poids saisi sur les 4 dernières semaines (
+              {trend.days}/{trend.needed} pour l'instant), et autant avec des calories (
+              {estimate.calorieDays}/{trend.needed}).
             </p>
           </div>
         ) : (
@@ -168,8 +179,8 @@ export function SuiviScreen() {
               goal={preferences.goal}
               rate={preferences.goalRateKg}
               kgPerWeek={trend.kgPerWeek}
-              steps={recent.steps}
-              calories={recent.calories}
+              estimate={estimate}
+              shift={shift}
             />
           )
         )}
@@ -234,31 +245,76 @@ function AdviceBlock({
   goal,
   rate,
   kgPerWeek,
-  steps,
-  calories,
+  estimate,
+  shift,
 }: {
   goal: WeightGoal
   rate: number
   kgPerWeek: number
-  steps: number | null
-  calories: number | null
+  estimate: MaintenanceEstimate
+  shift: StepsShift | null
 }) {
+  const facts = (
+    <p className="mt-2 text-xs text-slate-500">
+      Tendance : <span className="font-semibold">{formatSigned(kgPerWeek, 2)} kg/sem</span> · Objectif :{' '}
+      <span className="font-semibold">{formatSigned(targetRate(goal, rate), 2)} kg/sem</span>
+    </p>
+  )
+
+  // Weight alone isn't enough to coach on calories: say so rather than guess.
+  if (estimate.status === 'insufficient') {
+    return (
+      <div className="rounded-xl bg-slate-50 px-3.5 py-3">
+        <p className="text-sm font-semibold text-slate-700">Pas encore assez de données</p>
+        <p className="mt-0.5 text-xs text-slate-500">
+          Trop de jours sans calories : {estimate.calorieDays}/{estimate.needed} jours renseignés sur les 4 dernières
+          semaines. Saisissez-les pour obtenir un conseil et une estimation.
+        </p>
+        {facts}
+      </div>
+    )
+  }
+
   const advice = adviceFor(goal, rate, kgPerWeek)
   const ok = advice.tone === 'ok'
+  const color = ok ? 'text-emerald-700' : 'text-amber-700'
+  const goalVerb =
+    goal === 'loss'
+      ? `Pour perdre ${formatKg(Math.abs(rate))} kg/semaine`
+      : goal === 'gain'
+        ? `Pour prendre ${formatKg(Math.abs(rate))} kg/semaine`
+        : 'Pour maintenir ton poids'
+
   return (
     <div className={`rounded-xl px-3.5 py-3 ${ok ? 'bg-emerald-50' : 'bg-amber-50'}`}>
-      <p className={`text-sm font-semibold ${ok ? 'text-emerald-700' : 'text-amber-700'}`}>{advice.title}</p>
-      <p className={`mt-0.5 text-sm ${ok ? 'text-emerald-700' : 'text-amber-700'}`}>{advice.text}</p>
-      <p className="mt-2 text-xs text-slate-500">
-        Tendance : <span className="font-semibold">{formatSigned(kgPerWeek, 2)} kg/sem</span> · Objectif :{' '}
-        <span className="font-semibold">{formatSigned(targetRate(goal, rate), 2)} kg/sem</span>
-      </p>
-      {(steps != null || calories != null) && (
-        <p className="mt-0.5 text-xs text-slate-500">
-          Moyenne 14 j :{' '}
-          {[steps != null && `${formatInt(steps)} pas/j`, calories != null && `${formatInt(calories)} kcal/j`]
-            .filter(Boolean)
-            .join(' · ')}
+      <p className={`text-sm font-semibold ${color}`}>{advice.title}</p>
+      {shift && !ok && (
+        <p className="mt-1 text-sm text-amber-700">
+          Tes pas ont {shift.change < 0 ? 'baissé' : 'augmenté'} de {Math.round(Math.abs(shift.change) * 100)} % cette
+          semaine ({formatInt(shift.recent)} contre {formatInt(shift.previous)} par jour) : cela peut expliquer
+          l'évolution, avant de toucher aux calories.
+        </p>
+      )}
+      <p className={`mt-1 text-sm ${color}`}>{advice.text}</p>
+      {facts}
+      {estimate.status === 'ok' ? (
+        <>
+          <p className="mt-1 text-xs text-slate-500">
+            Entretien estimé : environ{' '}
+            <span className="font-semibold">{formatInt(roundTo(estimate.maintenance, 10))} kcal/jour</span>{' '}
+            (estimation approximative, sur {estimate.windowDays} jours dont {estimate.calorieDays} avec calories).
+          </p>
+          <p className="mt-1 text-xs font-medium text-slate-700">
+            {goalVerb}, vise environ{' '}
+            <span className="font-bold">
+              {formatInt(roundTo(calorieTarget(estimate.maintenance, goal, rate), 10))} kcal/jour
+            </span>
+            .
+          </p>
+        </>
+      ) : (
+        <p className="mt-1 text-xs text-slate-500">
+          Estimation de l'entretien non affichée : les calories saisies semblent incomplètes.
         </p>
       )}
     </div>

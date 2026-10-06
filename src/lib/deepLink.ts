@@ -1,5 +1,6 @@
 import { applyMerge } from './trackingImport'
-import { describeImport, hasDeepLinkParams, parseDeepLink, todayEntryDate } from './tracking'
+import { todayISO } from './date'
+import { describeImport, describeImports, hasDeepLinkParams, parseClipboardText, parseDeepLink } from './tracking'
 
 const LINK_KEYS = ['steps', 'date', 'weight', 'kcal', 'calories']
 
@@ -21,7 +22,7 @@ export function takeDeepLinkParams(): URLSearchParams | null {
 
 /** Validates and saves an import link; returns the message to show the user. */
 export async function importFromParams(params: URLSearchParams): Promise<{ ok: boolean; message: string }> {
-  const result = parseDeepLink(params, todayEntryDate())
+  const result = parseDeepLink(params, todayISO())
   if (result.kind === 'ignored') {
     return { ok: false, message: `Lien d'import ignoré : ${result.reason}` }
   }
@@ -29,4 +30,16 @@ export async function importFromParams(params: URLSearchParams): Promise<{ ok: b
   // existing row (never a duplicate), including re-runs of the same Shortcut.
   await applyMerge([result.entry], 'replace')
   return { ok: true, message: describeImport(result.entry) }
+}
+
+/**
+ * Imports what an iOS Shortcut left on the clipboard (`AAAA-MM-JJ;pas;poids;kcal`,
+ * or an import link). Nothing is saved unless the whole text is valid; the
+ * day's existing row is updated, never duplicated.
+ */
+export async function importFromClipboardText(text: string): Promise<{ ok: boolean; message: string }> {
+  const parsed = parseClipboardText(text, todayISO())
+  if (!parsed.ok) return { ok: false, message: parsed.error }
+  await applyMerge(parsed.entries, 'replace')
+  return { ok: true, message: describeImports(parsed.entries) }
 }

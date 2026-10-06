@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePreferences } from '../hooks/usePreferences'
 import { setHapticsEnabled, setSoundEnabled, setWeightGoal } from '../lib/settingsActions'
-import { importFromParams } from '../lib/deepLink'
-import { hasDeepLinkParams, paramsFromText, todayEntryDate } from '../lib/tracking'
+import { ClipboardImport } from '../components/ClipboardImport'
+import { todayISO } from '../lib/date'
+import { shortDate } from '../lib/tracking'
 import type { WeightGoal } from '../types'
 import { hapticLight } from '../lib/haptics'
 import {
@@ -11,7 +12,7 @@ import {
   requestNotificationPermission,
   type NotificationSupport,
 } from '../lib/notifications'
-import { ChevronLeftIcon, ClipboardPasteIcon, CopyIcon } from '../components/Icons'
+import { ChevronLeftIcon, CopyIcon } from '../components/Icons'
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -104,10 +105,12 @@ function GoalCard() {
 
 const SHORTCUT_STEPS = [
   'Ouvrez l\u2019app Raccourcis, puis touchez + (Nouveau raccourci).',
-  'Ajoutez l\u2019action « Rechercher des échantillons Santé » : Type = Pas, Période = aujourd\u2019hui, Regrouper par = jour, puis « Calculer » = Somme.',
-  'Ajoutez l\u2019action « Texte » et composez : l\u2019URL de l\u2019app + ?steps= + la variable (résultat de la somme) + &date= + la variable « Date actuelle » au format personnalisé AAAA-MM-JJ (yyyy-MM-dd).',
-  'Ajoutez l\u2019action « Ouvrir les URL » avec ce texte.',
-  'Optionnel : onglet Automatisation > + > « Heure du jour » (par ex. chaque soir à 22 h) > exécuter ce raccourci.',
+  'Ajoutez « Rechercher des échantillons Santé » : Type = Pas, Période = aujourd\u2019hui, puis « Calculer » = Somme. Si votre app de calories écrit dans Santé, refaites la même chose avec Type = Énergie alimentaire.',
+  'Vérifiez que ce total correspond à celui de l\u2019app Santé. Avec un iPhone et une Apple Watch, une somme brute peut compter les pas deux fois : si le total est plus élevé que dans Santé, utilisez la source ou la statistique agrégée plutôt que la somme brute.',
+  'Ajoutez « Texte » : date du jour (format AAAA-MM-JJ) ; pas ; poids ; kcal, séparés par des points-virgules. Poids et kcal peuvent rester vides. Exemple : 2026-10-06;8500;78,4;2400',
+  'Ajoutez « Copier dans le presse-papiers ».',
+  'Ensuite, ouvrez l\u2019app et touchez « Importer depuis le presse-papiers ».',
+  'Optionnel : Automatisation > Heure du jour (par ex. chaque soir) pour lancer le raccourci. Un import fait plus tôt dans la journée peut être refait plus tard : la valeur du jour est simplement mise à jour.',
 ]
 
 async function copyText(text: string): Promise<boolean> {
@@ -127,47 +130,39 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
-function ShortcutCard() {
+function CopyButton({ text, label, doneLabel }: { text: string; label: string; doneLabel: string }) {
   const [copied, setCopied] = useState(false)
-  const [pasted, setPasted] = useState('')
-  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null)
-  const templateUrl = `${APP_URL}?steps=8500&date=${todayEntryDate()}`
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        if (await copyText(text)) {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 2000)
+        }
+      }}
+      className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 py-3 text-sm font-semibold text-slate-700 active:bg-slate-200"
+    >
+      <CopyIcon className="h-4 w-4" />
+      {copied ? doneLabel : label}
+    </button>
+  )
+}
 
-  async function handleCopy() {
-    if (await copyText(templateUrl)) {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
-
-  async function handlePaste() {
-    try {
-      setPasted(await navigator.clipboard.readText())
-      setResult(null)
-    } catch {
-      setResult({ ok: false, text: 'Collage refusé : collez le lien dans le champ ci-dessus.' })
-    }
-  }
-
-  async function handleImport() {
-    const params = paramsFromText(pasted)
-    if (!hasDeepLinkParams(params)) {
-      setResult({ ok: false, text: 'Aucune donnée reconnue (attendu : steps=…&date=…).' })
-      return
-    }
-    const r = await importFromParams(params)
-    setResult({ ok: r.ok, text: r.message })
-    if (r.ok) setPasted('')
-  }
+function ShortcutCard() {
+  const today = todayISO()
+  // Example line for testing without the Shortcut: sets today's steps only.
+  const formatExample = `${today};8500;;`
+  const templateUrl = `${APP_URL}?steps=8500&date=${today}`
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
       <p className="font-semibold text-slate-800">Importer mes pas automatiquement</p>
       <p className="mb-3 text-xs text-slate-400">
-        Une app web ne peut pas lire Apple Santé. Un Raccourci iOS le fait à sa place et envoie les pas à
-        l'app par un lien. Rien ne quitte votre téléphone.
+        Une app web ne peut pas lire Apple Santé. Un Raccourci iOS le fait à sa place et copie une ligne de texte
+        que l'app importe d'un tap. Rien ne quitte votre téléphone.
       </p>
-      <ol className="mb-3 space-y-2">
+      <ol className="mb-4 space-y-2">
         {SHORTCUT_STEPS.map((text, i) => (
           <li key={i} className="flex gap-2.5 text-sm text-slate-700">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-accent">
@@ -178,62 +173,36 @@ function ShortcutCard() {
         ))}
       </ol>
 
-      <p className="mb-1 text-xs font-medium text-slate-500">URL modèle</p>
-      <p className="mb-2 break-all rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600 [user-select:text]">
-        {templateUrl}
-      </p>
-      <p className="mb-2 text-[11px] text-slate-400">
-        Options : <span className="font-mono">&amp;weight=78.4</span> et <span className="font-mono">&amp;kcal=2400</span>. Une
-        date manquante vaut aujourd'hui ; relancer le raccourci met à jour le même jour.
-      </p>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white active:bg-brand-700"
-      >
-        <CopyIcon className="h-4 w-4" />
-        {copied ? 'URL copiée' : 'Copier l\u2019URL modèle'}
-      </button>
+      <ClipboardImport />
 
-      <div className="mt-4 rounded-xl bg-amber-50 px-3 py-2.5 text-xs text-amber-700">
-        <p className="mb-1 font-semibold">App installée sur l'écran d'accueil ?</p>
-        Sur iPhone, « Ouvrir les URL » ouvre Safari, dont le stockage est séparé de celui de l'app installée : les
-        pas importés ne s'afficheraient alors pas dans l'app installée. Dans ce cas, remplacez l'étape 4 par
-        l'action « Copier dans le presse-papiers », puis ouvrez l'app, collez ci-dessous et touchez Importer.
-      </div>
+      <p className="mb-1 mt-4 text-xs font-medium text-slate-500">Format attendu</p>
+      <p className="mb-2 rounded-xl bg-slate-50 px-3 py-2 font-mono text-xs text-slate-600 [user-select:text]">
+        AAAA-MM-JJ;pas;poids;kcal
+      </p>
+      <CopyButton text={formatExample} label="Copier le format attendu" doneLabel="Format copié" />
+      <p className="mt-1.5 text-[11px] text-slate-400">
+        Copie un exemple ({shortDate(today)} : 8 500 pas) à importer pour tester sans le Raccourci.
+      </p>
 
-      <div className="mt-3 flex gap-2">
-        <input
-          value={pasted}
-          onChange={(e) => {
-            setPasted(e.target.value)
-            setResult(null)
-          }}
-          placeholder="Lien ou steps=8500&date=…"
-          aria-label="Lien d'import à coller"
-          className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:border-brand-400"
-        />
-        <button
-          type="button"
-          onClick={handlePaste}
-          aria-label="Coller depuis le presse-papiers"
-          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-slate-100 px-3 text-sm font-semibold text-slate-700 active:bg-slate-200"
-        >
-          <ClipboardPasteIcon className="h-4 w-4" />
-          Coller
-        </button>
-      </div>
-      <button
-        type="button"
-        onClick={handleImport}
-        disabled={!pasted.trim()}
-        className="mt-2 w-full rounded-xl bg-slate-100 py-3 text-sm font-semibold text-slate-700 active:bg-slate-200 disabled:opacity-40"
-      >
-        Importer
-      </button>
-      {result && (
-        <p className={`mt-2 text-xs font-medium ${result.ok ? 'text-emerald-600' : 'text-red-600'}`}>{result.text}</p>
-      )}
+      <details className="mt-4 rounded-xl bg-slate-50 px-3 py-2.5">
+        <summary className="cursor-pointer text-xs font-semibold text-slate-600">
+          Option : lien profond (si vous utilisez l'app dans Safari)
+        </summary>
+        <p className="mt-2 text-xs text-slate-500">
+          Sur iPhone, Safari et l'app installée sur l'écran d'accueil ont chacun leur propre stockage, et un lien
+          ouvert depuis Raccourcis s'ouvre dans Safari : avec l'app installée, les données n'apparaîtraient jamais
+          dedans. Utilisez donc le presse-papiers ci-dessus. Le lien ne sert que si vous utilisez l'app dans
+          Safari : remplacez alors les étapes 4 à 6 par une action « Texte » (URL + paramètres) puis « Ouvrir les URL ».
+        </p>
+        <p className="mb-2 mt-2 break-all rounded-lg bg-surface px-3 py-2 text-xs text-slate-600 [user-select:text]">
+          {templateUrl}
+        </p>
+        <p className="mb-2 text-[11px] text-slate-400">
+          Options : <span className="font-mono">&amp;weight=78.4</span> et <span className="font-mono">&amp;kcal=2400</span>. Une
+          date manquante vaut aujourd'hui. Les paramètres invalides sont ignorés.
+        </p>
+        <CopyButton text={templateUrl} label="Copier l'URL modèle" doneLabel="URL copiée" />
+      </details>
     </div>
   )
 }

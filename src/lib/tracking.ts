@@ -1,5 +1,5 @@
 import type { BodyMeasurement, WeightGoal } from '../types'
-import { addDays, dateToISO, mondayOf } from './date'
+import { addDays, mondayOf } from './date'
 
 /** One day of weight / steps / calories. Every field is optional. */
 export interface DayEntry {
@@ -142,6 +142,67 @@ export function paramsFromText(text: string): URLSearchParams {
   return new URLSearchParams(query)
 }
 
+/* -------------------- Clipboard line (Shortcut output) -------------------- */
+
+export type ClipboardParse = { ok: true; entries: DayEntry[] } | { ok: false; error: string }
+
+export const CLIPBOARD_FORMAT = 'AAAA-MM-JJ;pas;poids;kcal'
+
+const FIELD_LABEL: Record<TrackedField, string> = { steps: 'pas', weight: 'poids', calories: 'calories' }
+
+/**
+ * Reads what the iOS Shortcut copied: one `AAAA-MM-JJ;pas;poids;kcal` line per
+ * day (poids and kcal may be empty). Strict on purpose: a single bad line
+ * rejects everything, so nothing half-valid is ever saved. A pasted import
+ * link (`?steps=…&date=…`) is accepted too.
+ */
+export function parseClipboardText(text: string, today: string): ClipboardParse {
+  const trimmed = text.trim()
+  if (!trimmed) return { ok: false, error: 'Le presse-papiers est vide.' }
+
+  if (/(^|[?&])(steps|weight|kcal|calories)=/.test(trimmed)) {
+    const link = parseDeepLink(paramsFromText(trimmed), today)
+    return link.kind === 'entry'
+      ? { ok: true, entries: [link.entry] }
+      : { ok: false, error: `Lien d'import ignoré : ${link.reason}.` }
+  }
+
+  const lines = trimmed.split(/\r\n|\n|\r/).map((l) => l.trim()).filter(Boolean)
+  const entries: DayEntry[] = []
+  for (const line of lines) {
+    const cells = line.split(/;|\t/).map((c) => c.trim())
+    if (cells.length < 2 || cells.length > 4 || !/^\d{4}-\d{2}-\d{2}$/.test(cells[0])) {
+      if (entries.length === 0 && /^date$/i.test(cells[0])) continue // header line
+      return { ok: false, error: `Format non reconnu. Attendu : ${CLIPBOARD_FORMAT} (ex. ${today};8500;78,4;2400).` }
+    }
+    const date = cells[0]
+    if (!isValidISODate(date)) return { ok: false, error: `Date invalide : « ${date} ».` }
+    if (date > addDays(today, 1)) return { ok: false, error: `Date dans le futur : « ${date} ».` }
+
+    const entry: DayEntry = { date }
+    const fields: TrackedField[] = ['steps', 'weight', 'calories']
+    for (let i = 0; i < fields.length; i++) {
+      const raw = cells[i + 1]
+      if (raw == null || raw === '') continue
+      const value = validValue(fields[i], parseNumber(raw))
+      if (value == null) {
+        return { ok: false, error: `Valeur invalide pour « ${FIELD_LABEL[fields[i]]} » : « ${raw} » (nombre positif attendu).` }
+      }
+      entry[fields[i]] = value
+    }
+    if (entry.steps == null && entry.weight == null && entry.calories == null) {
+      return { ok: false, error: `Aucune valeur à importer pour le ${date}.` }
+    }
+    entries.push(entry)
+  }
+  return { ok: true, entries }
+}
+
+/** "Pas du 06/10 importés : 8 500" for one day, "3 jours importés" for several. */
+export function describeImports(entries: DayEntry[]): string {
+  return entries.length === 1 ? describeImport(entries[0]) : `${entries.length} jours importés`
+}
+
 /* ------------------------------ series ------------------------------ */
 
 export function eachDay(start: string, end: string): string[] {
@@ -257,14 +318,14 @@ export function weeklySummaries(byDate: Map<string, DayEntry>, fromDate: string,
 /* --------------------------- trend & advice --------------------------- */
 
 /** Days of the analysis window and the number of weigh-in days it needs. */
-export const TREND_WINDOW_DAYS = 21
+export const TREND_WINDOW_DAYS = 28
 export const TREND_MIN_DAYS = 14
 
 export type Trend =
   | { status: 'insufficient'; days: number; needed: number }
   | { status: 'ok'; kgPerWeek: number; days: number }
 
-/** Least-squares slope of weight over the last 3 weeks, in kg per week. */
+/** Least-squares slope of weight over the last 4 weeks, in kg per week. */
 export function computeTrend(byDate: Map<string, DayEntry>, today: string): Trend {
   const points: { x: number; y: number }[] = []
   for (let i = 0; i < TREND_WINDOW_DAYS; i++) {
@@ -311,12 +372,12 @@ export function adviceFor(goal: WeightGoal, rateKg: number, actualKgPerWeek: num
       ? {
           tone: 'calories-down',
           title: 'Perte plus lente que prévu',
-          text: 'Tu peux baisser légèrement tes calories ou augmenter tes pas.',
+          text: 'Tu peux ajuster légèrement les calories ou augmenter tes pas.',
         }
       : {
           tone: 'calories-up',
           title: 'Perte plus rapide que prévu',
-          text: 'Tu peux monter un peu les calories pour ne pas perdre trop vite.',
+          text: 'Tu peux corriger un peu les calories.',
         }
   }
   if (goal === 'gain') {
@@ -324,27 +385,91 @@ export function adviceFor(goal: WeightGoal, rateKg: number, actualKgPerWeek: num
       ? {
           tone: 'calories-up',
           title: 'Prise plus lente que prévu',
-          text: 'Tu peux monter un peu les calories.',
+          text: 'Tu peux ajuster légèrement les calories.',
         }
       : {
           tone: 'calories-down',
           title: 'Prise plus rapide que prévu',
-          text: 'Tu peux baisser légèrement les calories pour limiter la prise de gras.',
+          text: 'Tu peux corriger un peu les calories.',
         }
   }
   return diff < 0
     ? {
         tone: 'calories-up',
         title: 'Perte plus rapide que prévu',
-        text: 'Tu peux monter un peu les calories.',
+        text: 'Tu peux corriger un peu les calories.',
       }
     : {
         tone: 'calories-down',
         title: 'Poids en hausse plus que prévu',
-        text: 'Tu peux baisser légèrement tes calories ou augmenter tes pas.',
+        text: 'Tu peux ajuster légèrement les calories ou augmenter tes pas.',
       }
 }
 
-export function todayEntryDate(): string {
-  return dateToISO(new Date())
+
+/* ------------------- maintenance estimate & steps context ------------------- */
+
+/** kcal per kg of body weight gained or lost (usual rule of thumb). */
+export const KCAL_PER_KG = 7700
+export const CALORIE_MIN_DAYS = 14
+
+export type MaintenanceEstimate =
+  | { status: 'insufficient'; calorieDays: number; needed: number }
+  | { status: 'unreliable'; maintenance: number; calorieDays: number }
+  | { status: 'ok'; maintenance: number; avgCalories: number; calorieDays: number; windowDays: number }
+
+/**
+ * Rough maintenance calories: average intake over the window minus the
+ * energy the weight change represents (kg/day × 7700). Only meaningful once
+ * both weights and calories were logged on enough days.
+ */
+export function estimateMaintenance(byDate: Map<string, DayEntry>, today: string, kgPerWeek: number): MaintenanceEstimate {
+  const cals: number[] = []
+  for (let i = 0; i < TREND_WINDOW_DAYS; i++) {
+    const c = byDate.get(addDays(today, -i))?.calories
+    if (c != null) cals.push(c)
+  }
+  if (cals.length < CALORIE_MIN_DAYS) {
+    return { status: 'insufficient', calorieDays: cals.length, needed: CALORIE_MIN_DAYS }
+  }
+  const avgCalories = cals.reduce((a, b) => a + b, 0) / cals.length
+  const maintenance = avgCalories - (kgPerWeek / 7) * KCAL_PER_KG
+  // Outside any plausible range the logs are probably incomplete: don't coach on it.
+  if (maintenance < 1000 || maintenance > 6000) {
+    return { status: 'unreliable', maintenance, calorieDays: cals.length }
+  }
+  return { status: 'ok', maintenance, avgCalories, calorieDays: cals.length, windowDays: TREND_WINDOW_DAYS }
+}
+
+/** Daily calories to aim for to hit the target pace, from the maintenance estimate. */
+export function calorieTarget(maintenance: number, goal: WeightGoal, rateKg: number): number {
+  return maintenance + (targetRate(goal, rateKg) / 7) * KCAL_PER_KG
+}
+
+export function roundTo(n: number, step: number): number {
+  return Math.round(n / step) * step
+}
+
+export interface StepsShift {
+  recent: number
+  previous: number
+  /** Relative change, e.g. -0.25 for 25 % fewer steps. */
+  change: number
+}
+
+/** Average steps over the last 7 days vs the 7 before, when the gap is large enough to matter. */
+export function stepsShift(byDate: Map<string, DayEntry>, today: string): StepsShift | null {
+  const avgOf = (from: number) => {
+    const vals: number[] = []
+    for (let i = from; i < from + 7; i++) {
+      const s = byDate.get(addDays(today, -i))?.steps
+      if (s != null) vals.push(s)
+    }
+    return vals.length >= 3 ? vals.reduce((a, b) => a + b, 0) / vals.length : null
+  }
+  const recent = avgOf(0)
+  const previous = avgOf(7)
+  if (recent == null || previous == null || previous === 0) return null
+  const change = (recent - previous) / previous
+  return Math.abs(change) >= 0.2 && Math.abs(recent - previous) >= 1000 ? { recent, previous, change } : null
 }
