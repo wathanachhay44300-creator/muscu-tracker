@@ -1,9 +1,8 @@
-import { CheckIcon, CopyIcon, DumbbellIcon } from './Icons'
+import { CopyIcon, DumbbellIcon } from './Icons'
 import type { TemplateSummary } from '../hooks/useTemplates'
 
 interface StartSessionPickerProps {
   templates: TemplateSummary[] | undefined
-  plannedTemplateId: number | undefined
   starting: boolean
   onStartFromTemplate: (templateId: number) => void
   onStartFree: () => void
@@ -17,7 +16,6 @@ interface StartSessionPickerProps {
  */
 export function StartSessionPicker({
   templates,
-  plannedTemplateId,
   starting,
   onStartFromTemplate,
   onStartFree,
@@ -53,12 +51,6 @@ export function StartSessionPicker({
                   {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
                 </p>
               </div>
-              {plannedTemplateId === template.id && (
-                <span className="flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-accent">
-                  <CheckIcon className="h-3.5 w-3.5" />
-                  Planifiée
-                </span>
-              )}
             </button>
           ))}
         </div>

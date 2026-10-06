@@ -28,7 +28,7 @@ export function RestTimerWidget() {
   const timer = useRestTimer()
   const [expanded, setExpanded] = useState(false)
   const { pathname } = useLocation()
-  const onSessionScreen = pathname === '/' || pathname.startsWith('/jour/') || /^\/historique\/\d+$/.test(pathname)
+  const onSessionScreen = pathname === '/' || /^\/historique\/\d+$/.test(pathname)
 
   if (!timer.hasTimer && !onSessionScreen) return null
 

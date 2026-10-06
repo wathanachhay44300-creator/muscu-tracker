@@ -48,7 +48,6 @@ export default function App() {
           <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<SeanceScreen />} />
-            <Route path="/jour/:date" element={<SeanceScreen />} />
             <Route path="/historique" element={<HistoriqueScreen />} />
             <Route path="/historique/semaine" element={<WeeklyBreakdownScreen />} />
             <Route path="/historique/calendrier" element={<CalendrierScreen />} />

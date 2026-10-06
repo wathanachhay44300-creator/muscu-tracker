@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { WorkoutEditor } from "../components/WorkoutEditor";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { DuplicateSessionSheet } from "../components/DuplicateSessionSheet";
@@ -7,7 +6,6 @@ import { AngkorSilhouette } from "../components/AngkorSilhouette";
 import { PullToRefreshIndicator } from "../components/PullToRefreshIndicator";
 import { ChevronLeftIcon, ChevronRightIcon } from "../components/Icons";
 import { useWorkoutIdForDate } from "../hooks/useWorkout";
-import { usePlannedSessionForDate } from "../hooks/usePlannedSessions";
 import { useTemplates } from "../hooks/useTemplates";
 import {
   useSwipeNav,
@@ -19,7 +17,7 @@ import { getOrCreateWorkout } from "../lib/workoutActions";
 import {
   startWorkoutFromPreviousSession,
   startWorkoutFromTemplate,
-} from "../lib/planningActions";
+} from "../lib/sessionStart";
 import {
   addDays,
   formatDateFr,
@@ -29,11 +27,9 @@ import {
 import { StartSessionPicker } from "../components/StartSessionPicker";
 
 export function SeanceScreen() {
-  const { date: dateParam } = useParams();
-  const [date, setDate] = useState(dateParam || todayISO());
+  const [date, setDate] = useState(todayISO());
   const [enterDir, setEnterDir] = useState<SwipeDirection>(null);
   const workoutId = useWorkoutIdForDate(date);
-  const planned = usePlannedSessionForDate(date);
   const templates = useTemplates();
   const [starting, setStarting] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
@@ -122,7 +118,6 @@ export function SeanceScreen() {
           ) : (
             <StartSessionPicker
               templates={templates}
-              plannedTemplateId={planned?.session.templateId}
               starting={starting}
               onStartFromTemplate={handleStartFromTemplate}
               onStartFree={handleStart}

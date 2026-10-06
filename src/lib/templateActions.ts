@@ -10,11 +10,6 @@ export async function renameTemplate(id: number, name: string): Promise<void> {
   await db.workoutTemplates.update(id, { name })
 }
 
-/** Number of planned (not-yet-started) sessions that reference this template. */
-export async function countTemplateUsage(templateId: number): Promise<number> {
-  return db.plannedSessions.where('templateId').equals(templateId).count()
-}
-
 /** Duplicates a template and its exercise list, as a new independent program. */
 export async function duplicateTemplate(id: number): Promise<number> {
   const source = await db.workoutTemplates.get(id)
@@ -34,19 +29,12 @@ export async function duplicateTemplate(id: number): Promise<number> {
   return newId
 }
 
-/** Deletes a template, its exercise list, and any planned session using it. */
+/** Deletes a template and its exercise list (past sessions started from it are untouched). */
 export async function deleteTemplate(id: number): Promise<void> {
-  await db.transaction(
-    'rw',
-    db.workoutTemplates,
-    db.templateExercises,
-    db.plannedSessions,
-    async () => {
-      await db.templateExercises.where('templateId').equals(id).delete()
-      await db.plannedSessions.where('templateId').equals(id).delete()
-      await db.workoutTemplates.delete(id)
-    },
-  )
+  await db.transaction('rw', db.workoutTemplates, db.templateExercises, async () => {
+    await db.templateExercises.where('templateId').equals(id).delete()
+    await db.workoutTemplates.delete(id)
+  })
 }
 
 export async function addExerciseToTemplate(templateId: number, exerciseId: number): Promise<number> {

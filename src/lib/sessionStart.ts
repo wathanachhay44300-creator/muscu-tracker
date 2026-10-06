@@ -17,20 +17,6 @@ async function getLastTemplateWorkoutId(
   return last?.id ?? null
 }
 
-/** Schedules (or reschedules) a template on a given date — one planned session per date. */
-export async function schedulePlannedSession(date: string, templateId: number): Promise<number> {
-  const existing = await db.plannedSessions.where('date').equals(date).first()
-  if (existing?.id) {
-    await db.plannedSessions.update(existing.id, { templateId })
-    return existing.id
-  }
-  return db.plannedSessions.add({ date, templateId, createdAt: Date.now() })
-}
-
-export async function unschedulePlannedSession(id: number): Promise<void> {
-  await db.plannedSessions.delete(id)
-}
-
 /**
  * Quick-starts a session from a template: creates (or reuses) the workout for
  * that date, adds every template exercise that isn't already in it, and
@@ -90,8 +76,6 @@ export async function startWorkoutFromTemplate(date: string, templateId: number)
     }
   }
 
-  // Starting the session fulfills whatever was planned for that date.
-  await db.plannedSessions.where('date').equals(date).delete()
   return workoutId
 }
 

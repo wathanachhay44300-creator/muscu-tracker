@@ -5,14 +5,13 @@ import { useOptimisticOrder } from '../hooks/useOptimisticOrder'
 import { useDragReorder } from '../hooks/useDragReorder'
 import {
   addExerciseToTemplate,
-  countTemplateUsage,
   deleteTemplate,
   removeExerciseFromTemplate,
   renameTemplate,
   reorderTemplateExercises,
   updateTargetSets,
 } from '../lib/templateActions'
-import { schedulePlannedSession, startWorkoutFromTemplate } from '../lib/planningActions'
+import { startWorkoutFromTemplate } from '../lib/sessionStart'
 import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
 import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
@@ -28,9 +27,8 @@ export function TemplateDetailScreen() {
   const navigate = useNavigate()
 
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [scheduling, setScheduling] = useState(false)
   const [starting, setStarting] = useState(false)
-  const [deleting, setDeleting] = useState<{ usageCount: number } | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const exercises = detail?.exercises ?? []
   const exerciseIds = exercises.map((te) => te.id!)
@@ -62,11 +60,6 @@ export function TemplateDetailScreen() {
     setStarting(true)
     await startWorkoutFromTemplate(todayISO(), id!)
     navigate('/')
-  }
-
-  async function handleDeleteClick() {
-    const usageCount = await countTemplateUsage(id!)
-    setDeleting({ usageCount })
   }
 
   async function confirmDelete() {
@@ -193,19 +186,12 @@ export function TemplateDetailScreen() {
           >
             Démarrer maintenant
           </button>
-          <button
-            type="button"
-            onClick={() => setScheduling(true)}
-            className="w-full rounded-2xl bg-slate-100 py-3.5 font-semibold text-slate-700 active:bg-slate-200"
-          >
-            Planifier pour plus tard
-          </button>
         </div>
       )}
 
       <button
         type="button"
-        onClick={handleDeleteClick}
+        onClick={() => setDeleting(true)}
         className="mt-6 flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-red-500 active:text-red-700"
       >
         <TrashIcon className="h-4 w-4" />
@@ -220,77 +206,16 @@ export function TemplateDetailScreen() {
         />
       )}
 
-      {scheduling && (
-        <ScheduleSheet
-          onSchedule={async (date) => {
-            await schedulePlannedSession(date, id!)
-            setScheduling(false)
-          }}
-          onCancel={() => setScheduling(false)}
-        />
-      )}
-
       {deleting && (
         <ConfirmDialog
           title={`Supprimer « ${template.name} » ?`}
-          message={
-            deleting.usageCount > 0
-              ? `Ce programme a ${deleting.usageCount} séance${deleting.usageCount > 1 ? 's' : ''} planifiée${deleting.usageCount > 1 ? 's' : ''} à venir : elle${deleting.usageCount > 1 ? 's seront' : ' sera'} annulée${deleting.usageCount > 1 ? 's' : ''}. Vos séances déjà réalisées ne sont pas concernées.`
-              : 'Cette action est définitive.'
-          }
+          message="Cette action est définitive. Vos séances déjà réalisées ne sont pas concernées."
           confirmLabel="Supprimer"
           danger
           onConfirm={confirmDelete}
-          onCancel={() => setDeleting(null)}
+          onCancel={() => setDeleting(false)}
         />
       )}
-    </div>
-  )
-}
-
-function ScheduleSheet({
-  onSchedule,
-  onCancel,
-}: {
-  onSchedule: (date: string) => void
-  onCancel: () => void
-}) {
-  const [date, setDate] = useState(todayISO())
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
-      onClick={onCancel}
-    >
-      <div
-        className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-base font-semibold text-slate-900">Planifier cette séance</h2>
-        <input
-          type="date"
-          min={todayISO()}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base outline-none focus:border-brand-400"
-        />
-        <div className="mt-5 flex gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 rounded-xl bg-slate-100 py-3 font-medium text-slate-600 active:bg-slate-200"
-          >
-            Annuler
-          </button>
-          <button
-            type="button"
-            onClick={() => onSchedule(date)}
-            className="flex-1 rounded-xl bg-brand-600 py-3 font-medium text-white active:bg-brand-700"
-          >
-            Planifier
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

@@ -4,7 +4,6 @@ import type {
   AppPreferences,
   BodyMeasurement,
   Exercise,
-  PlannedSession,
   PlateCalculatorSettings,
   SetEntry,
   TemplateExercise,
@@ -24,7 +23,6 @@ interface ExportData {
   sets: SetEntry[]
   workoutTemplates: WorkoutTemplate[]
   templateExercises: TemplateExercise[]
-  plannedSessions: PlannedSession[]
   settings: (PlateCalculatorSettings | AppPreferences)[]
   bodyMeasurements: BodyMeasurement[]
 }
@@ -67,7 +65,6 @@ export async function exportAllDataJSON(): Promise<void> {
     sets,
     workoutTemplates,
     templateExercises,
-    plannedSessions,
     settings,
     bodyMeasurements,
   ] = await Promise.all([
@@ -77,7 +74,6 @@ export async function exportAllDataJSON(): Promise<void> {
     db.sets.toArray(),
     db.workoutTemplates.toArray(),
     db.templateExercises.toArray(),
-    db.plannedSessions.toArray(),
     db.settings.toArray(),
     db.bodyMeasurements.toArray(),
   ])
@@ -91,7 +87,6 @@ export async function exportAllDataJSON(): Promise<void> {
     sets,
     workoutTemplates,
     templateExercises,
-    plannedSessions,
     settings,
     bodyMeasurements,
   }
@@ -101,8 +96,8 @@ export async function exportAllDataJSON(): Promise<void> {
 
 /** Replaces all local data (except stored progress photos, which are no
  * longer part of the app and are left untouched) with the contents of a
- * previously exported JSON file; a `progressPhotos` field in an old backup is
- * simply ignored. Destructive and irreversible — the caller must confirm with the
+ * previously exported JSON file; `progressPhotos` and `plannedSessions` fields
+ * in an old backup (removed features) are simply ignored. Destructive and irreversible — the caller must confirm with the
  * user before calling this. */
 export async function importDataJSON(file: File): Promise<void> {
   const text = await file.text()
@@ -125,7 +120,6 @@ export async function importDataJSON(file: File): Promise<void> {
       db.sets,
       db.workoutTemplates,
       db.templateExercises,
-      db.plannedSessions,
       db.settings,
       db.bodyMeasurements,
     ],
@@ -137,7 +131,6 @@ export async function importDataJSON(file: File): Promise<void> {
         db.sets.clear(),
         db.workoutTemplates.clear(),
         db.templateExercises.clear(),
-        db.plannedSessions.clear(),
         db.settings.clear(),
         db.bodyMeasurements.clear(),
       ])
@@ -148,7 +141,6 @@ export async function importDataJSON(file: File): Promise<void> {
         db.sets.bulkPut(data.sets ?? []),
         db.workoutTemplates.bulkPut(data.workoutTemplates ?? []),
         db.templateExercises.bulkPut(data.templateExercises ?? []),
-        db.plannedSessions.bulkPut(data.plannedSessions ?? []),
         db.settings.bulkPut(data.settings ?? []),
         db.bodyMeasurements.bulkPut(data.bodyMeasurements ?? []),
       ])

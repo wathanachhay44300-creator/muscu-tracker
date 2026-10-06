@@ -3,7 +3,6 @@ import type {
   AppPreferences,
   BodyMeasurement,
   Exercise,
-  PlannedSession,
   PlateCalculatorSettings,
   ProgressPhoto,
   SetEntry,
@@ -21,7 +20,6 @@ class MuscuDB extends Dexie {
   sets!: Table<SetEntry, number>
   workoutTemplates!: Table<WorkoutTemplate, number>
   templateExercises!: Table<TemplateExercise, number>
-  plannedSessions!: Table<PlannedSession, number>
   // A single keyed store shared by every singleton settings row (plate
   // calculator preferences, app preferences, …), distinguished by `id`.
   settings!: Table<PlateCalculatorSettings | AppPreferences, string>
@@ -30,6 +28,9 @@ class MuscuDB extends Dexie {
 
   constructor() {
     super('muscu-tracker')
+    // NOTE: the `plannedSessions` store below belongs to the removed planning
+    // feature. It stays declared in the schema (without any accessor) so rows
+    // already on a device are neither migrated nor deleted — just never read.
     this.version(1).stores({
       exercises: '++id, name, muscleGroup, isCustom',
       workouts: '++id, date',

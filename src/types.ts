@@ -101,16 +101,6 @@ export interface TemplateExercise {
   targetSets: number
 }
 
-/** A template scheduled for a future (or today's) date. Consumed once that
- * session is actually started — it's a to-do, not a historical record. */
-export interface PlannedSession {
-  id?: number
-  /** ISO date, format yyyy-mm-dd */
-  date: string
-  templateId: number
-  createdAt: number
-}
-
 export interface PlateOption {
   weight: number
   enabled: boolean
