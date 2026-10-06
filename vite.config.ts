@@ -45,7 +45,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // webp: the bundled exercise demonstration images (~5 MB), so they work offline.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp}'],
         // Libre Baskerville and Manrope come from Google Fonts: cache it so titles stay serif offline.
         runtimeCaching: [
           {

@@ -1,5 +1,5 @@
 import { db } from '../db'
-import type { LoadType, MuscleGroup } from '../types'
+import type { Exercise, LoadType, MuscleGroup } from '../types'
 
 /** Number of past sessions (workouts) that used this exercise at least once. */
 export async function countExerciseUsage(exerciseId: number): Promise<number> {
@@ -31,4 +31,13 @@ export async function renameExerciseName(exerciseId: number, name: string): Prom
 
 export async function setExerciseFavorite(exerciseId: number, isFavorite: boolean): Promise<void> {
   await db.exercises.update(exerciseId, { favoritedAt: isFavorite ? Date.now() : undefined })
+}
+
+export type ExerciseDetailsPatch = Partial<
+  Pick<Exercise, 'notes' | 'videoUrl' | 'primaryMuscles' | 'secondaryMuscles' | 'equipment'>
+>
+
+/** Updates the personal fields of an exercise sheet (notes, video link, muscles of a custom exercise). */
+export async function updateExerciseDetails(exerciseId: number, patch: ExerciseDetailsPatch): Promise<void> {
+  await db.exercises.update(exerciseId, patch)
 }

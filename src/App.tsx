@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
-import { ensureSeedData } from './db'
 import { migrateLegacyExerciseData } from './lib/migrations'
+import { syncExerciseLibrary } from './lib/exerciseLibrarySync'
 import { BottomNav } from './components/BottomNav'
 import { SeanceScreen } from './screens/SeanceScreen'
 import { HistoriqueScreen } from './screens/HistoriqueScreen'
@@ -28,8 +28,8 @@ export default function App() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    ensureSeedData()
-      .then(() => migrateLegacyExerciseData())
+    migrateLegacyExerciseData()
+      .then(() => syncExerciseLibrary())
       .then(() => setReady(true))
   }, [])
 

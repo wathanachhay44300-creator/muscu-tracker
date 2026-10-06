@@ -381,3 +381,22 @@ export function ClipboardPasteIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function InfoIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5.5" />
+      <path d="M12 7.5h.01" />
+    </svg>
+  )
+}
+
+export function PlayCircleIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M10 8.5v7l6-3.5Z" />
+    </svg>
+  )
+}

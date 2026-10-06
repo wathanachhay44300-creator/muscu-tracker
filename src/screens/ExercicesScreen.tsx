@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { Exercise, MuscleGroup } from '../types'
+import type { Exercise } from '../types'
 import { CreateExerciseForm, EditExerciseForm } from '../components/ExercisePickerSheet'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { ContextMenuSheet } from '../components/ContextMenuSheet'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { useExerciseLibrary } from '../hooks/useExerciseLibrary'
+import { useExerciseBrowser } from '../hooks/useExerciseBrowser'
+import { ExerciseFilters } from '../components/ExerciseFilters'
+import { ExerciseInfoButton } from '../components/ExerciseInfoSheet'
 import { useInlineRename } from '../hooks/useInlineRename'
 import { useLongPress } from '../hooks/useLongPress'
 import { usePreferences } from '../hooks/usePreferences'
@@ -26,43 +29,13 @@ import {
 } from '../components/Icons'
 
 export function ExercicesScreen() {
-  const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Exercise | null>(null)
   const [deleting, setDeleting] = useState<{ exercise: Exercise; usageCount: number } | null>(null)
   const pullToRefresh = usePullToRefresh()
   const library = useExerciseLibrary()
-  const all = library?.all ?? []
-
-  const searching = query.trim().length > 0
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return q ? all.filter((e) => e.name.toLowerCase().includes(q)) : all
-  }, [all, query])
-
-  const favorites = useMemo(
-    () => (searching ? filtered.filter((e) => e.favoritedAt) : library?.favorites ?? []),
-    [searching, filtered, library],
-  )
-  const recent = useMemo(() => {
-    if (searching || !library) return []
-    const byId = new Map(all.map((e) => [e.id!, e]))
-    return library.recentIds.map((id) => byId.get(id)).filter((e): e is Exercise => !!e)
-  }, [searching, library, all])
-
-  // Everything not already shown in a shortcut section above, grouped by
-  // muscle group like before.
-  const shortcutIds = new Set([...favorites, ...recent].map((e) => e.id!))
-  const rest = searching ? filtered : filtered.filter((e) => !shortcutIds.has(e.id!))
-  const grouped = useMemo(() => {
-    const map = new Map<MuscleGroup, Exercise[]>()
-    for (const ex of rest) {
-      if (!map.has(ex.muscleGroup)) map.set(ex.muscleGroup, [])
-      map.get(ex.muscleGroup)!.push(ex)
-    }
-    return map
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rest])
+  const browser = useExerciseBrowser(library)
+  const { query, setQuery } = browser
 
   async function handleDeleteClick(ex: Exercise) {
     const usageCount = await countExerciseUsage(ex.id!)
@@ -96,42 +69,60 @@ export function ExercicesScreen() {
         </button>
       </div>
 
-      <div className="mb-4 flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
+      <div className="mb-2 flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
         <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Chercher un exercice…"
+          placeholder="Chercher (ex : shoulder press, dev incliné)…"
+          enterKeyHint="search"
+          autoCapitalize="off"
+          autoCorrect="off"
           className="w-full bg-transparent text-base outline-none placeholder:text-slate-400"
+        />
+        {query && (
+          <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-slate-400 active:bg-slate-200">
+            <XIcon className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="mb-4">
+        <ExerciseFilters
+          groups={browser.groups}
+          equipment={browser.equipment}
+          onToggleGroup={browser.toggleGroup}
+          onToggleEquipment={browser.toggleEquipment}
+          onClear={browser.clearFilters}
         />
       </div>
 
-      {favorites.length > 0 && (
-        <ExerciseSection
-          title="Favoris"
-          exercises={favorites}
-          onEdit={setEditing}
-          onDelete={handleDeleteClick}
-        />
-      )}
-
-      {recent.length > 0 && (
-        <ExerciseSection
-          title="Utilisés récemment"
-          exercises={recent}
-          onEdit={setEditing}
-          onDelete={handleDeleteClick}
-        />
-      )}
-
-      {[...grouped.entries()].map(([group, list]) => (
-        <ExerciseSection key={group} title={group} exercises={list} onEdit={setEditing} onDelete={handleDeleteClick} />
-      ))}
-
-      {filtered.length === 0 && (
-        <p className="mt-8 text-center text-sm text-slate-400">
-          Aucun exercice trouvé pour « {query} ».
-        </p>
+      {browser.mode === 'search' ? (
+        browser.results.length > 0 ? (
+          <>
+            <p className="mb-1.5 px-1 text-xs font-medium text-slate-400">
+              {browser.results.length} résultat{browser.results.length > 1 ? 's' : ''}
+            </p>
+            <ExerciseSection title={null} exercises={browser.results} onEdit={setEditing} onDelete={handleDeleteClick} />
+          </>
+        ) : (
+          <NoResults query={query} onCreate={() => setCreating(true)} />
+        )
+      ) : (
+        <>
+          {browser.favorites.length > 0 && (
+            <ExerciseSection title="Favoris" exercises={browser.favorites} onEdit={setEditing} onDelete={handleDeleteClick} />
+          )}
+          {browser.recent.length > 0 && (
+            <ExerciseSection title="Utilisés récemment" exercises={browser.recent} onEdit={setEditing} onDelete={handleDeleteClick} />
+          )}
+          {[...browser.grouped.entries()].map(([group, list]) => (
+            <ExerciseSection key={group} title={group} exercises={list} onEdit={setEditing} onDelete={handleDeleteClick} />
+          ))}
+          {browser.mode === 'grouped' && browser.results.length === 0 && (
+            <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice pour ces filtres.</p>
+          )}
+        </>
       )}
 
       {creating && (
@@ -204,14 +195,14 @@ function ExerciseSection({
   onEdit,
   onDelete,
 }: {
-  title: string
+  title: string | null
   exercises: Exercise[]
   onEdit: (ex: Exercise) => void
   onDelete: (ex: Exercise) => void
 }) {
   return (
     <div className="mb-5">
-      <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h3>
+      {title && <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h3>}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-surface">
         {exercises.map((ex, i) => (
           <ExerciseRow key={ex.id} exercise={ex} bordered={i > 0} onEdit={() => onEdit(ex)} onDelete={() => onDelete(ex)} />
@@ -305,6 +296,7 @@ function ExerciseRow({
         <span className="font-exercise text-[0.95rem] text-slate-900">{exercise.name}</span>
         <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
       </Link>
+      <ExerciseInfoButton exercise={exercise} className="!p-1.5" />
       <button
         type="button"
         data-no-long-press
@@ -341,6 +333,23 @@ function ExerciseRow({
           onClose={() => setMenuOpen(false)}
         />
       )}
+    </div>
+  )
+}
+
+/** Shown when a search finds nothing: offers to create the exercise with the typed text. */
+export function NoResults({ query, onCreate }: { query: string; onCreate: () => void }) {
+  return (
+    <div className="mt-6 rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center">
+      <p className="text-sm text-slate-500">Aucun exercice trouvé pour « {query.trim()} ».</p>
+      <button
+        type="button"
+        onClick={onCreate}
+        className="mt-3 inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white active:bg-brand-700"
+      >
+        <PlusIcon className="h-4 w-4" />
+        Créer « {query.trim()} »
+      </button>
     </div>
   )
 }

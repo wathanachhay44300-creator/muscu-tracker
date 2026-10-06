@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { DEFAULT_EXERCISES } from './exercisesSeed'
+import { EXERCISE_LIBRARY } from '../data/exerciseLibrary'
 import { guessLoadType } from './loadType'
 import type { Exercise, MuscleGroup } from '../types'
 
@@ -29,7 +29,7 @@ function guessMuscleFromLegacyJambes(name: string): MuscleGroup {
   return 'Quadriceps'
 }
 
-const DEFAULT_LOAD_TYPE_BY_NAME = new Map(DEFAULT_EXERCISES.map((e) => [e.name, e.loadType]))
+const DEFAULT_LOAD_TYPE_BY_NAME = new Map(EXERCISE_LIBRARY.map((e) => [e.name, e.loadType]))
 
 /**
  * Brings exercises created before the precise-muscle / load-type update up

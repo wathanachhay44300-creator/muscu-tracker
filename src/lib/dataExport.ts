@@ -1,9 +1,11 @@
 import { db } from '../db'
 import { todayISO } from './date'
+import { syncExerciseLibrary } from './exerciseLibrarySync'
 import type {
   AppPreferences,
   BodyMeasurement,
   Exercise,
+  ExerciseLibraryState,
   PlateCalculatorSettings,
   SetEntry,
   TemplateExercise,
@@ -23,7 +25,7 @@ interface ExportData {
   sets: SetEntry[]
   workoutTemplates: WorkoutTemplate[]
   templateExercises: TemplateExercise[]
-  settings: (PlateCalculatorSettings | AppPreferences)[]
+  settings: (PlateCalculatorSettings | AppPreferences | ExerciseLibraryState)[]
   bodyMeasurements: BodyMeasurement[]
 }
 
@@ -146,6 +148,8 @@ export async function importDataJSON(file: File): Promise<void> {
       ])
     },
   )
+  // A backup made before some library exercises existed: bring them in right away.
+  await syncExerciseLibrary()
 }
 
 function csvEscape(value: string): string {

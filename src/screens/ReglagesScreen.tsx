@@ -275,6 +275,10 @@ export function ReglagesScreen() {
 
         <GoalCard />
         <ShortcutCard />
+
+        <p className="px-2 pt-1 text-center text-[11px] text-slate-400">
+          Images et données d'exercices : free-exercise-db (domaine public)
+        </p>
       </div>
     </div>
   )

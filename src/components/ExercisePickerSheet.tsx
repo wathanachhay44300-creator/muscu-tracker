@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { db } from '../db'
 import { useExerciseLibrary } from '../hooks/useExerciseLibrary'
+import { useExerciseBrowser } from '../hooks/useExerciseBrowser'
+import { ExerciseFilters } from './ExerciseFilters'
+import { ExerciseInfoButton } from './ExerciseInfoSheet'
 import { renameExercise, setExerciseFavorite } from '../lib/exerciseActions'
 import { guessLoadType } from '../lib/loadType'
 import { LOAD_TYPES, MUSCLE_GROUPS, type Exercise, type LoadType, type MuscleGroup } from '../types'
@@ -14,63 +17,53 @@ interface ExercisePickerSheetProps {
 }
 
 export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: ExercisePickerSheetProps) {
-  const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
   const library = useExerciseLibrary()
-  const exercises = library?.all ?? []
-
-  const searching = query.trim().length > 0
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const list = q ? exercises.filter((e) => e.name.toLowerCase().includes(q)) : exercises
-    const excluded = new Set(excludeIds)
-    return list.filter((e) => !excluded.has(e.id!))
-  }, [exercises, query, excludeIds])
-
-  const favorites = useMemo(
-    () => (searching ? filtered.filter((e) => e.favoritedAt) : (library?.favorites ?? []).filter((e) => !excludeIds.includes(e.id!))),
-    [searching, filtered, library, excludeIds],
-  )
-  const recent = useMemo(() => {
-    if (searching || !library) return []
-    const byId = new Map(exercises.map((e) => [e.id!, e]))
-    const excluded = new Set(excludeIds)
-    return library.recentIds.map((id) => byId.get(id)).filter((e): e is Exercise => !!e && !excluded.has(e.id!))
-  }, [searching, library, exercises, excludeIds])
-
-  const shortcutIds = new Set([...favorites, ...recent].map((e) => e.id!))
-  const rest = searching ? filtered : filtered.filter((e) => !shortcutIds.has(e.id!))
-  const grouped = useMemo(() => {
-    const map = new Map<MuscleGroup, Exercise[]>()
-    for (const ex of rest) {
-      if (!map.has(ex.muscleGroup)) map.set(ex.muscleGroup, [])
-      map.get(ex.muscleGroup)!.push(ex)
-    }
-    return map
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rest])
+  const browser = useExerciseBrowser(library, excludeIds)
+  const { query, setQuery } = browser
 
   return (
     <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
-      <div className="flex items-center gap-2 border-b border-slate-200 px-4 pt-safe pt-4 pb-3">
-        <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
-          <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />
-          <input
-            autoFocus
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Chercher un exercice…"
-            className="w-full bg-transparent text-base outline-none placeholder:text-slate-400"
-          />
+      <div className="border-b border-slate-200 px-4 pt-safe pt-4 pb-2.5">
+        <div className="flex items-center gap-2">
+          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
+            <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Chercher (ex : shoulder press)…"
+              enterKeyHint="search"
+              autoCapitalize="off"
+              autoCorrect="off"
+              className="w-full bg-transparent text-base outline-none placeholder:text-slate-400"
+            />
+            {query && (
+              <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-slate-400 active:bg-slate-200">
+                <XIcon className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 rounded-full p-2 text-slate-500 active:bg-slate-100"
+            aria-label="Fermer"
+          >
+            <XIcon className="h-6 w-6" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="shrink-0 rounded-full p-2 text-slate-500 active:bg-slate-100"
-          aria-label="Fermer"
-        >
-          <XIcon className="h-6 w-6" />
-        </button>
+        {!creating && (
+          <div className="mt-2.5">
+            <ExerciseFilters
+              groups={browser.groups}
+              equipment={browser.equipment}
+              onToggleGroup={browser.toggleGroup}
+              onToggleEquipment={browser.toggleEquipment}
+              onClear={browser.clearFilters}
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-8">
@@ -88,27 +81,31 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
             <button
               type="button"
               onClick={() => setCreating(true)}
-              className="mt-4 flex w-full items-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-3 text-accent"
+              className="mt-4 flex min-h-12 w-full items-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-3 text-accent"
             >
               <PlusIcon className="h-5 w-5" />
-              <span className="font-medium">Créer un exercice personnalisé</span>
+              <span className="font-medium">
+                {query.trim() ? `Créer « ${query.trim()} »` : 'Créer un exercice personnalisé'}
+              </span>
             </button>
 
-            {favorites.length > 0 && (
-              <PickerSection title="Favoris" list={favorites} onSelect={onSelect} />
-            )}
-            {recent.length > 0 && (
-              <PickerSection title="Utilisés récemment" list={recent} onSelect={onSelect} />
-            )}
-
-            {[...grouped.entries()].map(([group, list]) => (
-              <PickerSection key={group} title={group} list={list} onSelect={onSelect} />
-            ))}
-
-            {filtered.length === 0 && (
-              <p className="mt-8 text-center text-sm text-slate-400">
-                Aucun exercice trouvé pour « {query} ».
-              </p>
+            {browser.mode === 'search' ? (
+              browser.results.length > 0 ? (
+                <PickerSection title={`${browser.results.length} résultat${browser.results.length > 1 ? 's' : ''}`} list={browser.results} onSelect={onSelect} />
+              ) : (
+                <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice trouvé pour « {query.trim()} ».</p>
+              )
+            ) : (
+              <>
+                {browser.favorites.length > 0 && <PickerSection title="Favoris" list={browser.favorites} onSelect={onSelect} />}
+                {browser.recent.length > 0 && <PickerSection title="Utilisés récemment" list={browser.recent} onSelect={onSelect} />}
+                {[...browser.grouped.entries()].map(([group, list]) => (
+                  <PickerSection key={group} title={group} list={list} onSelect={onSelect} />
+                ))}
+                {browser.mode === 'grouped' && browser.results.length === 0 && (
+                  <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice pour ces filtres.</p>
+                )}
+              </>
             )}
           </>
         )}
@@ -139,6 +136,7 @@ function PickerSection({
             >
               {ex.name}
             </button>
+            <ExerciseInfoButton exercise={ex} className="!p-2" />
             <button
               type="button"
               onClick={() => setExerciseFavorite(ex.id!, !ex.favoritedAt)}

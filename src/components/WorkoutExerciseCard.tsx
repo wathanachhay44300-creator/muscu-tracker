@@ -24,6 +24,7 @@ import { formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats
 import { relativeDateLabel } from '../lib/date'
 import { SetRow } from './SetRow'
 import { ContextMenuSheet } from './ContextMenuSheet'
+import { ExerciseInfoButton } from './ExerciseInfoSheet'
 import { CopyIcon, GripIcon, NoteIcon, PlusIcon, TrashIcon } from './Icons'
 
 interface WorkoutExerciseCardProps {
@@ -170,19 +171,22 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             )}
           </div>
         </div>
-        <button
-          type="button"
-          data-no-long-press
-          data-no-swipe
-          onClick={() => setNoteOpen((v) => !v)}
-          aria-label="Note sur cet exercice"
-          aria-expanded={noteOpen}
-          className={`shrink-0 rounded-lg p-1.5 active:bg-slate-100 ${
-            noteText.trim() ? 'text-accent' : 'text-slate-300'
-          }`}
-        >
-          <NoteIcon className="h-5 w-5" />
-        </button>
+        <div className="flex shrink-0 items-center">
+          <ExerciseInfoButton exercise={we.exercise} className="!rounded-lg !p-1.5 !text-slate-300" />
+          <button
+            type="button"
+            data-no-long-press
+            data-no-swipe
+            onClick={() => setNoteOpen((v) => !v)}
+            aria-label="Note sur cet exercice"
+            aria-expanded={noteOpen}
+            className={`shrink-0 rounded-lg p-1.5 active:bg-slate-100 ${
+              noteText.trim() ? 'text-accent' : 'text-slate-300'
+            }`}
+          >
+            <NoteIcon className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {noteOpen && (

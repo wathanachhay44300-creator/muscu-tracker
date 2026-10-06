@@ -3,6 +3,7 @@ import type {
   AppPreferences,
   BodyMeasurement,
   Exercise,
+  ExerciseLibraryState,
   PlateCalculatorSettings,
   ProgressPhoto,
   SetEntry,
@@ -11,7 +12,6 @@ import type {
   WorkoutExercise,
   WorkoutTemplate,
 } from './types'
-import { DEFAULT_EXERCISES } from './lib/exercisesSeed'
 
 class MuscuDB extends Dexie {
   exercises!: Table<Exercise, number>
@@ -22,7 +22,7 @@ class MuscuDB extends Dexie {
   templateExercises!: Table<TemplateExercise, number>
   // A single keyed store shared by every singleton settings row (plate
   // calculator preferences, app preferences, …), distinguished by `id`.
-  settings!: Table<PlateCalculatorSettings | AppPreferences, string>
+  settings!: Table<PlateCalculatorSettings | AppPreferences | ExerciseLibraryState, string>
   bodyMeasurements!: Table<BodyMeasurement, number>
   progressPhotos!: Table<ProgressPhoto, number>
 
@@ -90,25 +90,3 @@ class MuscuDB extends Dexie {
 }
 
 export const db = new MuscuDB()
-
-/**
- * Seeds the default exercise library the first time the app runs.
- * Wrapped in a single transaction so the check-then-write is atomic even if
- * called twice concurrently (e.g. React StrictMode double-invoking effects).
- */
-export async function ensureSeedData() {
-  await db.transaction('rw', db.exercises, async () => {
-    const count = await db.exercises.count()
-    if (count > 0) return
-    const now = Date.now()
-    await db.exercises.bulkAdd(
-      DEFAULT_EXERCISES.map((e) => ({
-        name: e.name,
-        muscleGroup: e.muscleGroup,
-        loadType: e.loadType,
-        isCustom: false,
-        createdAt: now,
-      })),
-    )
-  })
-}

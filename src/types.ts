@@ -26,6 +26,45 @@ export const LOAD_TYPES = [
 
 export type LoadType = (typeof LOAD_TYPES)[number]
 
+/** Equipment an exercise is done with (drives the library's equipment filter). */
+export const EQUIPMENT = ['barre', 'halteres', 'ez', 'machine', 'smith', 'poulie', 'poids_du_corps'] as const
+export type Equipment = (typeof EQUIPMENT)[number]
+
+export const EQUIPMENT_LABEL: Record<Equipment, string> = {
+  barre: 'Barre',
+  halteres: 'Haltères',
+  ez: 'Barre EZ',
+  machine: 'Machine',
+  smith: 'Smith',
+  poulie: 'Poulie',
+  poids_du_corps: 'Poids du corps',
+}
+
+/**
+ * Finer muscles than `MuscleGroup`, used for the "muscles travaillés" lists
+ * and the body diagram. Each one belongs to exactly one group (see data/muscles.ts).
+ */
+export type MuscleId =
+  | 'pectoraux'
+  | 'delt_ant'
+  | 'delt_lat'
+  | 'delt_post'
+  | 'trapezes'
+  | 'grand_dorsal'
+  | 'milieu_dos'
+  | 'lombaires'
+  | 'biceps'
+  | 'triceps'
+  | 'avant_bras'
+  | 'abdominaux'
+  | 'obliques'
+  | 'quadriceps'
+  | 'adducteurs'
+  | 'ischios'
+  | 'fessiers'
+  | 'moyen_fessier'
+  | 'mollets'
+
 export interface Exercise {
   id?: number
   name: string
@@ -40,6 +79,18 @@ export interface Exercise {
   /** When the exercise was marked as a favorite; undefined when it isn't
    * one. Doubles as the sort key so the most recently favorited comes first. */
   favoritedAt?: number
+  /** Stable id of the predefined library entry this row comes from (absent
+   * for exercises the user created). Lets the library grow without duplicates. */
+  seedId?: string
+  equipment?: Equipment
+  /** Muscles worked, for exercises the user created (predefined ones take
+   * theirs from the bundled library). */
+  primaryMuscles?: MuscleId[]
+  secondaryMuscles?: MuscleId[]
+  /** Personal notes shown on the exercise sheet. */
+  notes?: string
+  /** Optional link to a demonstration video the user likes. */
+  videoUrl?: string
 }
 
 export interface Workout {
@@ -99,6 +150,12 @@ export interface TemplateExercise {
   exerciseId: number
   order: number
   targetSets: number
+}
+
+/** Singleton settings row remembering which version of the predefined exercise library was synced. */
+export interface ExerciseLibraryState {
+  id: 'exerciseLibrary'
+  version: number
 }
 
 export interface PlateOption {
