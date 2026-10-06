@@ -11,6 +11,7 @@ import { ProgrammesScreen } from './screens/ProgrammesScreen'
 import { DumbbellIcon } from './components/Icons'
 import { RestTimerWidget } from './components/RestTimerWidget'
 import { SnackbarProvider } from './contexts/SnackbarContext'
+import { DeepLinkImporter } from './components/DeepLinkImporter'
 
 // Rarely-opened screens are split out of the main bundle (still precached by the service worker, so they open offline).
 const ExerciseDetailScreen = lazy(() => import('./screens/ExerciseDetailScreen').then((m) => ({ default: m.ExerciseDetailScreen })))
@@ -21,6 +22,7 @@ const BilanScreen = lazy(() => import('./screens/BilanScreen').then((m) => ({ de
 const CorpsScreen = lazy(() => import('./screens/CorpsScreen').then((m) => ({ default: m.CorpsScreen })))
 const PhotosScreen = lazy(() => import('./screens/PhotosScreen').then((m) => ({ default: m.PhotosScreen })))
 const DonneesScreen = lazy(() => import('./screens/DonneesScreen').then((m) => ({ default: m.DonneesScreen })))
+const SuiviScreen = lazy(() => import('./screens/SuiviScreen').then((m) => ({ default: m.SuiviScreen })))
 const ReglagesScreen = lazy(() => import('./screens/ReglagesScreen').then((m) => ({ default: m.ReglagesScreen })))
 
 export default function App() {
@@ -59,10 +61,12 @@ export default function App() {
             <Route path="/bilan/:workoutId" element={<BilanScreen />} />
             <Route path="/corps" element={<CorpsScreen />} />
             <Route path="/photos" element={<PhotosScreen />} />
+            <Route path="/suivi" element={<SuiviScreen />} />
             <Route path="/reglages" element={<ReglagesScreen />} />
             <Route path="/donnees" element={<DonneesScreen />} />
           </Routes>
           </Suspense>
+          <DeepLinkImporter />
           <RestTimerWidget />
           <BottomNav />
         </div>

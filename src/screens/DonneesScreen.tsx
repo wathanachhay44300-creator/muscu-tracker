@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { exportAllDataJSON, exportHistoryCSV, getDataSummary, importDataJSON, type DataSummary } from '../lib/dataExport'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { TrackingImportCard } from '../components/TrackingImportCard'
 import { ChevronLeftIcon, DownloadIcon, UploadIcon } from '../components/Icons'
 
 export function DonneesScreen() {
@@ -99,7 +100,7 @@ export function DonneesScreen() {
         <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
           <p className="mb-1 text-sm font-semibold text-slate-700">Sauvegarde complète (JSON)</p>
           <p className="mb-3 text-xs text-slate-400">
-            Toutes vos données (séances, exercices, programmes, mesures, photos). À conserver pour restaurer plus
+            Toutes vos données (séances, exercices, programmes, mesures, pas, poids, calories, objectif, photos). À conserver pour restaurer plus
             tard, sur cet appareil ou un autre.
           </p>
           <button
@@ -129,6 +130,8 @@ export function DonneesScreen() {
             Exporter en CSV
           </button>
         </div>
+
+        <TrackingImportCard />
 
         <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
           <p className="mb-1 text-sm font-semibold text-red-700">Importer des données</p>

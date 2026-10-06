@@ -13,6 +13,7 @@ import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { formatDateLong } from '../lib/date'
 import { formatVolume } from '../lib/stats'
 import {
+  ActivityIcon,
   CalendarIcon,
   CameraIcon,
   ChartIcon,
@@ -57,6 +58,17 @@ export function HistoriqueScreen() {
           <div className="flex items-center gap-2.5">
             <ChartIcon className="h-5 w-5 text-accent" />
             <span className="font-medium text-slate-800">Répartition par muscle (semaine)</span>
+          </div>
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        </Link>
+
+        <Link
+          to="/suivi"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
+        >
+          <div className="flex items-center gap-2.5">
+            <ActivityIcon className="h-5 w-5 text-accent" />
+            <span className="font-medium text-slate-800">Pas, poids &amp; calories</span>
           </div>
           <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
         </Link>

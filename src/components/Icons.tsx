@@ -362,3 +362,22 @@ export function NoteIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function ActivityIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 12h4l2.5-7 5 14 2.5-7H21" />
+    </svg>
+  )
+}
+
+export function ClipboardPasteIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="5" y="4.5" width="14" height="17" rx="2" />
+      <path d="M9 4.5V3.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+      <path d="M12 10v7" />
+      <path d="M9 14l3 3 3-3" />
+    </svg>
+  )
+}

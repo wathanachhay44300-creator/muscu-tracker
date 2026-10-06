@@ -130,7 +130,13 @@ export interface AppPreferences {
   soundEnabled: boolean
   /** Light vibrations on set-added / long-press menu / PR, where supported. */
   hapticsEnabled: boolean
+  /** Body-weight objective, used for the indicative advice on the tracking screen. */
+  goal: WeightGoal
+  /** Target pace in kg/week (magnitude; the sign comes from `goal`). */
+  goalRateKg: number
 }
+
+export type WeightGoal = 'loss' | 'maintain' | 'gain'
 
 /** One day's body-weight/measurements entry. All fields optional so the user
  * can log just their weight some days and full measurements other days. */
@@ -144,6 +150,11 @@ export interface BodyMeasurement {
   hips?: number
   arms?: number
   thighs?: number
+  /** Daily step count. Lives on the same per-day row as the weight, so
+   * there is exactly one weight history shared by every screen. */
+  steps?: number
+  /** Daily calorie intake, in kcal. */
+  calories?: number
   createdAt: number
 }
 

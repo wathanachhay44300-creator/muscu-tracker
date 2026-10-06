@@ -113,9 +113,13 @@ export function CorpsScreen() {
               <div>
                 <p className="text-sm font-semibold text-slate-900">{relativeDateLabel(m.date)}</p>
                 <p className="text-xs text-slate-400">
-                  {METRICS.filter((metric) => m[metric.key] != null)
-                    .map((metric) => `${metric.label} ${m[metric.key]}${metric.unit}`)
-                    .join(' · ')}
+                  {[
+                    ...METRICS.filter((metric) => m[metric.key] != null).map(
+                      (metric) => `${metric.label} ${m[metric.key]}${metric.unit}`,
+                    ),
+                    ...(m.steps != null ? [`Pas ${m.steps.toLocaleString('fr-FR')}`] : []),
+                    ...(m.calories != null ? [`${m.calories.toLocaleString('fr-FR')} kcal`] : []),
+                  ].join(' · ')}
                 </p>
               </div>
               <button

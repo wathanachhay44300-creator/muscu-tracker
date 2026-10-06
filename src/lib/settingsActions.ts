@@ -1,5 +1,5 @@
 import { db } from '../db'
-import type { AppPreferences, PlateCalculatorSettings } from '../types'
+import type { AppPreferences, PlateCalculatorSettings, WeightGoal } from '../types'
 
 export const DEFAULT_BAR_WEIGHT = 20
 export const DEFAULT_PLATE_WEIGHTS = [20, 10, 5, 2.5, 1.25]
@@ -35,7 +35,7 @@ const PREFERENCES_ID = 'appPreferences' as const
 function defaultPreferences(): AppPreferences {
   // Off by default: the app is often used in a gym, where an unexpected
   // chime (or buzz) is more awkward than welcome — both are opt-in.
-  return { id: PREFERENCES_ID, soundEnabled: false, hapticsEnabled: false }
+  return { id: PREFERENCES_ID, soundEnabled: false, hapticsEnabled: false, goal: 'maintain', goalRateKg: 0.3 }
 }
 
 export async function getPreferences(): Promise<AppPreferences> {
@@ -53,4 +53,9 @@ export async function setSoundEnabled(soundEnabled: boolean): Promise<void> {
 export async function setHapticsEnabled(hapticsEnabled: boolean): Promise<void> {
   const current = await getPreferences()
   await db.settings.put({ ...current, hapticsEnabled })
+}
+
+export async function setWeightGoal(goal: WeightGoal, goalRateKg?: number): Promise<void> {
+  const current = await getPreferences()
+  await db.settings.put({ ...current, goal, goalRateKg: goalRateKg ?? current.goalRateKg })
 }
