@@ -2,11 +2,13 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { createPortal } from 'react-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { MUSCLE_IDS, MUSCLES } from '../data/muscles'
+import { MUSCLES } from '../data/muscles'
 import { updateExerciseDetails } from '../lib/exerciseActions'
 import { demoSearchUrl, getExerciseInfo, normalizeVideoUrl } from '../lib/exerciseInfo'
 import { EQUIPMENT_LABEL, type Exercise, type MuscleId } from '../types'
+import { secondaryGroupsOf } from '../lib/muscleGroups'
 import { BodyDiagram } from './BodyDiagram'
+import { PrincipalPicker, SecondaryPicker } from './MuscleGroupPickers'
 import { ExerciseImages } from './ExerciseImages'
 import { InfoIcon, PlayCircleIcon, XIcon } from './Icons'
 
@@ -248,47 +250,35 @@ function MuscleList({ label, muscles, strong = false }: { label: string; muscles
   )
 }
 
-/** For the user's own exercises: tap a muscle to cycle none → principal → secondaire. */
+/** For the user's own exercises: the same main / secondary pickers as the edit form, saved on the spot. */
 function MuscleEditor({ exercise }: { exercise: Exercise }) {
-  const primary = exercise.primaryMuscles ?? []
-  const secondary = exercise.secondaryMuscles ?? []
-
-  function cycle(m: MuscleId) {
-    const isP = primary.includes(m)
-    const isS = secondary.includes(m)
-    const p = primary.filter((x) => x !== m)
-    const s = secondary.filter((x) => x !== m)
-    if (!isP && !isS) p.push(m)
-    else if (isP) s.push(m)
-    updateExerciseDetails(exercise.id!, { primaryMuscles: p, secondaryMuscles: s })
-  }
-
+  const secondary = secondaryGroupsOf(exercise)
   return (
-    <div className="mt-4">
-      <p className="mb-1.5 text-xs font-medium text-slate-500">
-        Choisissez les muscles : un tap = principal, deux taps = secondaire, trois = retirer.
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {MUSCLE_IDS.map((m) => {
-          const level = primary.includes(m) ? 'p' : secondary.includes(m) ? 's' : null
-          return (
-            <button
-              key={m}
-              type="button"
-              onClick={() => cycle(m)}
-              aria-pressed={level != null}
-              className={`min-h-9 rounded-full px-3 text-xs font-semibold ${
-                level === 'p'
-                  ? 'bg-brand-600 text-white'
-                  : level === 's'
-                    ? 'bg-brand-50 text-accent'
-                    : 'border border-slate-200 text-slate-500 active:bg-slate-100'
-              }`}
-            >
-              {MUSCLES[m].label}
-            </button>
-          )
-        })}
+    <div className="mt-4 space-y-3">
+      <div>
+        <p className="mb-1.5 text-xs font-medium text-slate-500">Muscle principal</p>
+        <PrincipalPicker
+          value={exercise.muscleGroup}
+          onChange={(g) =>
+            // The main muscle can't also be secondary; stale fine-grained muscles no longer apply.
+            updateExerciseDetails(exercise.id!, {
+              muscleGroup: g,
+              secondaryGroups: secondary.filter((x) => x !== g),
+              primaryMuscles: undefined,
+              secondaryMuscles: undefined,
+            })
+          }
+        />
+      </div>
+      <div>
+        <p className="mb-1.5 text-xs font-medium text-slate-500">Muscles secondaires (optionnel)</p>
+        <SecondaryPicker
+          principal={exercise.muscleGroup}
+          value={secondary}
+          onChange={(groups) =>
+            updateExerciseDetails(exercise.id!, { secondaryGroups: groups, primaryMuscles: undefined, secondaryMuscles: undefined })
+          }
+        />
       </div>
     </div>
   )

@@ -103,7 +103,13 @@ export function ExercicesScreen() {
             <p className="mb-1.5 px-1 text-xs font-medium text-slate-400">
               {browser.results.length} résultat{browser.results.length > 1 ? 's' : ''}
             </p>
-            <ExerciseSection title={null} exercises={browser.results} onEdit={setEditing} onDelete={handleDeleteClick} />
+            <ExerciseSection
+              title={null}
+              exercises={browser.results}
+              secondaryOnly={browser.secondaryOnly}
+              onEdit={setEditing}
+              onDelete={handleDeleteClick}
+            />
           </>
         ) : (
           <NoResults query={query} onCreate={() => setCreating(true)} />
@@ -119,6 +125,15 @@ export function ExercicesScreen() {
           {[...browser.grouped.entries()].map(([group, list]) => (
             <ExerciseSection key={group} title={group} exercises={list} onEdit={setEditing} onDelete={handleDeleteClick} />
           ))}
+          {browser.secondaryList.length > 0 && (
+            <ExerciseSection
+              title="Muscle secondaire"
+              exercises={browser.secondaryList}
+              secondaryOnly={browser.secondaryOnly}
+              onEdit={setEditing}
+              onDelete={handleDeleteClick}
+            />
+          )}
           {browser.mode === 'grouped' && browser.results.length === 0 && (
             <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice pour ces filtres.</p>
           )}
@@ -192,11 +207,14 @@ export function ExercicesScreen() {
 function ExerciseSection({
   title,
   exercises,
+  secondaryOnly,
   onEdit,
   onDelete,
 }: {
   title: string | null
   exercises: Exercise[]
+  /** Ids to mark "secondaire" (they only match the muscle filter as a secondary muscle). */
+  secondaryOnly?: Set<number>
   onEdit: (ex: Exercise) => void
   onDelete: (ex: Exercise) => void
 }) {
@@ -205,7 +223,7 @@ function ExerciseSection({
       {title && <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h3>}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-surface">
         {exercises.map((ex, i) => (
-          <ExerciseRow key={ex.id} exercise={ex} bordered={i > 0} onEdit={() => onEdit(ex)} onDelete={() => onDelete(ex)} />
+          <ExerciseRow key={ex.id} exercise={ex} bordered={i > 0} secondaryNote={secondaryOnly?.has(ex.id!)} onEdit={() => onEdit(ex)} onDelete={() => onDelete(ex)} />
         ))}
       </div>
     </div>
@@ -215,11 +233,13 @@ function ExerciseSection({
 function ExerciseRow({
   exercise,
   bordered,
+  secondaryNote = false,
   onEdit,
   onDelete,
 }: {
   exercise: Exercise
   bordered: boolean
+  secondaryNote?: boolean
   onEdit: () => void
   onDelete: () => void
 }) {
@@ -293,7 +313,12 @@ function ExerciseRow({
         )}
       </button>
       <Link to={`/exercices/${exercise.id}`} className="flex flex-1 items-center justify-between py-3 pl-1 active:bg-slate-50">
-        <span className="font-exercise text-[0.95rem] text-slate-900">{exercise.name}</span>
+        <span className="min-w-0">
+          <span className="font-exercise block text-[0.95rem] text-slate-900">{exercise.name}</span>
+          {secondaryNote && (
+            <span className="block text-[11px] font-medium text-slate-400">secondaire · {exercise.muscleGroup}</span>
+          )}
+        </span>
         <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
       </Link>
       <ExerciseInfoButton exercise={exercise} className="!p-1.5" />

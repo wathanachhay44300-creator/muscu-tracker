@@ -6,7 +6,9 @@ import { ExerciseFilters } from './ExerciseFilters'
 import { ExerciseInfoButton } from './ExerciseInfoSheet'
 import { renameExercise, setExerciseFavorite } from '../lib/exerciseActions'
 import { guessLoadType } from '../lib/loadType'
-import { LOAD_TYPES, MUSCLE_GROUPS, type Exercise, type LoadType, type MuscleGroup } from '../types'
+import { secondaryGroupsOf } from '../lib/muscleGroups'
+import { PrincipalPicker, SecondaryPicker } from './MuscleGroupPickers'
+import { LOAD_TYPES, type Exercise, type LoadType, type MuscleGroup } from '../types'
 import { SearchIcon, XIcon, PlusIcon, StarIcon, StarOutlineIcon } from './Icons'
 
 interface ExercisePickerSheetProps {
@@ -91,7 +93,12 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
 
             {browser.mode === 'search' ? (
               browser.results.length > 0 ? (
-                <PickerSection title={`${browser.results.length} résultat${browser.results.length > 1 ? 's' : ''}`} list={browser.results} onSelect={onSelect} />
+                <PickerSection
+                  title={`${browser.results.length} résultat${browser.results.length > 1 ? 's' : ''}`}
+                  list={browser.results}
+                  onSelect={onSelect}
+                  secondaryOnly={browser.secondaryOnly}
+                />
               ) : (
                 <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice trouvé pour « {query.trim()} ».</p>
               )
@@ -102,6 +109,14 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
                 {[...browser.grouped.entries()].map(([group, list]) => (
                   <PickerSection key={group} title={group} list={list} onSelect={onSelect} />
                 ))}
+                {browser.secondaryList.length > 0 && (
+                  <PickerSection
+                    title="Muscle secondaire"
+                    list={browser.secondaryList}
+                    onSelect={onSelect}
+                    secondaryOnly={browser.secondaryOnly}
+                  />
+                )}
                 {browser.mode === 'grouped' && browser.results.length === 0 && (
                   <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice pour ces filtres.</p>
                 )}
@@ -118,10 +133,13 @@ function PickerSection({
   title,
   list,
   onSelect,
+  secondaryOnly,
 }: {
   title: string
   list: Exercise[]
   onSelect: (exercise: Exercise) => void
+  /** Ids to mark "secondaire" (matched the muscle filter only as a secondary muscle). */
+  secondaryOnly?: Set<number>
 }) {
   return (
     <div className="mt-5">
@@ -135,6 +153,11 @@ function PickerSection({
               className="font-exercise flex-1 px-4 py-3 text-left text-base text-slate-900 active:bg-slate-50"
             >
               {ex.name}
+              {secondaryOnly?.has(ex.id!) && (
+                <span className="block font-sans text-[11px] font-medium text-slate-400">
+                  secondaire · {ex.muscleGroup}
+                </span>
+              )}
             </button>
             <ExerciseInfoButton exercise={ex} className="!p-2" />
             <button
@@ -159,11 +182,17 @@ function PickerSection({
 interface ExerciseFormProps {
   initialName: string
   initialGroup: MuscleGroup
+  initialSecondary?: MuscleGroup[]
   initialLoadType: LoadType
   /** True for create: the load type re-suggests itself as the name changes, until the user picks one manually. */
   autoSuggestLoadType?: boolean
   submitLabel: string
-  onSubmit: (values: { name: string; muscleGroup: MuscleGroup; loadType: LoadType }) => Promise<void>
+  onSubmit: (values: {
+    name: string
+    muscleGroup: MuscleGroup
+    secondaryGroups: MuscleGroup[]
+    loadType: LoadType
+  }) => Promise<void>
   onCancel: () => void
 }
 
@@ -171,6 +200,7 @@ interface ExerciseFormProps {
 function ExerciseForm({
   initialName,
   initialGroup,
+  initialSecondary = [],
   initialLoadType,
   autoSuggestLoadType = false,
   submitLabel,
@@ -179,6 +209,7 @@ function ExerciseForm({
 }: ExerciseFormProps) {
   const [name, setName] = useState(initialName)
   const [group, setGroup] = useState<MuscleGroup>(initialGroup)
+  const [secondary, setSecondary] = useState<MuscleGroup[]>(initialSecondary.filter((g) => g !== initialGroup))
   const [loadType, setLoadType] = useState<LoadType>(initialLoadType)
   const [loadTypeTouched, setLoadTypeTouched] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -195,7 +226,7 @@ function ExerciseForm({
     const trimmed = name.trim()
     if (!trimmed || saving) return
     setSaving(true)
-    await onSubmit({ name: trimmed, muscleGroup: group, loadType })
+    await onSubmit({ name: trimmed, muscleGroup: group, secondaryGroups: secondary.filter((g) => g !== group), loadType })
   }
 
   return (
@@ -211,23 +242,21 @@ function ExerciseForm({
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-600">Groupe musculaire</label>
-        <div className="flex flex-wrap gap-2">
-          {MUSCLE_GROUPS.map((g) => (
-            <button
-              key={g}
-              type="button"
-              onClick={() => setGroup(g)}
-              className={`rounded-full px-3.5 py-2 text-sm font-medium ${
-                group === g
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-slate-100 text-slate-600 active:bg-slate-200'
-              }`}
-            >
-              {g}
-            </button>
-          ))}
-        </div>
+        <label className="mb-1 block text-sm font-medium text-slate-600">Muscle principal</label>
+        <PrincipalPicker
+          value={group}
+          onChange={(g) => {
+            setGroup(g)
+            // The main muscle can't also be a secondary one.
+            setSecondary((list) => list.filter((x) => x !== g))
+          }}
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-600">
+          Muscles secondaires <span className="font-normal text-slate-400">(optionnel)</span>
+        </label>
+        <SecondaryPicker principal={group} value={secondary} onChange={setSecondary} />
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-slate-600">Type de chargement</label>
@@ -289,10 +318,18 @@ export function CreateExerciseForm({
       autoSuggestLoadType
       submitLabel="Ajouter"
       onCancel={onCancel}
-      onSubmit={async ({ name, muscleGroup, loadType }) => {
+      onSubmit={async ({ name, muscleGroup, secondaryGroups, loadType }) => {
         const createdAt = Date.now()
-        const id = await db.exercises.add({ name, muscleGroup, loadType, isCustom: true, createdAt })
-        onCreated({ id, name, muscleGroup, loadType, isCustom: true, createdAt })
+        const row = {
+          name,
+          muscleGroup,
+          loadType,
+          isCustom: true,
+          createdAt,
+          ...(secondaryGroups.length > 0 ? { secondaryGroups } : {}),
+        }
+        const id = await db.exercises.add(row)
+        onCreated({ id, ...row })
       }}
     />
   )
@@ -311,11 +348,12 @@ export function EditExerciseForm({
     <ExerciseForm
       initialName={exercise.name}
       initialGroup={exercise.muscleGroup}
+      initialSecondary={secondaryGroupsOf(exercise)}
       initialLoadType={exercise.loadType}
       submitLabel="Enregistrer"
       onCancel={onCancel}
-      onSubmit={async ({ name, muscleGroup, loadType }) => {
-        await renameExercise(exercise.id!, { name, muscleGroup, loadType })
+      onSubmit={async ({ name, muscleGroup, secondaryGroups, loadType }) => {
+        await renameExercise(exercise.id!, { name, muscleGroup, secondaryGroups, loadType })
         onSaved()
       }}
     />

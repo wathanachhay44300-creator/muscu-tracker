@@ -2,6 +2,7 @@ import { LIBRARY_BY_SEED_ID, type LibraryExercise } from '../data/exerciseLibrar
 import { MUSCLES } from '../data/muscles'
 import { EQUIPMENT_LABEL, type Equipment, type Exercise, type MuscleGroup } from '../types'
 import { nameKey } from './exerciseLibrarySync'
+import { secondaryGroupsOf } from './muscleGroups'
 
 /** The library entry behind a predefined (or adopted) exercise, if any. */
 export function libraryEntryOf(ex: Pick<Exercise, 'seedId'>): LibraryExercise | undefined {
@@ -109,6 +110,16 @@ export function scoreExercise(ex: Exercise, queryTokens: string[]): number {
   return total + bonus
 }
 
+/** Works one of these groups, as main or secondary muscle. */
+export function matchesGroups(ex: Exercise, groups: MuscleGroup[]): boolean {
+  return groups.includes(ex.muscleGroup) || secondaryGroupsOf(ex).some((g) => groups.includes(g))
+}
+
+/** Matches the selected muscle filter only through a secondary muscle (not its main group). */
+export function isSecondaryMatch(ex: Exercise, groups: MuscleGroup[]): boolean {
+  return groups.length > 0 && !groups.includes(ex.muscleGroup) && matchesGroups(ex, groups)
+}
+
 export interface ExerciseFilterState {
   query: string
   groups: MuscleGroup[]
@@ -120,7 +131,8 @@ export function filterExercises(list: Exercise[], f: ExerciseFilterState): Exerc
   const q = tokenize(f.query)
   const scored: { ex: Exercise; score: number }[] = []
   for (const ex of list) {
-    if (f.groups.length && !f.groups.includes(ex.muscleGroup)) continue
+    // An exercise matches a muscle filter through its main group or any secondary one.
+    if (f.groups.length && !matchesGroups(ex, f.groups)) continue
     if (f.equipment.length) {
       const eq = equipmentOf(ex)
       if (!eq || !f.equipment.includes(eq)) continue

@@ -19,7 +19,7 @@ export async function softDeleteExercise(exerciseId: number): Promise<void> {
 
 export async function renameExercise(
   exerciseId: number,
-  patch: { name: string; muscleGroup: MuscleGroup; loadType: LoadType },
+  patch: { name: string; muscleGroup: MuscleGroup; secondaryGroups?: MuscleGroup[]; loadType: LoadType },
 ): Promise<void> {
   await db.exercises.update(exerciseId, patch)
 }
@@ -34,7 +34,10 @@ export async function setExerciseFavorite(exerciseId: number, isFavorite: boolea
 }
 
 export type ExerciseDetailsPatch = Partial<
-  Pick<Exercise, 'notes' | 'videoUrl' | 'primaryMuscles' | 'secondaryMuscles' | 'equipment'>
+  Pick<
+    Exercise,
+    'notes' | 'videoUrl' | 'primaryMuscles' | 'secondaryMuscles' | 'secondaryGroups' | 'muscleGroup' | 'equipment'
+  >
 >
 
 /** Updates the personal fields of an exercise sheet (notes, video link, muscles of a custom exercise). */

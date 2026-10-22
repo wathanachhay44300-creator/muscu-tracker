@@ -13,6 +13,7 @@ import {
   updateWorkoutRpe,
 } from '../lib/workoutActions'
 import { totalVolume, formatVolume } from '../lib/stats'
+import { secondaryGroupsOf } from '../lib/muscleGroups'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { SessionTimer } from './SessionTimer'
@@ -104,7 +105,11 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
       {exercises.length > 0 && (
         <MuscleGroupBreakdown
-          items={exercises.map((we) => ({ muscleGroup: we.exercise.muscleGroup, setCount: we.sets.length }))}
+          items={exercises.map((we) => ({
+            muscleGroup: we.exercise.muscleGroup,
+            secondaryGroups: secondaryGroupsOf(we.exercise),
+            setCount: we.sets.length,
+          }))}
         />
       )}
 

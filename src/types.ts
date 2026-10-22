@@ -82,6 +82,10 @@ export interface Exercise {
   /** Stable id of the predefined library entry this row comes from (absent
    * for exercises the user created). Lets the library grow without duplicates. */
   seedId?: string
+  /** Other muscle groups the exercise works, besides `muscleGroup` (the main
+   * one, used to classify it). When absent, predefined exercises derive them
+   * from the bundled library; the user's own exercises have none. */
+  secondaryGroups?: MuscleGroup[]
   equipment?: Equipment
   /** Muscles worked, for exercises the user created (predefined ones take
    * theirs from the bundled library). */

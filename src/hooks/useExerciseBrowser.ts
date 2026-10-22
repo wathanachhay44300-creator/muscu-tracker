@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { Equipment, Exercise, MuscleGroup } from '../types'
 import type { ExerciseLibrary } from './useExerciseLibrary'
-import { filterExercises } from '../lib/exerciseSearch'
+import { filterExercises, isSecondaryMatch } from '../lib/exerciseSearch'
 
 export type BrowseMode = 'browse' | 'grouped' | 'search'
 
@@ -30,7 +30,13 @@ export function useExerciseBrowser(library: ExerciseLibrary | undefined, exclude
 
   const results = useMemo(() => filterExercises(all, { query, groups, equipment }), [all, query, groups, equipment])
 
-  const { favorites, recent, grouped } = useMemo(() => {
+  /** Results that only match the muscle filter through a secondary muscle. */
+  const secondaryOnly = useMemo(
+    () => new Set(results.filter((e) => isSecondaryMatch(e, groups)).map((e) => e.id!)),
+    [results, groups],
+  )
+
+  const { favorites, recent, grouped, secondaryList } = useMemo(() => {
     const byGroup = (list: Exercise[]) => {
       const map = new Map<MuscleGroup, Exercise[]>()
       for (const ex of list) {
@@ -39,13 +45,23 @@ export function useExerciseBrowser(library: ExerciseLibrary | undefined, exclude
       }
       return map
     }
-    if (mode !== 'browse') return { favorites: [] as Exercise[], recent: [] as Exercise[], grouped: byGroup(results) }
+    if (mode !== 'browse') {
+      // Filters only: main-muscle matches grouped by muscle, then the ones that only work it as a secondary.
+      const main = mode === 'grouped' ? results.filter((e) => !secondaryOnly.has(e.id!)) : results
+      const secondary = mode === 'grouped' ? results.filter((e) => secondaryOnly.has(e.id!)) : []
+      return { favorites: [] as Exercise[], recent: [] as Exercise[], grouped: byGroup(main), secondaryList: secondary }
+    }
     const fav = (library?.favorites ?? []).filter((e) => all.some((a) => a.id === e.id))
     const byId = new Map(all.map((e) => [e.id!, e]))
     const rec = (library?.recentIds ?? []).map((id) => byId.get(id)).filter((e): e is Exercise => !!e)
     const shortcut = new Set([...fav, ...rec].map((e) => e.id!))
-    return { favorites: fav, recent: rec, grouped: byGroup(all.filter((e) => !shortcut.has(e.id!))) }
-  }, [mode, library, all, results])
+    return {
+      favorites: fav,
+      recent: rec,
+      grouped: byGroup(all.filter((e) => !shortcut.has(e.id!))),
+      secondaryList: [] as Exercise[],
+    }
+  }, [mode, library, all, results, secondaryOnly])
 
   function toggle<T>(list: T[], value: T): T[] {
     return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
@@ -66,6 +82,8 @@ export function useExerciseBrowser(library: ExerciseLibrary | undefined, exclude
     searching,
     filtering,
     results,
+    secondaryOnly,
+    secondaryList,
     favorites,
     recent,
     grouped,

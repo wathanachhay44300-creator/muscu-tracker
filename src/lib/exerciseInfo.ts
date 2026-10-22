@@ -2,6 +2,7 @@ import { EQUIPMENT_NOTES, FAMILIES } from '../data/exerciseFamilies'
 import type { LibraryExercise } from '../data/exerciseLibrary'
 import type { Equipment, Exercise, MuscleId } from '../types'
 import { equipmentOf, libraryEntryOf } from './exerciseSearch'
+import { musclesOfGroup, musclesOfGroups, secondaryGroupsOf } from './muscleGroups'
 
 export interface ExerciseInfo {
   entry: LibraryExercise | undefined
@@ -25,8 +26,7 @@ export function getExerciseInfo(ex: Exercise): ExerciseInfo {
   return {
     entry,
     equipment,
-    primary: entry?.primary ?? ex.primaryMuscles ?? [],
-    secondary: entry?.secondary ?? ex.secondaryMuscles ?? [],
+    ...musclesFor(ex, entry),
     steps: family?.steps ?? [],
     tips: family?.tips ?? [],
     equipmentNote: entry && equipment ? EQUIPMENT_NOTES[equipment] : undefined,
@@ -48,4 +48,17 @@ export function normalizeVideoUrl(raw: string): string | null {
   } catch {
     return null
   }
+}
+
+/**
+ * Detailed muscles for the sheet and diagram. Predefined exercises use the
+ * bundled library; the user's own exercises show every muscle of their main
+ * group, and of each secondary group (older exercises that stored finer
+ * muscles keep showing those).
+ */
+function musclesFor(ex: Exercise, entry: LibraryExercise | undefined): { primary: MuscleId[]; secondary: MuscleId[] } {
+  if (entry) return { primary: entry.primary, secondary: entry.secondary }
+  const primary = ex.primaryMuscles?.length ? ex.primaryMuscles : musclesOfGroup(ex.muscleGroup)
+  const secondary = ex.secondaryMuscles?.length ? ex.secondaryMuscles : musclesOfGroups(secondaryGroupsOf(ex))
+  return { primary, secondary: secondary.filter((m) => !primary.includes(m)) }
 }
