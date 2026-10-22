@@ -20,9 +20,6 @@ export function formatVolume(n: number): string {
   return Math.round(n).toLocaleString('fr-FR')
 }
 
-/** How much of a set counts for each secondary muscle group (the main one gets 1). */
-export const SECONDARY_WEIGHT = 0.5
-
 export interface MuscleGroupCount {
   group: MuscleGroup
   count: number
@@ -33,19 +30,13 @@ export interface MuscleGroupCount {
  * falsy groups fall back to "Autre" so nothing silently disappears.
  */
 export function countByMuscleGroup(
-  items: { muscleGroup: MuscleGroup | undefined; secondaryGroups?: MuscleGroup[]; setCount: number }[],
+  items: { muscleGroup: MuscleGroup | undefined; setCount: number }[],
 ): MuscleGroupCount[] {
   const map = new Map<MuscleGroup, number>()
-  const add = (group: MuscleGroup, n: number) => map.set(group, (map.get(group) ?? 0) + n)
   for (const item of items) {
     if (item.setCount <= 0) continue
-    const main = item.muscleGroup || 'Autre'
-    add(main, item.setCount)
-    // A set fully counts for the main muscle and half for each secondary one,
-    // so shared work shows up without inflating the totals.
-    for (const group of item.secondaryGroups ?? []) {
-      if (group !== main) add(group, item.setCount * SECONDARY_WEIGHT)
-    }
+    const group = item.muscleGroup || 'Autre'
+    map.set(group, (map.get(group) ?? 0) + item.setCount)
   }
   return [...map.entries()].map(([group, count]) => ({ group, count })).sort((a, b) => b.count - a.count)
 }

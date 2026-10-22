@@ -12,7 +12,6 @@ import {
   updateTargetSets,
 } from '../lib/templateActions'
 import { startWorkoutFromTemplate } from '../lib/sessionStart'
-import { secondaryGroupsOf } from '../lib/muscleGroups'
 import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
 import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
@@ -172,11 +171,7 @@ export function TemplateDetailScreen() {
         <div className="mt-4">
           <MuscleGroupBreakdown
             title="Répartition par muscle (prévue)"
-            items={exercises.map((te) => ({
-              muscleGroup: te.exercise.muscleGroup,
-              secondaryGroups: secondaryGroupsOf(te.exercise),
-              setCount: te.targetSets,
-            }))}
+            items={exercises.map((te) => ({ muscleGroup: te.exercise.muscleGroup, setCount: te.targetSets }))}
           />
         </div>
       )}
