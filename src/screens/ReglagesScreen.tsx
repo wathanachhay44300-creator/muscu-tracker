@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { usePreferences } from '../hooks/usePreferences'
-import { setHapticsEnabled, setShowMuscleMap, setSoundEnabled, setWeightGoal, setWeightStep, WEIGHT_STEPS } from '../lib/settingsActions'
+import { setHapticsEnabled, setSoundEnabled, setWeightGoal, setWeightStep, WEIGHT_STEPS } from '../lib/settingsActions'
 import { ClipboardImport } from '../components/ClipboardImport'
 import { todayISO } from '../lib/date'
 import { shortDate } from '../lib/tracking'
@@ -312,18 +312,6 @@ export function ReglagesScreen() {
               )
             })}
           </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-sm">
-          <div>
-            <p className="font-semibold text-ink">{t('settings.muscleMap')}</p>
-            <p className="text-xs text-muted">{t('settings.muscleMapHint')}</p>
-          </div>
-          <Toggle
-            on={preferences?.showMuscleMap ?? true}
-            label={t('settings.muscleMap')}
-            onChange={(v) => setShowMuscleMap(v)}
-          />
         </div>
 
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-sm">

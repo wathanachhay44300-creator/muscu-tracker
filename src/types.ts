@@ -192,8 +192,6 @@ export interface AppPreferences {
   goalRateKg: number
   /** Weight change per notch when dragging a weight value in a set (kg). */
   weightStep: number
-  /** Body diagram thumbnail + muscle pills on the session cards (on when missing). */
-  showMuscleMap?: boolean
 }
 
 export type WeightGoal = 'loss' | 'maintain' | 'gain'

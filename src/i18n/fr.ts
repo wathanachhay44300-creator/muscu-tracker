@@ -57,8 +57,6 @@ export const fr = {
     settings: 'Réglages',
   },
   settings: {
-    muscleMap: 'Afficher le schéma sur les cartes',
-    muscleMapHint: 'Vignette des muscles travaillés à côté de chaque exercice en séance. Désactive pour des cartes plus compactes.',
     perWeek: 'semaine',
     deepLinkHelp: 'Sur iPhone, Safari et l’app installée sur l’écran d’accueil ont chacun leur propre stockage, et un lien ouvert depuis Raccourcis s’ouvre dans Safari : avec l’app installée, les données n’apparaîtraient jamais dedans. Utilisez donc le presse-papiers ci-dessus. Le lien ne sert que si vous utilisez l’app dans Safari : remplacez alors les étapes 4 à 6 par une action « Texte » (URL + paramètres) puis « Ouvrir les URL ».',
     deepLinkOptions: 'Options : {weight} et {kcal}. Une date manquante vaut aujourd’hui. Les paramètres invalides sont ignorés.',

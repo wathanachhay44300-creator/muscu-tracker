@@ -56,8 +56,6 @@ export const en: Dictionary = {
     settings: 'Settings',
   },
   settings: {
-    muscleMap: 'Show the body diagram on cards',
-    muscleMapHint: 'Thumbnail of the muscles worked next to each exercise during a workout. Turn off for more compact cards.',
     perWeek: 'week',
     deepLinkHelp: 'On iPhone, Safari and the app installed on the home screen each have their own storage, and a link opened from Shortcuts opens in Safari: with the app installed, the data would never show up in it. So use the clipboard above. The link is only useful if you use the app in Safari: then replace steps 4 to 6 with a “Text” action (URL + parameters) followed by “Open URLs”.',
     deepLinkOptions: 'Options: {weight} and {kcal}. A missing date means today. Invalid parameters are ignored.',

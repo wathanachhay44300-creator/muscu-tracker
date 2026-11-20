@@ -55,11 +55,6 @@ export async function setHapticsEnabled(hapticsEnabled: boolean): Promise<void> 
   await db.settings.put({ ...current, hapticsEnabled })
 }
 
-export async function setShowMuscleMap(showMuscleMap: boolean): Promise<void> {
-  const current = await getPreferences()
-  await db.settings.put({ ...current, showMuscleMap })
-}
-
 export async function setWeightGoal(goal: WeightGoal, goalRateKg?: number): Promise<void> {
   const current = await getPreferences()
   await db.settings.put({ ...current, goal, goalRateKg: goalRateKg ?? current.goalRateKg })
