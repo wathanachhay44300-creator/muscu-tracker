@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { EXERCISE_LIBRARY, LIBRARY_VERSION } from '../data/exerciseLibrary'
+import { EXERCISE_LIBRARY, LIBRARY_BY_SEED_ID, LIBRARY_VERSION } from '../data/exerciseLibrary'
 import type { Exercise, ExerciseLibraryState } from '../types'
 
 const STATE_ID = 'exerciseLibrary' as const
@@ -25,7 +25,11 @@ export function nameKey(name: string): string {
  *   user created themselves) is adopted by giving it the `seedId`: the user's
  *   own row, history, records, favorites and programs are kept as they are, and
  *   no visible duplicate is created;
- * - everything else is added as a new predefined exercise.
+ * - everything else is added as a new predefined exercise;
+ * - v2 (English names): a row still carrying the original French name of its
+ *   library entry is renamed to the English name. Sessions, programs and
+ *   records point to exercises by id, never by name, so nothing else moves.
+ *   A name the user changed themselves is left untouched.
  */
 export async function syncExerciseLibrary(): Promise<void> {
   await db.transaction('rw', db.exercises, db.settings, async () => {
@@ -46,7 +50,9 @@ export async function syncExerciseLibrary(): Promise<void> {
     const toAdd: Exercise[] = []
     for (const entry of EXERCISE_LIBRARY) {
       if (bySeedId.has(entry.seedId)) continue
-      const sameName = byName.get(nameKey(entry.name))?.find((e) => !e.seedId)
+      const sameName = [nameKey(entry.name), nameKey(entry.frenchName)]
+        .flatMap((k) => byName.get(k) ?? [])
+        .find((e) => !e.seedId)
       if (sameName) {
         await db.exercises.update(sameName.id!, {
           seedId: entry.seedId,
@@ -66,6 +72,14 @@ export async function syncExerciseLibrary(): Promise<void> {
       })
     }
     if (toAdd.length > 0) await db.exercises.bulkAdd(toAdd)
+
+    // French → English names for rows saved before v2 (including adopted ones above).
+    for (const row of all) {
+      const entry = row.seedId ? LIBRARY_BY_SEED_ID.get(row.seedId) : undefined
+      if (entry && row.name !== entry.name && nameKey(row.name) === nameKey(entry.frenchName)) {
+        await db.exercises.update(row.id!, { name: entry.name })
+      }
+    }
     await db.settings.put({ id: STATE_ID, version: LIBRARY_VERSION })
   })
 }

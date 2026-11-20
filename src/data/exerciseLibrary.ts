@@ -1,9 +1,13 @@
 import type { Equipment, LoadType, MuscleGroup, MuscleId } from '../types'
+import { EXERCISE_NAMES_EN } from './exerciseNamesEn'
 
-/** One predefined exercise. `seedId` is a stable slug of the French name and never changes. */
+/** One predefined exercise. `seedId` is a stable slug of the original French
+ * name and never changes; `name` is the English display name. */
 export interface LibraryExercise {
   seedId: string
   name: string
+  /** Original French name: kept searchable, and used to recognise rows saved before the English names. */
+  frenchName: string
   group: MuscleGroup
   equipment: Equipment
   /** Key into FAMILIES (shared instructions). */
@@ -72,15 +76,18 @@ function ex(
   synonyms = '',
   unilateral = false,
 ): void {
+  const english = EXERCISE_NAMES_EN[name]
+  if (!english) throw new Error(`Missing English name for "${name}"`)
   entries.push({
     seedId: slugify(name),
-    name,
+    name: english,
+    frenchName: name,
     group,
     equipment,
     family,
     primary,
     secondary,
-    synonyms: synonyms ? synonyms.split(',').map((s) => s.trim()) : [],
+    synonyms: [name, ...(synonyms ? synonyms.split(',').map((s) => s.trim()) : [])],
     unilateral,
     loadType: EQUIPMENT_LOAD_TYPE[equipment],
   })
@@ -244,6 +251,6 @@ ex('Tapis de course', 'Autre', 'machine', 'cardio_treadmill', [QUAD, MOL], [ISC,
 export const EXERCISE_LIBRARY: readonly LibraryExercise[] = entries
 
 /** Bump when entries are added/changed so installed apps sync them once. */
-export const LIBRARY_VERSION = 1
+export const LIBRARY_VERSION = 2
 
 export const LIBRARY_BY_SEED_ID: ReadonlyMap<string, LibraryExercise> = new Map(entries.map((e) => [e.seedId, e]))

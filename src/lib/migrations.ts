@@ -29,7 +29,12 @@ function guessMuscleFromLegacyJambes(name: string): MuscleGroup {
   return 'Quadriceps'
 }
 
-const DEFAULT_LOAD_TYPE_BY_NAME = new Map(EXERCISE_LIBRARY.map((e) => [e.name, e.loadType]))
+const DEFAULT_LOAD_TYPE_BY_NAME = new Map(
+  EXERCISE_LIBRARY.flatMap((e) => [
+    [e.name, e.loadType],
+    [e.frenchName, e.loadType],
+  ]),
+)
 
 /**
  * Brings exercises created before the precise-muscle / load-type update up
