@@ -58,6 +58,12 @@ export function MiniRulerField({
 
   const expectedLeft = useRef<number | null>(null)
   const interacting = useRef(false)
+  /** A finger, mouse or wheel is acting on the ruler. Scroll events without it are the browser's own (snap, keyboard closing…). */
+  const userGesture = useRef(false)
+  /** A finger is on the box. Stays true through pointercancel: on a phone the browser cancels the
+   * pointer as soon as it starts scrolling, while the finger is still dragging the ruler. */
+  const fingerDown = useRef(false)
+  const gestureEndTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const offGrid = useRef(false)
   /** Off-grid value being left: its fractional index and the scroll offset it sits at. */
   const leaving = useRef<{ index: number; left: number } | null>(null)
@@ -68,12 +74,21 @@ export function MiniRulerField({
   useEffect(() => {
     latest.current = { step, count, value, onCommit, haptics }
   })
-  useEffect(() => () => clearTimeout(settleTimer.current), [])
+  useEffect(
+    () => () => {
+      clearTimeout(settleTimer.current)
+      clearTimeout(gestureEndTimer.current)
+    },
+    [],
+  )
 
   // Outside changes (undo, another row…) show up unless the user is acting on this box.
+  // Only reacts to a new stored value: closing the keyboard must not bring back the old one
+  // before the typed value has been saved.
   useEffect(() => {
     if (!interacting.current && !editing) setCurrent(value)
-  }, [value, editing])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
 
   // Place the ruler on the shown value, unless it's being scrolled (that would kill the momentum).
   useLayoutEffect(() => {
@@ -105,6 +120,8 @@ export function MiniRulerField({
   function settle() {
     const el = scrollerRef.current
     interacting.current = false
+    // A finger held still mid-swipe also lets the ruler settle: the gesture isn't over yet.
+    if (!fingerDown.current) userGesture.current = false
     setAdjusting(false)
     if (!el) return
     const { step, value, onCommit } = latest.current
@@ -115,10 +132,9 @@ export function MiniRulerField({
     setCurrent(v)
     // Snapping may have stopped on the other side of the off-grid value: put the ruler on the kept one.
     const target = index * GAP
-    if (Math.abs(el.scrollLeft - target) >= 1) {
-      expectedLeft.current = target
-      el.scrollLeft = target
-    }
+    // Also the reference a later browser-driven scroll gets put back to.
+    expectedLeft.current = target
+    if (Math.abs(el.scrollLeft - target) >= 1) el.scrollLeft = target
     if (v !== value) onCommit(v)
   }
 
@@ -127,6 +143,12 @@ export function MiniRulerField({
     if (!el) return
     const left = el.scrollLeft
     if (expectedLeft.current != null && Math.abs(left - expectedLeft.current) < 1.5) return
+    if (!userGesture.current && !fingerDown.current && !interacting.current) {
+      // The browser moved the ruler by itself (re-snap after the keyboard closes, layout change…):
+      // put it back on the shown value instead of rounding it to a graduation.
+      if (expectedLeft.current != null) el.scrollLeft = expectedLeft.current
+      return
+    }
     expectedLeft.current = null
     if (!interacting.current) {
       interacting.current = true
@@ -155,6 +177,7 @@ export function MiniRulerField({
     const el = scrollerRef.current
     if (!el) return
     const onWheel = (e: WheelEvent) => {
+      userGesture.current = true
       if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
       e.preventDefault()
       el.scrollBy({ left: e.deltaY })
@@ -163,9 +186,28 @@ export function MiniRulerField({
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
 
+  function startTouch() {
+    clearTimeout(gestureEndTimer.current)
+    fingerDown.current = true
+    userGesture.current = true
+  }
+
+  /** Finger lifted: a swipe in progress keeps going (momentum) through `interacting`; a tap leaves
+   * no gesture behind. A quick flick can lift the finger before the first scroll event, hence the delay. */
+  function endTouch() {
+    fingerDown.current = false
+    clearTimeout(gestureEndTimer.current)
+    gestureEndTimer.current = setTimeout(() => {
+      if (!interacting.current) userGesture.current = false
+    }, 300)
+  }
+
   /** A tap (no slide: a scroll swallows the click) opens the keyboard. */
   function openKeyboard() {
     if (interacting.current) return
+    // A tap, not a swipe: the scroll the keyboard causes when it opens or closes isn't the user's.
+    clearTimeout(gestureEndTimer.current)
+    userGesture.current = false
     const input = inputRef.current
     if (!input) return
     setText(formatDecimal(current))
@@ -229,6 +271,11 @@ export function MiniRulerField({
         aria-valuenow={current}
         aria-valuetext={`${formatDecimal(current)} ${unit}`}
         onScroll={handleScroll}
+        onPointerDown={startTouch}
+        onTouchStart={startTouch}
+        onPointerUp={endTouch}
+        onTouchEnd={endTouch}
+        onTouchCancel={endTouch}
         onClick={openKeyboard}
         onKeyDown={onSliderKey}
         className={`absolute inset-0 flex cursor-ew-resize overflow-x-auto overflow-y-hidden outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
