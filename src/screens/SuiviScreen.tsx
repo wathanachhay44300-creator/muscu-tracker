@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useBodyMeasurementForDate, useBodyMeasurements } from '../hooks/useBodyMeasurements'
 import { usePreferences } from '../hooks/usePreferences'
 import { upsertBodyMeasurement } from '../lib/bodyActions'
@@ -41,6 +41,7 @@ const GOAL_LABEL: Record<WeightGoal, string> = { loss: 'Perte de poids', maintai
 
 export function SuiviScreen() {
   const navigate = useNavigate()
+  const location = useLocation()
   const today = todayISO()
   const [date, setDate] = useState(today)
   const [period, setPeriod] = useState<Period>('30')
@@ -73,7 +74,7 @@ export function SuiviScreen() {
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => navigate('/historique')}
+          onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/progres'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour"
         >

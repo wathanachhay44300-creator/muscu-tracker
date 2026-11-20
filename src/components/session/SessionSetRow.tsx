@@ -1,0 +1,233 @@
+import { useEffect, useRef, useState } from 'react'
+import type { SetEntry } from '../../types'
+import { useLongPress } from '../../hooks/useLongPress'
+import { useSwipeToDelete } from '../../hooks/useSwipeToDelete'
+import { usePreferences } from '../../hooks/usePreferences'
+import { hapticMenuOpen } from '../../lib/haptics'
+import { ContextMenuSheet } from '../ContextMenuSheet'
+import { CheckIcon, CopyIcon, StarIcon, TrashIcon } from '../Icons'
+
+export const SET_GRID = 'grid grid-cols-[2rem_1fr_1fr_2.75rem] items-center gap-1.5'
+
+interface SessionSetRowProps {
+  set: SetEntry
+  index: number
+  /** The next set to do: outlined in accent. */
+  current: boolean
+  isPR: boolean
+  onChangeWeight: (weight: number) => void
+  onChangeReps: (reps: number) => void
+  onToggleDone: () => void
+  onRemove: () => void
+  onDuplicate: () => void
+}
+
+/**
+ * One row of the session sets table: SÉRIE / KG / REPS / OK. Swipe left to
+ * delete, long-press for duplicate/delete. Ticked sets are dimmed but stay
+ * editable.
+ */
+export function SessionSetRow({
+  set,
+  index,
+  current,
+  isPR,
+  onChangeWeight,
+  onChangeReps,
+  onToggleDone,
+  onRemove,
+  onDuplicate,
+}: SessionSetRowProps) {
+  const preferences = usePreferences()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const longPress = useLongPress(() => {
+    hapticMenuOpen(!!preferences?.hapticsEnabled)
+    setMenuOpen(true)
+  })
+  const swipe = useSwipeToDelete(onRemove)
+  const done = !!set.done
+
+  return (
+    <div className="relative overflow-hidden rounded-xl">
+      <div
+        ref={swipe.revealRef}
+        className="absolute inset-0 flex items-center justify-end bg-danger pr-4 opacity-0"
+        aria-hidden="true"
+      >
+        <TrashIcon className="h-5 w-5 text-on-danger" />
+      </div>
+      <div
+        data-swipe-to-delete
+        ref={swipe.contentRef}
+        className={`relative ${SET_GRID} rounded-xl bg-surface px-1 py-1 ${
+          current ? 'ring-2 ring-inset ring-accent' : ''
+        }`}
+        onPointerDown={(e) => {
+          longPress.onPointerDown(e)
+          swipe.handlers.onPointerDown(e)
+        }}
+        onPointerMove={(e) => {
+          longPress.onPointerMove(e)
+          swipe.handlers.onPointerMove(e)
+        }}
+        onPointerUp={(e) => {
+          longPress.onPointerUp(e)
+          swipe.handlers.onPointerUp(e)
+        }}
+        onPointerCancel={(e) => {
+          longPress.onPointerCancel(e)
+          swipe.handlers.onPointerCancel(e)
+        }}
+        onClickCapture={longPress.onClickCapture}
+        onContextMenu={longPress.onContextMenu}
+      >
+        <span
+          className={`flex justify-center text-sm font-bold font-numbers ${done ? 'text-faint' : 'text-muted'}`}
+          title={isPR ? 'Record personnel' : undefined}
+        >
+          {isPR ? <StarIcon className="h-4 w-4 text-highlight" /> : index + 1}
+        </span>
+
+        <Stepper
+          value={set.weight}
+          step={2.5}
+          decimal
+          dimmed={done}
+          label={`Poids en kg, série ${index + 1}`}
+          onCommit={onChangeWeight}
+        />
+        <Stepper
+          value={set.reps}
+          step={1}
+          dimmed={done}
+          label={`Répétitions, série ${index + 1}`}
+          onCommit={onChangeReps}
+        />
+
+        <button
+          type="button"
+          data-no-long-press
+          data-no-swipe
+          onClick={onToggleDone}
+          aria-pressed={done}
+          aria-label={done ? `Série ${index + 1} faite, annuler` : `Valider la série ${index + 1}`}
+          className={`flex h-11 w-11 items-center justify-center justify-self-center rounded-full ${
+            done ? 'bg-accent text-on-accent' : 'border-2 border-line-strong text-faint active:bg-surface-3'
+          }`}
+        >
+          <CheckIcon className="h-5 w-5" strokeWidth={3} />
+        </button>
+      </div>
+
+      {menuOpen && (
+        <ContextMenuSheet
+          title={`Série ${index + 1}`}
+          actions={[
+            { label: 'Dupliquer la série', icon: CopyIcon, onSelect: onDuplicate },
+            { label: 'Supprimer la série', icon: TrashIcon, onSelect: onRemove, danger: true },
+          ]}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+function display(n: number): string {
+  return String(Number.isInteger(n) ? n : round2(n)).replace('.', ',')
+}
+
+/** Number field with − / + buttons (phase 3 replaces the buttons with dragging). */
+function Stepper({
+  value,
+  step,
+  decimal = false,
+  dimmed,
+  label,
+  onCommit,
+}: {
+  value: number
+  step: number
+  decimal?: boolean
+  dimmed: boolean
+  label: string
+  onCommit: (v: number) => void
+}) {
+  // Local value is the source of truth while editing, so fast taps don't race
+  // the database round trip; it re-syncs when the stored value changes elsewhere.
+  const [current, setCurrent] = useState(value)
+  const [text, setText] = useState(display(value))
+  const [pulse, setPulse] = useState(false)
+  const focused = useRef(false)
+  const pulseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(pulseTimer.current), [])
+
+  useEffect(() => {
+    if (focused.current) return
+    setCurrent(value)
+    setText(display(value))
+  }, [value])
+
+  function apply(n: number) {
+    const v = Math.max(0, decimal ? round2(n) : Math.round(n))
+    setCurrent(v)
+    setText(display(v))
+    onCommit(v)
+  }
+
+  function bump(delta: number) {
+    apply(current + delta)
+    setPulse(true)
+    clearTimeout(pulseTimer.current)
+    pulseTimer.current = setTimeout(() => setPulse(false), 150)
+  }
+
+  return (
+    <div
+      data-no-long-press
+      data-no-swipe
+      className={`flex h-12 items-center overflow-hidden rounded-xl bg-surface-2 ${dimmed ? 'opacity-55' : ''}`}
+    >
+      <button
+        type="button"
+        onClick={() => bump(-step)}
+        aria-label={`Moins ${display(step)}`}
+        className="h-full w-9 shrink-0 text-lg font-semibold text-muted active:text-accent-ink"
+      >
+        −
+      </button>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onFocus={(e) => {
+          focused.current = true
+          e.target.select()
+        }}
+        onBlur={(e) => {
+          focused.current = false
+          const n = decimal ? parseFloat(e.target.value.replace(',', '.')) : parseInt(e.target.value, 10)
+          apply(Number.isFinite(n) ? n : 0)
+        }}
+        onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+        inputMode={decimal ? 'decimal' : 'numeric'}
+        enterKeyHint="done"
+        aria-label={label}
+        className={`w-0 min-w-0 flex-1 bg-transparent text-center text-xl font-bold font-numbers text-ink outline-none transition-transform duration-150 ${
+          pulse ? 'scale-110' : 'scale-100'
+        }`}
+      />
+      <button
+        type="button"
+        onClick={() => bump(step)}
+        aria-label={`Plus ${display(step)}`}
+        className="h-full w-9 shrink-0 text-lg font-semibold text-muted active:text-accent-ink"
+      >
+        +
+      </button>
+    </div>
+  )
+}

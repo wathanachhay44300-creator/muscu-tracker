@@ -132,6 +132,9 @@ export interface SetEntry {
   reps: number
   order: number
   createdAt: number
+  /** Ticked "OK" in session mode. Purely a progress marker: statistics and
+   * history count every logged set, ticked or not. */
+  done?: boolean
 }
 
 /** Convenience shape used in the UI: an exercise plus its sets within one workout. */

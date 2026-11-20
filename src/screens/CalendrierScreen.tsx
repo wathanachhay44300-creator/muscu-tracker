@@ -4,12 +4,18 @@ import { useWorkoutCalendarDates } from '../hooks/useWorkoutCalendar'
 import { computeWeeklyStreak } from '../lib/calendarActions'
 import { useSwipeNav, getSlideClass, type SwipeDirection } from '../hooks/useSwipeNav'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
+import { HistoryTabs } from '../components/HistoryTabs'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { formatDateLong } from '../lib/date'
+import { getOrCreateWorkout } from '../lib/workoutActions'
 import { addMonths, daysInMonth, formatMonthFr, isToday, monthStartOf, todayISO } from '../lib/date'
 
 const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
 export function CalendrierScreen() {
   const navigate = useNavigate()
+  const todayStr = todayISO()
+  const [addingDate, setAddingDate] = useState<string | null>(null)
   const [monthStart, setMonthStart] = useState(() => monthStartOf(todayISO()))
   const [enterDir, setEnterDir] = useState<SwipeDirection>(null)
   const workouts = useWorkoutCalendarDates()
@@ -47,17 +53,8 @@ export function CalendrierScreen() {
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-      <div className="mb-5 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => navigate('/historique')}
-          className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Retour à l'historique"
-        >
-          <ChevronLeftIcon className="h-5 w-5" />
-        </button>
-        <h1 className="text-lg font-bold text-ink">Calendrier</h1>
-      </div>
+      <h1 className="mb-4 pt-2 !text-[2rem] leading-none text-ink">Historique</h1>
+      <HistoryTabs />
 
       <div className="mb-4 flex items-center justify-between">
         <button
@@ -110,10 +107,16 @@ export function CalendrierScreen() {
                 <button
                   key={date}
                   type="button"
-                  disabled={!workoutId}
-                  onClick={() => workoutId && navigate(`/historique/${workoutId}`)}
-                  className="flex aspect-square items-center justify-center"
-                  aria-label={workoutId ? `${day} — séance enregistrée, voir le détail` : String(day)}
+                  disabled={!workoutId && date > todayStr}
+                  onClick={() => (workoutId ? navigate(`/historique/${workoutId}`) : setAddingDate(date))}
+                  className="flex aspect-square items-center justify-center disabled:opacity-40"
+                  aria-label={
+                    workoutId
+                      ? `${day} — séance enregistrée, voir le détail`
+                      : date > todayStr
+                        ? String(day)
+                        : `${day} — ajouter une séance ce jour-là`
+                  }
                 >
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors ${
@@ -133,6 +136,21 @@ export function CalendrierScreen() {
 
       {monthCount === 0 && (
         <p className="mt-6 text-center text-sm text-muted">Aucune séance enregistrée ce mois-ci.</p>
+      )}
+
+      {addingDate && (
+        <ConfirmDialog
+          title={`Ajouter une séance le ${formatDateLong(addingDate)} ?`}
+          message="Pour rattraper une séance oubliée : elle s'ouvre en mode séance, à la date choisie."
+          confirmLabel="Ajouter"
+          onConfirm={async () => {
+            const date = addingDate
+            setAddingDate(null)
+            const id = await getOrCreateWorkout(date)
+            navigate(`/seance/${id}`)
+          }}
+          onCancel={() => setAddingDate(null)}
+        />
       )}
     </div>
   )

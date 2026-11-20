@@ -21,6 +21,20 @@ body {
 .pt-safe {
   padding-top: env(safe-area-inset-top);
 }
+/* The "séance en cours" banner already sits under the notch: the screen
+ * under it (a direct child of the app's main container) drops that inset.
+ * Full-screen sheets are not direct children, so they keep theirs. */
+.has-session-banner .app-main > .pt-safe {
+  padding-top: 0.75rem;
+}
+:root {
+  --session-banner-h: 2.75rem;
+  /* Where sticky headers stick: under the notch, and under the banner when shown. */
+  --sticky-top: env(safe-area-inset-top, 0px);
+}
+.has-session-banner {
+  --sticky-top: calc(env(safe-area-inset-top, 0px) + var(--session-banner-h));
+}
 
 input[type='number'] {
   -moz-appearance: textfield;

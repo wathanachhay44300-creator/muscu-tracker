@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useWeeklyMuscleBreakdown } from '../hooks/useWeeklyBreakdown'
 import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
@@ -9,6 +9,7 @@ export function WeeklyBreakdownScreen() {
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayISO()))
   const items = useWeeklyMuscleBreakdown(weekStart)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const weekEnd = addDays(weekStart, 6)
   const isCurrentWeek = weekStart === mondayOf(todayISO())
@@ -19,7 +20,7 @@ export function WeeklyBreakdownScreen() {
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => navigate('/historique')}
+          onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/progres'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour à l'historique"
         >

@@ -400,3 +400,31 @@ export function PlayCircleIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function HomeIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 10.5 12 4l8 6.5" />
+      <path d="M6 9v10.5a1 1 0 0 0 1 1h3.5v-6h3v6H17a1 1 0 0 0 1-1V9" />
+    </svg>
+  )
+}
+
+export function MoreIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <circle cx="5.5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="18.5" cy="12" r="1.8" />
+    </svg>
+  )
+}
+
+export function TrendIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.5 17 9.5 11l4 4 7-7.5" />
+      <path d="M15 7.5h5.5V13" />
+    </svg>
+  )
+}

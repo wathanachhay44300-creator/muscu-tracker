@@ -28,7 +28,9 @@ export function RestTimerWidget() {
   const timer = useRestTimer()
   const [expanded, setExpanded] = useState(false)
   const { pathname } = useLocation()
-  const onSessionScreen = pathname === '/' || /^\/historique\/\d+$/.test(pathname)
+  // Session mode docks its own timer; a past session being edited can start one here.
+  const onSessionScreen = /^\/historique\/\d+$/.test(pathname)
+  if (pathname.startsWith('/seance')) return null
 
   if (!timer.hasTimer && !onSessionScreen) return null
 

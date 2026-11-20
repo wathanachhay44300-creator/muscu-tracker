@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { migrateLegacyExerciseData } from './lib/migrations'
 import { syncExerciseLibrary } from './lib/exerciseLibrarySync'
 import { BottomNav } from './components/BottomNav'
-import { SeanceScreen } from './screens/SeanceScreen'
+import { AujourdhuiScreen } from './screens/AujourdhuiScreen'
+import { SessionScreen } from './screens/SessionScreen'
+import { ProgresScreen } from './screens/ProgresScreen'
+import { ResumeSessionBanner } from './components/ResumeSessionBanner'
 import { HistoriqueScreen } from './screens/HistoriqueScreen'
 import { HistoriqueDetailScreen } from './screens/HistoriqueDetailScreen'
 import { ExercicesScreen } from './screens/ExercicesScreen'
@@ -44,12 +47,17 @@ export default function App() {
   return (
     <HashRouter>
       <SnackbarProvider>
-        <div className="min-h-dvh bg-page">
+        <div className="app-main min-h-dvh bg-page">
+          <ResumeSessionBanner />
           <Suspense fallback={null}>
           <Routes>
-            <Route path="/" element={<SeanceScreen />} />
+            <Route path="/" element={<AujourdhuiScreen />} />
+            <Route path="/seance" element={<SessionScreen />} />
+            <Route path="/seance/:workoutId" element={<SessionScreen />} />
+            <Route path="/progres" element={<ProgresScreen />} />
+            <Route path="/progres/muscles" element={<WeeklyBreakdownScreen />} />
             <Route path="/historique" element={<HistoriqueScreen />} />
-            <Route path="/historique/semaine" element={<WeeklyBreakdownScreen />} />
+            <Route path="/historique/semaine" element={<Navigate to="/progres/muscles" replace />} />
             <Route path="/historique/calendrier" element={<CalendrierScreen />} />
             <Route path="/historique/:workoutId" element={<HistoriqueDetailScreen />} />
             <Route path="/exercices" element={<ExercicesScreen />} />
@@ -61,6 +69,7 @@ export default function App() {
             <Route path="/suivi" element={<SuiviScreen />} />
             <Route path="/reglages" element={<ReglagesScreen />} />
             <Route path="/donnees" element={<DonneesScreen />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>
           <DeepLinkImporter />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTemplateDetail } from '../hooks/useTemplates'
 import { useOptimisticOrder } from '../hooks/useOptimisticOrder'
 import { useDragReorder } from '../hooks/useDragReorder'
@@ -25,6 +25,7 @@ export function TemplateDetailScreen() {
   const id = templateId ? Number(templateId) : undefined
   const detail = useTemplateDetail(id)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [pickerOpen, setPickerOpen] = useState(false)
   const [starting, setStarting] = useState(false)
@@ -59,7 +60,7 @@ export function TemplateDetailScreen() {
   async function handleStartToday() {
     setStarting(true)
     await startWorkoutFromTemplate(todayISO(), id!)
-    navigate('/')
+    navigate('/seance')
   }
 
   async function confirmDelete() {
@@ -72,7 +73,7 @@ export function TemplateDetailScreen() {
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => navigate('/programmes')}
+          onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/programmes'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour aux programmes"
         >

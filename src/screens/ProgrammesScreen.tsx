@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTemplates, type TemplateSummary } from '../hooks/useTemplates'
 import {
   createTemplate,
@@ -17,6 +17,7 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { hapticMenuOpen } from '../lib/haptics'
 import {
   CheckIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
   ClipboardIcon,
   CopyIcon,
@@ -30,7 +31,10 @@ const NAME_SUGGESTIONS = ['Push', 'Pull', 'Legs', 'Full Body', 'Haut du corps', 
 
 export function ProgrammesScreen() {
   const templates = useTemplates()
-  const [creating, setCreating] = useState(false)
+  // "Nouveau" on the home screen opens this list with the creation sheet open.
+  const [params] = useSearchParams()
+  const [creating, setCreating] = useState(() => params.get('nouveau') === '1')
+  const location = useLocation()
   const navigate = useNavigate()
   const pullToRefresh = usePullToRefresh()
 
@@ -50,7 +54,17 @@ export function ProgrammesScreen() {
     >
       <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-ink">Programmes</h1>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/'))}
+            aria-label="Retour"
+            className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-surface-3"
+          >
+            <ChevronLeftIcon className="h-5 w-5" />
+          </button>
+          <h1 className="text-ink">Programmes</h1>
+        </div>
         <button
           type="button"
           onClick={() => setCreating(true)}

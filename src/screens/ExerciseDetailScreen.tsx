@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useExerciseHistory } from '../hooks/useExerciseHistory'
 import { usePersonalRecords } from '../hooks/usePersonalRecords'
 import { ChevronLeftIcon, StarIcon } from '../components/Icons'
@@ -15,6 +15,7 @@ export function ExerciseDetailScreen() {
   const history = useExerciseHistory(id)
   const records = usePersonalRecords(id)
   const navigate = useNavigate()
+  const location = useLocation()
   const [metric, setMetric] = useState<Metric>('weight')
 
   const chartPoints = useMemo(() => {
@@ -56,7 +57,7 @@ export function ExerciseDetailScreen() {
       <div className="mb-5 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => navigate('/exercices')}
+          onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/exercices'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour aux exercices"
         >

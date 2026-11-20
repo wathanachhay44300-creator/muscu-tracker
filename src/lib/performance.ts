@@ -75,3 +75,65 @@ export async function getPersonalRecords(exerciseId: number): Promise<PersonalRe
   }
   return { bestWeight, bestVolume }
 }
+
+export interface BestSet {
+  weight: number
+  reps: number
+  date: string
+}
+
+/** Heaviest set ever logged for an exercise (most reps on a tie), or null.
+ * `excludeWorkoutId` leaves out a session (the one in progress). */
+export async function getBestSet(exerciseId: number, excludeWorkoutId?: number): Promise<BestSet | null> {
+  const links = (await db.workoutExercises.where('exerciseId').equals(exerciseId).toArray()).filter(
+    (l) => l.workoutId !== excludeWorkoutId,
+  )
+  if (links.length === 0) return null
+  const [sets, workouts] = await Promise.all([
+    db.sets.where('workoutExerciseId').anyOf(links.map((l) => l.id!)).toArray(),
+    db.workouts.bulkGet(links.map((l) => l.workoutId)),
+  ])
+  const dateByLink = new Map(links.map((l, i) => [l.id!, workouts[i]?.date ?? '']))
+  let best: BestSet | null = null
+  for (const s of sets) {
+    if (s.weight <= 0 || s.reps <= 0) continue
+    if (!best || s.weight > best.weight || (s.weight === best.weight && s.reps > best.reps)) {
+      best = { weight: s.weight, reps: s.reps, date: dateByLink.get(s.workoutExerciseId) ?? '' }
+    }
+  }
+  return best
+}
+
+export interface LatestRecord {
+  exerciseId: number
+  weight: number
+  reps: number
+  date: string
+}
+
+/**
+ * The most recent personal record across all exercises: the latest set
+ * whose weight beat every earlier set of the same exercise (a first-ever
+ * set doesn't count as a record).
+ */
+export async function getLatestRecord(): Promise<LatestRecord | null> {
+  const [workouts, links, sets] = await Promise.all([
+    db.workouts.toArray(),
+    db.workoutExercises.toArray(),
+    db.sets.toArray(),
+  ])
+  const dateOfWorkout = new Map(workouts.map((w) => [w.id!, w.date]))
+  const linkInfo = new Map(links.map((l) => [l.id!, { exerciseId: l.exerciseId, date: dateOfWorkout.get(l.workoutId) }]))
+  const rows = sets
+    .map((s) => ({ s, info: linkInfo.get(s.workoutExerciseId) }))
+    .filter((r): r is { s: SetEntry; info: { exerciseId: number; date: string } } => !!r.info?.date && r.s.weight > 0 && r.s.reps > 0)
+    .sort((a, b) => (a.info.date === b.info.date ? a.s.createdAt - b.s.createdAt : a.info.date < b.info.date ? -1 : 1))
+  const best = new Map<number, number>()
+  let latest: LatestRecord | null = null
+  for (const { s, info } of rows) {
+    const prev = best.get(info.exerciseId)
+    if (prev != null && s.weight > prev) latest = { exerciseId: info.exerciseId, weight: s.weight, reps: s.reps, date: info.date }
+    if (prev == null || s.weight > prev) best.set(info.exerciseId, s.weight)
+  }
+  return latest
+}

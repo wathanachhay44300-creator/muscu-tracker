@@ -22,6 +22,8 @@ function readStored(): TimerState {
   }
 }
 
+const CHANGE_EVENT = 'muscu-tracker:rest-timer'
+
 function persist(state: TimerState): void {
   try {
     if (state) localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
@@ -29,6 +31,8 @@ function persist(state: TimerState): void {
   } catch {
     // Storage unavailable — the timer just won't survive a reload.
   }
+  // Several components use this hook (floating widget, session mode): keep them in sync.
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: state }))
 }
 
 /**
@@ -47,6 +51,15 @@ export function useRestTimer() {
   useEffect(() => {
     prefsRef.current = preferences
   }, [preferences])
+
+  useEffect(() => {
+    function onChange(e: Event) {
+      setState((e as CustomEvent<TimerState>).detail)
+      setNow(Date.now())
+    }
+    window.addEventListener(CHANGE_EVENT, onChange)
+    return () => window.removeEventListener(CHANGE_EVENT, onChange)
+  }, [])
 
   useEffect(() => {
     if (state?.status !== 'running') return
@@ -89,49 +102,46 @@ export function useRestTimer() {
 
   function start(durationMs: number) {
     void requestNotificationPermission()
-    const t = Date.now()
-    const next: TimerState = { status: 'running', endTime: t + durationMs, totalMs: durationMs }
+    commit({ status: 'running', endTime: Date.now() + durationMs, totalMs: durationMs })
+  }
+
+  // Reads the latest state (not a render-time snapshot) so rapid taps compose.
+  const stateRef = useRef(state)
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
+
+  function commit(next: TimerState) {
+    stateRef.current = next
     setState(next)
-    setNow(t)
+    setNow(Date.now())
     persist(next)
   }
 
   function pause() {
-    setState((s) => {
-      if (s?.status !== 'running') return s
-      const next: TimerState = { status: 'paused', remainingMs: Math.max(0, s.endTime - Date.now()), totalMs: s.totalMs }
-      persist(next)
-      return next
-    })
+    const s = stateRef.current
+    if (s?.status !== 'running') return
+    commit({ status: 'paused', remainingMs: Math.max(0, s.endTime - Date.now()), totalMs: s.totalMs })
   }
 
   function resume() {
-    setState((s) => {
-      if (s?.status !== 'paused') return s
-      const t = Date.now()
-      const next: TimerState = { status: 'running', endTime: t + s.remainingMs, totalMs: s.totalMs }
-      setNow(t)
-      persist(next)
-      return next
-    })
+    const s = stateRef.current
+    if (s?.status !== 'paused') return
+    commit({ status: 'running', endTime: Date.now() + s.remainingMs, totalMs: s.totalMs })
   }
 
   function addSeconds(sec: number) {
-    setState((s) => {
-      if (!s) return s
-      const next: TimerState =
-        s.status === 'running'
-          ? { ...s, endTime: s.endTime + sec * 1000 }
-          : { ...s, remainingMs: Math.max(0, s.remainingMs + sec * 1000) }
-      persist(next)
-      return next
-    })
-    setNow(Date.now())
+    const s = stateRef.current
+    if (!s) return
+    commit(
+      s.status === 'running'
+        ? { ...s, endTime: s.endTime + sec * 1000 }
+        : { ...s, remainingMs: Math.max(0, s.remainingMs + sec * 1000) },
+    )
   }
 
   function reset() {
-    setState(null)
-    persist(null)
+    commit(null)
   }
 
   return { remainingMs, totalMs, isRunning, isPaused, isDone, hasTimer: state != null, start, pause, resume, addSeconds, reset }

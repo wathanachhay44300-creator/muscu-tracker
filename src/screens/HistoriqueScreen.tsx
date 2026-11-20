@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { BackToTopButton } from '../components/BackToTopButton'
@@ -15,28 +15,11 @@ import { updateWorkoutTitle } from '../lib/workoutActions'
 import { applyHistoryFilters, groupByMonth, layoutMonths, type MonthGroup } from '../lib/historyGroups'
 import { formatDateFr } from '../lib/date'
 import { formatVolume } from '../lib/stats'
-import {
-  ActivityIcon,
-  CalendarIcon,
-  ChartIcon,
-  ChevronRightIcon,
-  DownloadIcon,
-  PencilIcon,
-  ScaleIcon,
-  SettingsIcon,
-  XIcon,
-} from '../components/Icons'
+import { CalendarIcon, ChevronRightIcon, PencilIcon, XIcon } from '../components/Icons'
+import { HistoryTabs } from '../components/HistoryTabs'
 
 const PAGE_SIZE = 10
 
-const SHORTCUTS = [
-  { to: '/historique/calendrier', label: 'Calendrier', icon: CalendarIcon },
-  { to: '/historique/semaine', label: 'Muscles', icon: ChartIcon },
-  { to: '/suivi', label: 'Pas · poids · kcal', icon: ActivityIcon },
-  { to: '/corps', label: 'Poids & mesures', icon: ScaleIcon },
-  { to: '/donnees', label: 'Export / import', icon: DownloadIcon },
-  { to: '/reglages', label: 'Réglages', icon: SettingsIcon },
-]
 
 export function HistoriqueScreen() {
   const history = useWorkoutHistory()
@@ -101,21 +84,9 @@ export function HistoriqueScreen() {
       onPointerCancel={pullToRefresh.handlers.onPointerCancel}
     >
       <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
-      <h1 className="mb-3 text-lg font-bold text-ink">Historique</h1>
+      <h1 className="mb-4 pt-2 !text-[2rem] leading-none text-ink">Historique</h1>
 
-      {/* Compact shortcuts: a single scrollable row instead of a tall list, so sessions start high on screen. */}
-      <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {SHORTCUTS.map((s) => (
-          <Link
-            key={s.to}
-            to={s.to}
-            className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-xs font-semibold text-ink-2 shadow-sm active:bg-surface-3"
-          >
-            <s.icon className="h-4 w-4 text-accent-ink" />
-            {s.label}
-          </Link>
-        ))}
-      </div>
+      <HistoryTabs />
 
       {all.length > 0 && (
         <div className="mb-2 grid grid-cols-2 gap-2">
@@ -274,7 +245,7 @@ function MonthSection({
         onClick={onToggle}
         aria-expanded={open}
         className="sticky z-10 -mx-4 flex min-h-12 w-[calc(100%+2rem)] items-center justify-between gap-2 border-b border-line/70 bg-page px-5 py-2 text-left active:bg-surface-3"
-        style={{ top: 'env(safe-area-inset-top, 0px)' }}
+        style={{ top: 'var(--sticky-top)' }}
       >
         <span className="flex items-center gap-2">
           <ChevronRightIcon

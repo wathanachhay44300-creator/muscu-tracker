@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { usePreferences } from '../hooks/usePreferences'
 import { setHapticsEnabled, setSoundEnabled, setWeightGoal } from '../lib/settingsActions'
 import { ClipboardImport } from '../components/ClipboardImport'
@@ -14,7 +14,7 @@ import {
   requestNotificationPermission,
   type NotificationSupport,
 } from '../lib/notifications'
-import { CheckIcon, ChevronLeftIcon, CopyIcon } from '../components/Icons'
+import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, CopyIcon, DownloadIcon } from '../components/Icons'
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -271,6 +271,20 @@ export function ReglagesScreen() {
 
       <div className="space-y-3">
         <ThemeCard />
+
+        <Link
+          to="/donnees"
+          className="flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-line bg-surface px-4 py-3 shadow-sm active:bg-surface-2"
+        >
+          <span className="flex items-center gap-3">
+            <DownloadIcon className="h-5 w-5 text-accent-ink" />
+            <span>
+              <span className="block font-semibold text-ink">Données</span>
+              <span className="block text-xs text-muted">Export / import (JSON, CSV, Apple Santé)</span>
+            </span>
+          </span>
+          <ChevronRightIcon className="h-5 w-5 text-faint" />
+        </Link>
 
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-sm">
           <div>

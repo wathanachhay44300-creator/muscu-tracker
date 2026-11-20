@@ -224,3 +224,8 @@ export async function restoreWorkoutSnapshot(snapshot: WorkoutSnapshot): Promise
   )
   return newWorkoutId
 }
+
+/** Ticks (or unticks) a set as done in session mode. */
+export async function setSetDone(setId: number, done: boolean): Promise<void> {
+  await db.sets.update(setId, { done: done ? true : undefined })
+}

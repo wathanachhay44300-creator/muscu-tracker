@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkoutDetail } from '../hooks/useWorkout'
 import { usePreferences } from '../hooks/usePreferences'
@@ -9,13 +9,12 @@ import {
   addExerciseToWorkout,
   finishWorkout,
   reorderWorkoutExercises,
-  updateWorkoutNotes,
-  updateWorkoutRpe,
 } from '../lib/workoutActions'
 import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { SessionTimer } from './SessionTimer'
+import { SessionNotes, SessionRpe } from './SessionExtras'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
 import type { Exercise, WorkoutExerciseWithSets } from '../types'
@@ -24,26 +23,11 @@ interface WorkoutEditorProps {
   workoutId: number
 }
 
-const RPE_VALUES = Array.from({ length: 10 }, (_, i) => i + 1)
-
 export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   const detail = useWorkoutDetail(workoutId)
   const [pickerOpen, setPickerOpen] = useState(false)
   const navigate = useNavigate()
   const preferences = usePreferences()
-
-  const [notes, setNotes] = useState('')
-  const notesLoadedFor = useRef<number | null>(null)
-  const notesTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-
-  useEffect(() => {
-    if (!detail) return
-    if (notesLoadedFor.current === workoutId) return
-    notesLoadedFor.current = workoutId
-    setNotes(detail.workout.notes ?? '')
-  }, [detail, workoutId])
-
-  useEffect(() => () => clearTimeout(notesTimeout.current), [])
 
   const exercises = detail?.exercises ?? []
   const exerciseIds = exercises.map((we) => we.id!)
@@ -63,12 +47,6 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   const sessionVolume = totalVolume(exercises.flatMap((we) => we.sets))
   const setTimestamps = exercises.flatMap((we) => we.sets.map((s) => s.createdAt))
   const firstSetAt = setTimestamps.length ? Math.min(...setTimestamps) : null
-
-  function handleNotesChange(value: string) {
-    setNotes(value)
-    clearTimeout(notesTimeout.current)
-    notesTimeout.current = setTimeout(() => updateWorkoutNotes(workoutId, value), 400)
-  }
 
   async function handleSelectExercise(exercise: Exercise) {
     await addExerciseToWorkout(workoutId, exercise.id!)
@@ -132,49 +110,9 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         Ajouter un exercice
       </button>
 
-      {exercises.length > 0 && (
-        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-semibold text-ink-2">Ressenti de la séance (RPE)</p>
-            {workout.rpe != null && (
-              <button
-                type="button"
-                onClick={() => updateWorkoutRpe(workoutId, null)}
-                className="text-xs font-medium text-muted active:text-ink-2"
-              >
-                Effacer
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {RPE_VALUES.map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => updateWorkoutRpe(workoutId, n)}
-                className={`h-9 w-9 rounded-full text-sm font-semibold ${
-                  workout.rpe === n
-                    ? 'bg-accent text-on-accent'
-                    : 'bg-surface-3 text-ink-2 active:bg-surface-4'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {exercises.length > 0 && <SessionRpe workout={workout} />}
 
-      <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-        <p className="mb-2 text-sm font-semibold text-ink-2">Notes de séance</p>
-        <textarea
-          value={notes}
-          onChange={(e) => handleNotesChange(e.target.value)}
-          placeholder="Fatigue, sommeil, douleurs, contexte…"
-          rows={3}
-          className="w-full resize-none rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-sm outline-none focus:border-accent-line"
-        />
-      </div>
+      <SessionNotes key={workout.id} workout={workout} />
 
       {pickerOpen && (
         <ExercisePickerSheet
