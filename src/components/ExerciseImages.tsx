@@ -26,9 +26,9 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
 
   return (
     <section>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Démonstration</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Démonstration</h3>
       {allFailed ? (
-        <p className="rounded-xl bg-slate-50 px-3 py-4 text-center text-sm text-slate-400">
+        <p className="rounded-xl bg-surface-2 px-3 py-4 text-center text-sm text-muted">
           Images indisponibles pour le moment.
         </p>
       ) : (
@@ -47,12 +47,12 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
           )}
         </div>
       )}
-      <p className="mt-1.5 text-[11px] text-slate-400">Images : free-exercise-db (domaine public)</p>
+      <p className="mt-1.5 text-[11px] text-muted">Images : free-exercise-db (domaine public)</p>
 
       {zoomed != null &&
         createPortal(
           <div
-            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-3 animate-fade-in-backdrop"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-scrim/90 p-3 animate-fade-in-backdrop"
             onClick={() => setZoomed(null)}
             onPointerDown={(e) => e.stopPropagation()}
           >
@@ -64,7 +64,7 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
             <button
               type="button"
               aria-label="Fermer l'image"
-              className="absolute right-3 top-3 rounded-full bg-black/50 p-2.5 text-white"
+              className="absolute right-3 top-3 rounded-full bg-scrim/50 p-2.5 text-on-scrim"
               onClick={() => setZoomed(null)}
               style={{ marginTop: 'env(safe-area-inset-top)' }}
             >
@@ -96,9 +96,9 @@ function Thumb({
       type="button"
       onClick={onZoom}
       aria-label={`Agrandir : ${alt}`}
-      className="relative aspect-[3/2] overflow-hidden rounded-xl bg-slate-100 active:opacity-80"
+      className="relative aspect-[3/2] overflow-hidden rounded-xl bg-surface-3 active:opacity-80"
     >
-      {!loaded && <span className="absolute inset-0 animate-pulse bg-slate-200" aria-hidden="true" />}
+      {!loaded && <span className="absolute inset-0 animate-pulse bg-surface-4" aria-hidden="true" />}
       <img
         src={src}
         alt={alt}
@@ -109,7 +109,7 @@ function Thumb({
         onError={onError}
         className={`h-full w-full object-cover transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
       />
-      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white">
+      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-scrim/55 px-2 py-0.5 text-[10px] font-semibold text-on-scrim">
         {label}
       </span>
     </button>

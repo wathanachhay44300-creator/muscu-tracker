@@ -24,11 +24,11 @@ export function StartSessionPicker({
   const hasTemplates = templates && templates.length > 0
 
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-center">
-      <DumbbellIcon className="h-10 w-10 text-slate-300" />
+    <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+      <DumbbellIcon className="h-10 w-10 text-faint" />
       <div>
-        <p className="font-medium text-slate-600">Aucune séance ce jour-là</p>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="font-medium text-ink-2">Aucune séance ce jour-là</p>
+        <p className="mt-1 text-sm text-muted">
           {hasTemplates
             ? 'Choisissez un programme pour démarrer, avec vos dernières performances déjà remplies.'
             : 'Démarrez une séance pour commencer à noter vos exercices.'}
@@ -43,11 +43,11 @@ export function StartSessionPicker({
               type="button"
               onClick={() => onStartFromTemplate(template.id!)}
               disabled={starting}
-              className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50 disabled:opacity-50"
+              className="flex w-full items-center justify-between rounded-2xl border border-line bg-surface px-4 py-3.5 shadow-sm active:bg-surface-2 disabled:opacity-50"
             >
               <div>
-                <p className="font-semibold text-slate-900">{template.name}</p>
-                <p className="text-xs text-slate-400">
+                <p className="font-semibold text-ink">{template.name}</p>
+                <p className="text-xs text-muted">
                   {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
                 </p>
               </div>
@@ -62,8 +62,8 @@ export function StartSessionPicker({
         disabled={starting}
         className={
           hasTemplates
-            ? 'mt-1 w-full rounded-2xl bg-slate-100 px-6 py-3 font-medium text-slate-600 active:bg-slate-200 disabled:opacity-50'
-            : 'mt-2 rounded-2xl bg-brand-600 px-6 py-3.5 font-semibold text-white shadow-sm active:bg-brand-700 disabled:opacity-50'
+            ? 'mt-1 w-full rounded-2xl bg-surface-3 px-6 py-3 font-medium text-ink-2 active:bg-surface-4 disabled:opacity-50'
+            : 'mt-2 rounded-2xl bg-accent px-6 py-3.5 font-semibold text-on-accent shadow-sm active:bg-accent-hover disabled:opacity-50'
         }
       >
         Séance libre
@@ -73,7 +73,7 @@ export function StartSessionPicker({
         type="button"
         onClick={onDuplicatePrevious}
         disabled={starting}
-        className="flex w-full items-center justify-center gap-1.5 rounded-2xl bg-slate-100 px-6 py-3 font-medium text-slate-600 active:bg-slate-200 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-1.5 rounded-2xl bg-surface-3 px-6 py-3 font-medium text-ink-2 active:bg-surface-4 disabled:opacity-50"
       >
         <CopyIcon className="h-4 w-4" />
         Dupliquer une séance précédente

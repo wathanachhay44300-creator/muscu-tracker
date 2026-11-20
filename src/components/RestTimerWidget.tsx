@@ -33,38 +33,38 @@ export function RestTimerWidget() {
   if (!timer.hasTimer && !onSessionScreen) return null
 
   const tone = timer.isDone
-    ? 'bg-emerald-600 text-white animate-pop-in'
+    ? 'bg-good text-on-good animate-pop-in'
     : timer.isRunning
-      ? 'bg-brand-600 text-white'
+      ? 'bg-accent text-on-accent'
       : timer.isPaused
-        ? 'bg-amber-500 text-white'
-        : 'bg-surface text-slate-600 border border-slate-200'
+        ? 'bg-highlight text-on-highlight'
+        : 'bg-surface text-ink-2 border border-line'
   const showPresets = !timer.hasTimer || timer.isDone
 
   return (
     <div className="pointer-events-none fixed bottom-24 right-4 z-40 flex flex-col items-end gap-2">
       {expanded && (
-        <div className="animate-slide-up pointer-events-auto w-64 rounded-2xl border border-slate-200 bg-surface p-3 shadow-lg">
+        <div className="animate-slide-up pointer-events-auto w-64 rounded-2xl border border-line bg-surface p-3 shadow-lg">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Minuteur de repos</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Minuteur de repos</p>
             <button
               type="button"
               onClick={() => setExpanded(false)}
-              className="rounded-full p-1 text-slate-400 active:bg-slate-100"
+              className="rounded-full p-1 text-muted active:bg-surface-3"
               aria-label="Réduire"
             >
               <XIcon className="h-4 w-4" />
             </button>
           </div>
           <p
-            className={`mb-3 text-center text-4xl font-bold tabular-nums ${
-              timer.isDone ? 'text-emerald-600' : 'text-slate-900'
+            className={`mb-3 text-center text-4xl font-bold font-numbers tabular-nums ${
+              timer.isDone ? 'text-good-ink' : 'text-ink'
             }`}
           >
             {formatCountdown(timer.remainingMs)}
           </p>
-          {timer.isDone && <p className="mb-2 text-center text-sm font-semibold text-emerald-600">Repos terminé !</p>}
-          {timer.isPaused && <p className="mb-2 text-center text-sm font-medium text-amber-600">En pause</p>}
+          {timer.isDone && <p className="mb-2 text-center text-sm font-semibold text-good-ink">Repos terminé !</p>}
+          {timer.isPaused && <p className="mb-2 text-center text-sm font-medium text-highlight-ink">En pause</p>}
 
           {showPresets ? (
             <div className="grid grid-cols-3 gap-1.5">
@@ -73,7 +73,7 @@ export function RestTimerWidget() {
                   key={p.sec}
                   type="button"
                   onClick={() => timer.start(p.sec * 1000)}
-                  className="rounded-xl bg-brand-600 py-2.5 text-sm font-semibold text-white active:bg-brand-700"
+                  className="rounded-xl bg-accent py-2.5 text-sm font-semibold text-on-accent active:bg-accent-hover"
                 >
                   {p.label}
                 </button>
@@ -84,14 +84,14 @@ export function RestTimerWidget() {
               <button
                 type="button"
                 onClick={() => timer.addSeconds(-15)}
-                className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm font-semibold text-slate-600 active:bg-slate-200"
+                className="rounded-xl bg-surface-3 px-3 py-2.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
               >
                 −15s
               </button>
               <button
                 type="button"
                 onClick={() => (timer.isRunning ? timer.pause() : timer.resume())}
-                className="flex flex-1 items-center justify-center rounded-xl bg-brand-600 py-2.5 text-white active:bg-brand-700"
+                className="flex flex-1 items-center justify-center rounded-xl bg-accent py-2.5 text-on-accent active:bg-accent-hover"
                 aria-label={timer.isRunning ? 'Pause' : 'Reprendre'}
               >
                 {timer.isRunning ? <PauseIcon className="h-4 w-4" /> : <PlayIcon className="h-4 w-4" />}
@@ -99,7 +99,7 @@ export function RestTimerWidget() {
               <button
                 type="button"
                 onClick={() => timer.addSeconds(15)}
-                className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm font-semibold text-slate-600 active:bg-slate-200"
+                className="rounded-xl bg-surface-3 px-3 py-2.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
               >
                 +15s
               </button>
@@ -109,7 +109,7 @@ export function RestTimerWidget() {
                   timer.reset()
                   setExpanded(false)
                 }}
-                className="rounded-xl bg-slate-100 px-3 py-2.5 text-slate-600 active:bg-slate-200"
+                className="rounded-xl bg-surface-3 px-3 py-2.5 text-ink-2 active:bg-surface-4"
                 aria-label="Arrêter le minuteur"
               >
                 <RefreshIcon className="h-4 w-4" />
@@ -127,7 +127,7 @@ export function RestTimerWidget() {
         className={`pointer-events-auto flex h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-lg active:scale-95 ${tone}`}
       >
         <TimerIcon className="h-5 w-5 shrink-0" />
-        {timer.hasTimer && <span className="tabular-nums">{formatCountdown(timer.remainingMs)}</span>}
+        {timer.hasTimer && <span className="font-numbers tabular-nums">{formatCountdown(timer.remainingMs)}</span>}
       </button>
     </div>
   )

@@ -101,7 +101,7 @@ export function HistoriqueScreen() {
       onPointerCancel={pullToRefresh.handlers.onPointerCancel}
     >
       <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
-      <h1 className="mb-3 text-lg font-bold text-slate-900">Historique</h1>
+      <h1 className="mb-3 text-lg font-bold text-ink">Historique</h1>
 
       {/* Compact shortcuts: a single scrollable row instead of a tall list, so sessions start high on screen. */}
       <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -109,9 +109,9 @@ export function HistoriqueScreen() {
           <Link
             key={s.to}
             to={s.to}
-            className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-surface px-3.5 text-xs font-semibold text-slate-700 shadow-sm active:bg-slate-100"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-xs font-semibold text-ink-2 shadow-sm active:bg-surface-3"
           >
-            <s.icon className="h-4 w-4 text-accent" />
+            <s.icon className="h-4 w-4 text-accent-ink" />
             {s.label}
           </Link>
         ))}
@@ -142,30 +142,30 @@ export function HistoriqueScreen() {
       )}
 
       {all.length > 0 && (
-        <p className="mb-1 px-1 text-xs font-medium text-slate-400" aria-live="polite">
+        <p className="mb-1 px-1 text-xs font-medium text-muted" aria-live="polite">
           {filtered.length} séance{filtered.length > 1 ? 's' : ''}
           {filtersActive && ` sur ${all.length}`}
         </p>
       )}
 
       {history && all.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-300 px-4 py-14 text-center">
-          <CalendarIcon className="h-10 w-10 text-slate-300" />
-          <p className="font-medium text-slate-600">Pas encore de séance enregistrée</p>
-          <p className="text-sm text-slate-400">Vos séances passées apparaîtront ici une fois enregistrées.</p>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
+          <CalendarIcon className="h-10 w-10 text-faint" />
+          <p className="font-medium text-ink-2">Pas encore de séance enregistrée</p>
+          <p className="text-sm text-muted">Vos séances passées apparaîtront ici une fois enregistrées.</p>
         </div>
       )}
 
       {all.length > 0 && filtered.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-center">
-          <p className="font-medium text-slate-600">Aucune séance ne correspond à ces filtres</p>
+        <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+          <p className="font-medium text-ink-2">Aucune séance ne correspond à ces filtres</p>
           <button
             type="button"
             onClick={() => {
               setProgram('')
               setExercise('')
             }}
-            className="mt-3 rounded-full bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 active:bg-slate-200"
+            className="mt-3 rounded-full bg-surface-3 px-4 py-2.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
           >
             Effacer les filtres
           </button>
@@ -186,7 +186,7 @@ export function HistoriqueScreen() {
         <button
           type="button"
           onClick={() => setLimit((l) => l + PAGE_SIZE)}
-          className="mt-2 w-full rounded-2xl bg-slate-100 py-3.5 text-sm font-semibold text-slate-700 active:bg-slate-200"
+          className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
         >
           Voir plus ({remaining} séance{remaining > 1 ? 's' : ''} restante{remaining > 1 ? 's' : ''})
         </button>
@@ -214,7 +214,7 @@ function FilterSelect({
       onChange={(e) => onChange(e.target.value)}
       aria-label={label}
       className={`h-11 min-w-0 rounded-xl border bg-surface px-3 text-sm outline-none ${
-        value ? 'border-brand-400 font-semibold text-accent' : 'border-slate-200 text-slate-500'
+        value ? 'border-accent-line font-semibold text-accent-ink' : 'border-line text-muted'
       }`}
     >
       <option value="">{label}</option>
@@ -233,7 +233,7 @@ function FilterChip({ label, onClear }: { label: string; onClear: () => void }) 
       type="button"
       onClick={onClear}
       aria-label={`Retirer le filtre ${label}`}
-      className="flex min-h-9 items-center gap-1.5 rounded-full bg-brand-50 py-1.5 pl-3 pr-2.5 text-xs font-semibold text-accent active:bg-brand-100"
+      className="flex min-h-9 items-center gap-1.5 rounded-full bg-accent-soft py-1.5 pl-3 pr-2.5 text-xs font-semibold text-accent-ink active:bg-accent-soft"
     >
       <span className="max-w-[10rem] truncate">{label}</span>
       <XIcon className="h-3.5 w-3.5" />
@@ -273,17 +273,17 @@ function MonthSection({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="sticky z-10 -mx-4 flex min-h-12 w-[calc(100%+2rem)] items-center justify-between gap-2 border-b border-slate-200/70 bg-page px-5 py-2 text-left active:bg-slate-100"
+        className="sticky z-10 -mx-4 flex min-h-12 w-[calc(100%+2rem)] items-center justify-between gap-2 border-b border-line/70 bg-page px-5 py-2 text-left active:bg-surface-3"
         style={{ top: 'env(safe-area-inset-top, 0px)' }}
       >
         <span className="flex items-center gap-2">
           <ChevronRightIcon
-            className="h-4 w-4 shrink-0 text-slate-400"
+            className="h-4 w-4 shrink-0 text-muted"
             style={{ transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 200ms ease' }}
           />
-          <span className="font-display text-base text-slate-900">{group.label}</span>
+          <span className="font-display text-base text-ink">{group.label}</span>
         </span>
-        <span className="text-xs font-medium tabular-nums text-slate-500">
+        <span className="text-xs font-medium tabular-nums text-muted">
           {count} séance{count > 1 ? 's' : ''}
           {group.volume > 0 && <> · {formatVolume(group.volume)} kg</>}
         </span>
@@ -298,7 +298,7 @@ function MonthSection({
       >
         <div className="overflow-hidden" inert={!open}>
           {shown.length > 0 && (
-            <div className="my-2 overflow-hidden rounded-xl border border-slate-200 bg-surface shadow-sm">
+            <div className="my-2 overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
               {shown.map((summary, i) => (
                 <SessionRow key={summary.workout.id} summary={summary} bordered={i > 0} />
               ))}
@@ -337,18 +337,18 @@ function SessionRow({ summary, bordered }: { summary: WorkoutSummary; bordered: 
         onPointerUp={longPress.onPointerUp}
         onPointerCancel={longPress.onPointerCancel}
         onClickCapture={longPress.onClickCapture}
-        className={`flex min-h-12 cursor-pointer items-center gap-3 px-3.5 active:bg-slate-50 ${
-          bordered ? 'border-t border-slate-100' : ''
+        className={`flex min-h-12 cursor-pointer items-center gap-3 px-3.5 active:bg-surface-2 ${
+          bordered ? 'border-t border-line' : ''
         }`}
       >
-        <span className="w-[4.25rem] shrink-0 text-xs font-medium text-slate-500">
+        <span className="w-[4.25rem] shrink-0 text-xs font-medium text-muted">
           {formatDateFr(workout.date, { withYear: false })}
         </span>
-        <span className="min-w-0 flex-1 truncate font-semibold text-slate-900">{title}</span>
-        <span className="shrink-0 text-xs font-medium tabular-nums text-slate-500">
+        <span className="min-w-0 flex-1 truncate font-semibold text-ink">{title}</span>
+        <span className="shrink-0 text-xs font-medium tabular-nums text-muted">
           {volume > 0 ? `${formatVolume(volume)} kg` : '—'}
         </span>
-        <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        <ChevronRightIcon className="h-4 w-4 shrink-0 text-faint" />
       </div>
 
       {menuOpen && (

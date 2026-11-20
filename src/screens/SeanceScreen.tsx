@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { WorkoutEditor } from "../components/WorkoutEditor";
-import { ThemeToggle } from "../components/ThemeToggle";
+import { Link } from "react-router-dom";
 import { DuplicateSessionSheet } from "../components/DuplicateSessionSheet";
 import { AngkorSilhouette } from "../components/AngkorSilhouette";
 import { PullToRefreshIndicator } from "../components/PullToRefreshIndicator";
-import { ChevronLeftIcon, ChevronRightIcon } from "../components/Icons";
+import { ChevronLeftIcon, ChevronRightIcon, SettingsIcon } from "../components/Icons";
 import { useWorkoutIdForDate } from "../hooks/useWorkout";
 import { useTemplates } from "../hooks/useTemplates";
 import {
@@ -76,31 +76,37 @@ export function SeanceScreen() {
       <div className="relative isolate">
         <AngkorSilhouette className="inset-x-0 bottom-0 h-24 w-full" />
         <div className="mb-2 flex justify-end">
-          <ThemeToggle />
+          <Link
+            to="/reglages"
+            aria-label="Réglages"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-3 text-muted active:bg-surface-4"
+          >
+            <SettingsIcon className="h-5 w-5" />
+          </Link>
         </div>
         <div className="mb-5 flex items-center justify-between">
           <button
             type="button"
             onClick={() => changeDate(addDays(date, -1), "right")}
-            className="rounded-full p-2 text-slate-400 active:bg-slate-100"
+            className="rounded-full p-2 text-muted active:bg-surface-3"
             aria-label="Jour précédent"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
 
           <div className="text-center">
-            <h1 className="text-lg font-bold text-slate-900">
+            <h1 className="text-lg font-bold text-ink">
               {relativeDateLabel(date)}
             </h1>
             {relativeDateLabel(date) !== formatDateFr(date) && (
-              <p className="text-xs text-slate-400">{formatDateFr(date)}</p>
+              <p className="text-xs text-muted">{formatDateFr(date)}</p>
             )}
           </div>
 
           <button
             type="button"
             onClick={() => changeDate(addDays(date, 1), "left")}
-            className="rounded-full p-2 text-slate-400 active:bg-slate-100"
+            className="rounded-full p-2 text-muted active:bg-surface-3"
             aria-label="Jour suivant"
           >
             <ChevronRightIcon className="h-5 w-5" />

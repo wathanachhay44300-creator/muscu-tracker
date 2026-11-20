@@ -14,7 +14,7 @@ export function PrincipalPicker({ value, onChange }: { value: MuscleGroup; onCha
           role="radio"
           aria-checked={value === g}
           onClick={() => onChange(g)}
-          className={`${CHIP} ${value === g ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 active:bg-slate-200'}`}
+          className={`${CHIP} ${value === g ? 'bg-accent text-on-accent' : 'bg-surface-3 text-ink-2 active:bg-surface-4'}`}
         >
           {g}
         </button>
@@ -50,10 +50,10 @@ export function SecondaryPicker({
             onClick={() => onChange(on ? value.filter((x) => x !== g) : [...value, g])}
             className={`${CHIP} ${
               on
-                ? 'bg-brand-50 text-accent ring-2 ring-brand-300'
+                ? 'bg-accent-soft text-accent-ink ring-2 ring-accent-line'
                 : isMain
-                  ? 'bg-slate-50 text-slate-300'
-                  : 'border border-slate-200 text-slate-600 active:bg-slate-100'
+                  ? 'bg-surface-2 text-faint'
+                  : 'border border-line text-ink-2 active:bg-surface-3'
             }`}
           >
             {g}

@@ -36,7 +36,7 @@ export default function App() {
   if (!ready) {
     return (
       <div className="flex h-dvh flex-col items-center justify-center gap-3 bg-page">
-        <DumbbellIcon className="h-8 w-8 animate-pulse text-accent" />
+        <DumbbellIcon className="h-8 w-8 animate-pulse text-accent-ink" />
       </div>
     )
   }

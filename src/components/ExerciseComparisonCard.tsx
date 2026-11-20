@@ -15,12 +15,12 @@ export function ExerciseComparisonCard({ we, comparison, style }: ExerciseCompar
   const sets = comparison?.sets ?? []
 
   return (
-    <div className="animate-fade-in rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm" style={style}>
-      <p className="font-exercise text-[0.95rem] text-slate-900">{we.exercise.name}</p>
-      <p className="mb-2.5 text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
+    <div className="animate-fade-in rounded-2xl border border-line bg-surface p-4 shadow-sm" style={style}>
+      <p className="font-exercise text-[0.95rem] text-ink">{we.exercise.name}</p>
+      <p className="mb-2.5 text-xs font-medium text-muted">{we.exercise.muscleGroup}</p>
 
       {!hasHistory && (
-        <p className="mb-2 rounded-lg bg-slate-50 px-2.5 py-2 text-xs text-slate-500">
+        <p className="mb-2 rounded-lg bg-surface-2 px-2.5 py-2 text-xs text-muted">
           Première fois sur cet exercice — rien à comparer.
         </p>
       )}
@@ -61,8 +61,9 @@ function SetComparisonRow({
         ? 'down'
         : 'flat'
 
-  const toneClass = { up: 'text-emerald-600', down: 'text-red-700', flat: 'text-slate-500' }[tone]
-  const toneArrow = { up: '↑', down: '↓', flat: '→' }[tone]
+  const toneClass = { up: 'text-progress', down: 'text-decline', flat: 'text-stable' }[tone]
+  // Never color alone: each state also carries its own sign.
+  const toneArrow = { up: '↑', down: '↓', flat: '=' }[tone]
 
   // The pill gets its own slightly-delayed entrance on top of the row's own
   // fade-in, so the progress indicator "pops" in just after the row lands —
@@ -72,26 +73,26 @@ function SetComparisonRow({
   return (
     <div
       className={`flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm ${
-        set.isPR ? 'animate-pop-in bg-amber-50 ring-1 ring-amber-200' : 'animate-fade-in bg-slate-50'
+        set.isPR ? 'animate-pop-in bg-highlight-soft ring-1 ring-highlight-line' : 'animate-fade-in bg-surface-2'
       }`}
       style={{ animationDelay: `${rowDelayMs}ms` }}
     >
       <div className="flex min-w-0 items-center gap-1.5">
-        {set.isPR && <StarIcon className="pr-star-glow h-3.5 w-3.5 shrink-0 text-amber-500" />}
-        <span className="shrink-0 text-slate-400">Série {index + 1}</span>
-        <span className="truncate font-semibold text-slate-900">
+        {set.isPR && <StarIcon className="pr-star-glow h-3.5 w-3.5 shrink-0 text-highlight" />}
+        <span className="shrink-0 text-muted">Série {index + 1}</span>
+        <span className="truncate font-semibold text-ink">
           {formatWeight(set.weight)}kg × {set.reps}
         </span>
       </div>
       {hasPreviousSet ? (
         <span
-          className={`animate-fade-in shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold ${toneClass}`}
+          className={`animate-fade-in shrink-0 rounded-full bg-surface-3 px-2 py-0.5 text-xs font-semibold ${toneClass}`}
           style={{ animationDelay: `${pillDelayMs}ms` }}
         >
           {toneArrow} {formatDelta(weightDelta, repsDelta)}
         </span>
       ) : hasHistory ? (
-        <span className="shrink-0 text-xs font-medium text-slate-400">Nouvelle série</span>
+        <span className="shrink-0 text-xs font-medium text-muted">Nouvelle série</span>
       ) : null}
     </div>
   )

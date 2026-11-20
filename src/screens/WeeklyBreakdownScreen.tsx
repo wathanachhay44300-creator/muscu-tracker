@@ -20,35 +20,35 @@ export function WeeklyBreakdownScreen() {
         <button
           type="button"
           onClick={() => navigate('/historique')}
-          className="-ml-2 rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour à l'historique"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-bold text-slate-900">Répartition hebdomadaire</h1>
+        <h1 className="text-lg font-bold text-ink">Répartition hebdomadaire</h1>
       </div>
 
       <div className="mb-5 flex items-center justify-between">
         <button
           type="button"
           onClick={() => setWeekStart((w) => addWeeks(w, -1))}
-          className="rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Semaine précédente"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div className="text-center">
-          <p className="text-sm font-semibold text-slate-700">
+          <p className="text-sm font-semibold text-ink-2">
             {isCurrentWeek ? 'Cette semaine' : formatDateFr(weekStart, { withYear: false })}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted">
             {formatDateFr(weekStart, { withYear: false })} – {formatDateFr(weekEnd, { withYear: false })}
           </p>
         </div>
         <button
           type="button"
           onClick={() => setWeekStart((w) => addWeeks(w, 1))}
-          className="rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Semaine suivante"
         >
           <ChevronRightIcon className="h-5 w-5" />
@@ -56,12 +56,12 @@ export function WeeklyBreakdownScreen() {
       </div>
 
       {items && totalSets === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-14 text-center">
-          <p className="text-slate-500">Aucune série enregistrée cette semaine-là.</p>
+        <div className="rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
+          <p className="text-muted">Aucune série enregistrée cette semaine-là.</p>
         </div>
       ) : (
         <>
-          <p className="mb-3 text-center text-xs font-medium text-slate-400">
+          <p className="mb-3 text-center text-xs font-medium text-muted">
             {totalSets} série{totalSets > 1 ? 's' : ''} au total
           </p>
           <MuscleGroupBreakdown items={items ?? []} title="Séries par muscle" />

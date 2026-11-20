@@ -1,48 +1,30 @@
-const STORAGE_KEY = 'muscu-tracker:theme'
-const LIGHT_THEME_COLOR = '#8b1e1e'
-const DARK_THEME_COLOR = '#241712'
+import { DEFAULT_THEME, THEME_STORAGE_KEY, isThemeId, type ThemeId } from '../theme/themes'
 
-export type ThemeChoice = 'light' | 'dark'
-
-/** The user's explicit choice, if any — `null` means "follow the OS". */
-export function getStoredTheme(): ThemeChoice | null {
+export function getStoredTheme(): ThemeId {
   try {
-    const v = localStorage.getItem(STORAGE_KEY)
-    return v === 'light' || v === 'dark' ? v : null
+    const v = localStorage.getItem(THEME_STORAGE_KEY)
+    return isThemeId(v) ? v : DEFAULT_THEME
   } catch {
-    return null
+    return DEFAULT_THEME
   }
 }
 
-export function setStoredTheme(theme: ThemeChoice): void {
+export function setStoredTheme(theme: ThemeId): void {
   try {
-    localStorage.setItem(STORAGE_KEY, theme)
+    localStorage.setItem(THEME_STORAGE_KEY, theme)
   } catch {
     // Storage unavailable (private mode, quota) — theme just won't persist.
   }
 }
 
-export function systemPrefersDark(): boolean {
-  return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
-export function resolveTheme(stored: ThemeChoice | null): ThemeChoice {
-  return stored ?? (systemPrefersDark() ? 'dark' : 'light')
-}
-
 /**
- * Applies the theme to the document: the `data-theme` attribute (only when
- * the user made an explicit choice — otherwise CSS alone follows the OS via
- * `prefers-color-scheme`) and the PWA/browser-chrome tint, which can't
- * follow our own attribute on its own.
+ * Applies a theme: the `data-theme` attribute (every color comes from it,
+ * see src/theme/theme.css) and the browser/PWA chrome tint, read back from
+ * the theme's own `--nav-bg` token so the color is defined in one place only.
  */
-export function applyTheme(stored: ThemeChoice | null): void {
+export function applyTheme(theme: ThemeId): void {
   const root = document.documentElement
-  if (stored) root.setAttribute('data-theme', stored)
-  else root.removeAttribute('data-theme')
-
-  const resolved = resolveTheme(stored)
-  document
-    .querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', resolved === 'dark' ? DARK_THEME_COLOR : LIGHT_THEME_COLOR)
+  root.setAttribute('data-theme', theme)
+  const chrome = getComputedStyle(root).getPropertyValue('--bg').trim()
+  if (chrome) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', chrome)
 }

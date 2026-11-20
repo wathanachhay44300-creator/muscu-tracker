@@ -26,7 +26,7 @@ export function ExerciseInfoButton({ exercise, className = '' }: { exercise: Exe
           setOpen(true)
         }}
         aria-label={`Voir la fiche de ${exercise.name}`}
-        className={`shrink-0 rounded-full p-2 text-slate-400 active:bg-slate-100 active:text-accent ${className}`}
+        className={`shrink-0 rounded-full p-2 text-muted active:bg-surface-3 active:text-accent-ink ${className}`}
       >
         <InfoIcon className="h-5 w-5" />
       </button>
@@ -103,7 +103,7 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-scrim/40 animate-fade-in-backdrop sm:items-center sm:p-4"
       onClick={onClose}
       // Portals bubble through React ancestors: keep the opening card's gestures out of it.
       onPointerDown={stop}
@@ -126,10 +126,10 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
           onPointerUp={onDragEnd}
           onPointerCancel={onDragEnd}
         >
-          <div className="mx-auto mb-2.5 h-1.5 w-10 rounded-full bg-slate-200" />
+          <div className="mx-auto mb-2.5 h-1.5 w-10 rounded-full bg-surface-4" />
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="font-exercise !text-lg leading-tight text-slate-900">{exercise.name}</h2>
+              <h2 className="font-exercise !text-lg leading-tight text-ink">{exercise.name}</h2>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {info.equipment && <Badge>{EQUIPMENT_LABEL[info.equipment]}</Badge>}
                 <Badge>{exercise.muscleGroup}</Badge>
@@ -141,7 +141,7 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
               onClick={onClose}
               onPointerDown={stop}
               aria-label="Fermer la fiche"
-              className="-mr-2 -mt-1 shrink-0 rounded-full p-2.5 text-slate-500 active:bg-slate-100"
+              className="-mr-2 -mt-1 shrink-0 rounded-full p-2.5 text-muted active:bg-surface-3"
             >
               <XIcon className="h-6 w-6" />
             </button>
@@ -150,9 +150,9 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
 
         <div className="space-y-5 overflow-y-auto px-5 pb-8 pt-2" style={{ overscrollBehavior: 'contain' }}>
           <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Muscles travaillés</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Muscles travaillés</h3>
             {info.primary.length + info.secondary.length === 0 ? (
-              <p className="text-sm text-slate-400">Aucun muscle renseigné.</p>
+              <p className="text-sm text-muted">Aucun muscle renseigné.</p>
             ) : (
               <div className="space-y-2">
                 {info.primary.length > 0 && (
@@ -169,11 +169,11 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
 
           {info.steps.length > 0 && (
             <section>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Comment faire</h3>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Comment faire</h3>
               <ol className="space-y-2.5">
                 {info.steps.map((s, i) => (
-                  <li key={i} className="flex gap-2.5 text-sm text-slate-700">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-accent">
+                  <li key={i} className="flex gap-2.5 text-sm text-ink-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent-ink">
                       {i + 1}
                     </span>
                     <span>{s}</span>
@@ -181,33 +181,33 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
                 ))}
               </ol>
               {info.tips.length > 0 && (
-                <div className="mt-4 rounded-xl bg-amber-50 px-3.5 py-3">
-                  <p className="mb-1 text-xs font-semibold text-amber-700">Conseils et erreurs fréquentes</p>
-                  <ul className="list-disc space-y-1 pl-4 text-sm text-amber-700">
+                <div className="mt-4 rounded-xl bg-highlight-soft px-3.5 py-3">
+                  <p className="mb-1 text-xs font-semibold text-highlight-ink">Conseils et erreurs fréquentes</p>
+                  <ul className="list-disc space-y-1 pl-4 text-sm text-highlight-ink">
                     {info.tips.map((t, i) => (
                       <li key={i}>{t}</li>
                     ))}
                   </ul>
                 </div>
               )}
-              {info.equipmentNote && <p className="mt-3 text-xs text-slate-500">{info.equipmentNote}</p>}
+              {info.equipmentNote && <p className="mt-3 text-xs text-muted">{info.equipmentNote}</p>}
             </section>
           )}
 
           {entry && <ExerciseImages seedId={entry.seedId} name={exercise.name} />}
 
           <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Vidéo</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Vidéo</h3>
             <a
               href={demoSearchUrl(exercise.name)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 text-sm font-semibold text-white active:bg-brand-700"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-on-accent active:bg-accent-hover"
             >
               <PlayCircleIcon className="h-5 w-5" />
               Voir une démonstration
             </a>
-            <p className="mt-1.5 text-center text-[11px] text-slate-400">
+            <p className="mt-1.5 text-center text-[11px] text-muted">
               Ouvre une recherche vidéo « comment faire {exercise.name} » dans un nouvel onglet.
             </p>
           </section>
@@ -224,7 +224,7 @@ function Badge({ children, tone = 'neutral' }: { children: React.ReactNode; tone
   return (
     <span
       className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-        tone === 'accent' ? 'bg-brand-50 text-accent' : 'bg-slate-100 text-slate-600'
+        tone === 'accent' ? 'bg-accent-soft text-accent-ink' : 'bg-surface-3 text-ink-2'
       }`}
     >
       {children}
@@ -235,12 +235,12 @@ function Badge({ children, tone = 'neutral' }: { children: React.ReactNode; tone
 function MuscleList({ label, muscles, strong = false }: { label: string; muscles: MuscleId[]; strong?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="mr-0.5 text-xs font-medium text-slate-500">{label}</span>
+      <span className="mr-0.5 text-xs font-medium text-muted">{label}</span>
       {muscles.map((m) => (
         <span
           key={m}
           className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-            strong ? 'bg-brand-600 text-white' : 'bg-brand-50 text-accent'
+            strong ? 'bg-accent text-on-accent' : 'bg-accent-soft text-accent-ink'
           }`}
         >
           {MUSCLES[m].label}
@@ -256,7 +256,7 @@ function MuscleEditor({ exercise }: { exercise: Exercise }) {
   return (
     <div className="mt-4 space-y-3">
       <div>
-        <p className="mb-1.5 text-xs font-medium text-slate-500">Muscle principal</p>
+        <p className="mb-1.5 text-xs font-medium text-muted">Muscle principal</p>
         <PrincipalPicker
           value={exercise.muscleGroup}
           onChange={(g) =>
@@ -271,7 +271,7 @@ function MuscleEditor({ exercise }: { exercise: Exercise }) {
         />
       </div>
       <div>
-        <p className="mb-1.5 text-xs font-medium text-slate-500">Muscles secondaires (optionnel)</p>
+        <p className="mb-1.5 text-xs font-medium text-muted">Muscles secondaires (optionnel)</p>
         <SecondaryPicker
           principal={exercise.muscleGroup}
           value={secondary}
@@ -325,16 +325,16 @@ function PersonalFields({ exercise }: { exercise: Exercise }) {
 
   return (
     <section>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Mes notes et ma vidéo</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Mes notes et ma vidéo</h3>
       <textarea
         value={notes}
         onChange={(e) => changeNotes(e.target.value)}
         rows={3}
         placeholder="Réglages de la machine, sensations, astuces…"
-        className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:border-brand-400"
+        className="w-full resize-none rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-accent-line"
       />
       <label className="mt-3 block">
-        <span className="mb-1 block text-xs font-medium text-slate-500">Lien vidéo (optionnel)</span>
+        <span className="mb-1 block text-xs font-medium text-muted">Lien vidéo (optionnel)</span>
         <input
           value={video}
           onChange={(e) => changeVideo(e.target.value)}
@@ -343,18 +343,18 @@ function PersonalFields({ exercise }: { exercise: Exercise }) {
           autoCorrect="off"
           placeholder="https://youtube.com/…"
           aria-invalid={videoError || undefined}
-          className={`h-12 w-full rounded-xl border bg-slate-50 px-3 text-sm outline-none focus:border-brand-400 ${
-            videoError ? 'border-red-400' : 'border-slate-200'
+          className={`h-12 w-full rounded-xl border bg-surface-2 px-3 text-sm outline-none focus:border-accent-line ${
+            videoError ? 'border-danger' : 'border-line'
           }`}
         />
       </label>
-      {videoError && <p className="mt-1 text-xs font-medium text-red-600">Ce lien n’est pas valide.</p>}
+      {videoError && <p className="mt-1 text-xs font-medium text-danger-ink">Ce lien n’est pas valide.</p>}
       {savedVideo && !videoError && (
         <a
           href={savedVideo}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-slate-100 text-sm font-semibold text-slate-700 active:bg-slate-200"
+          className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-surface-3 text-sm font-semibold text-ink-2 active:bg-surface-4"
         >
           <PlayCircleIcon className="h-5 w-5" />
           Ouvrir ma vidéo

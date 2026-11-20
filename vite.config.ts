@@ -19,8 +19,8 @@ export default defineConfig({
         name: 'Muscu Tracker',
         short_name: 'Muscu',
         description: 'Suivi de musculation hors-ligne, rapide et sans compte.',
-        theme_color: '#8b1e1e',
-        background_color: '#f3e9d7',
+        theme_color: '#0b0b0f',
+        background_color: '#0b0b0f',
         display: 'standalone',
         orientation: 'portrait',
         start_url: base,
@@ -45,25 +45,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // webp: the bundled exercise demonstration images (~5 MB), so they work offline.
+        // woff2: bundled fonts; webp: exercise demonstration images (~5 MB). All precached for offline use.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp}'],
-        // Libre Baskerville and Manrope come from Google Fonts: cache it so titles stay serif offline.
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'google-fonts-css' },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-files',
-              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
     }),
   ],

@@ -13,11 +13,11 @@ export function PullToRefreshIndicator({ indicatorRef, refreshing }: PullToRefre
   return (
     <div
       ref={indicatorRef}
-      className="pointer-events-none fixed left-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-surface shadow-md"
+      className="pointer-events-none fixed left-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface shadow-md"
       style={{ top: 'calc(env(safe-area-inset-top) + 8px)', opacity: 0, transform: 'translate3d(-50%, -48px, 0)' }}
       aria-hidden="true"
     >
-      <RefreshIcon className={`h-5 w-5 text-accent ${refreshing ? 'animate-spin' : ''}`} />
+      <RefreshIcon className={`h-5 w-5 text-accent-ink ${refreshing ? 'animate-spin' : ''}`} />
     </div>
   )
 }

@@ -29,7 +29,7 @@ export function ExerciseFilters({ groups, equipment, onToggleGroup, onToggleEqui
           <button
             type="button"
             onClick={onClear}
-            className="flex min-h-9 shrink-0 items-center gap-1 rounded-full px-3 text-xs font-semibold text-slate-500 active:bg-slate-100"
+            className="flex min-h-9 shrink-0 items-center gap-1 rounded-full px-3 text-xs font-semibold text-muted active:bg-surface-3"
           >
             <XIcon className="h-3.5 w-3.5" />
             Effacer
@@ -47,7 +47,7 @@ function Chip({ label, on, onClick }: { label: string; on: boolean; onClick: () 
       onClick={onClick}
       aria-pressed={on}
       className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-semibold ${
-        on ? 'bg-brand-600 text-white' : 'border border-slate-200 bg-surface text-slate-600 active:bg-slate-100'
+        on ? 'bg-accent text-on-accent' : 'border border-line bg-surface text-ink-2 active:bg-surface-3'
       }`}
     >
       {label}

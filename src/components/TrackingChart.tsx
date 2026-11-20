@@ -96,39 +96,39 @@ export function TrackingChart({ columns }: TrackingChartProps) {
           y={PANELS.weight.top - 2}
           width={Math.max(colW, 4)}
           height={PANELS.calories.top + PANELS.calories.height - PANELS.weight.top + 4}
-          fill="var(--color-slate-100)"
+          fill="var(--surface-3)"
           rx="2"
         />
 
         {/* Weight */}
-        <text x={PAD_L} y={PANELS.weight.title} fontSize="9" fontWeight="700" fill="var(--color-slate-500)">
+        <text x={PAD_L} y={PANELS.weight.title} fontSize="9" fontWeight="700" fill="var(--text-muted)">
           Poids (kg)
         </text>
-        <text x={PAD_L - 4} y={PANELS.weight.top + 7} fontSize="8" textAnchor="end" fill="var(--color-slate-400)">
+        <text x={PAD_L - 4} y={PANELS.weight.top + 7} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatKg(wMax)}
         </text>
-        <text x={PAD_L - 4} y={PANELS.weight.top + PANELS.weight.height} fontSize="8" textAnchor="end" fill="var(--color-slate-400)">
+        <text x={PAD_L - 4} y={PANELS.weight.top + PANELS.weight.height} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatKg(wMin)}
         </text>
-        <line x1={PAD_L} x2={W - PAD_R} y1={PANELS.weight.top + PANELS.weight.height} y2={PANELS.weight.top + PANELS.weight.height} stroke="var(--color-slate-200)" />
+        <line x1={PAD_L} x2={W - PAD_R} y1={PANELS.weight.top + PANELS.weight.height} y2={PANELS.weight.top + PANELS.weight.height} stroke="var(--border)" />
         {columns.map(
           (c, i) =>
             c.weight != null && (
-              <circle key={i} cx={x(i)} cy={wy(c.weight)} r={i === selected ? 3 : 1.8} fill="var(--color-slate-400)" />
+              <circle key={i} cx={x(i)} cy={wy(c.weight)} r={i === selected ? 3 : 1.8} fill="var(--text-muted)" />
             ),
         )}
         {smoothPath && (
-          <path d={smoothPath} fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={smoothPath} fill="none" stroke="var(--accent-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         )}
 
         {/* Steps */}
-        <text x={PAD_L} y={PANELS.steps.title} fontSize="9" fontWeight="700" fill="var(--color-slate-500)">
+        <text x={PAD_L} y={PANELS.steps.title} fontSize="9" fontWeight="700" fill="var(--text-muted)">
           Pas
         </text>
-        <text x={PAD_L - 4} y={PANELS.steps.top + 7} fontSize="8" textAnchor="end" fill="var(--color-slate-400)">
+        <text x={PAD_L - 4} y={PANELS.steps.top + 7} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatTick(sMax)}
         </text>
-        <line x1={PAD_L} x2={W - PAD_R} y1={PANELS.steps.top + PANELS.steps.height} y2={PANELS.steps.top + PANELS.steps.height} stroke="var(--color-slate-200)" />
+        <line x1={PAD_L} x2={W - PAD_R} y1={PANELS.steps.top + PANELS.steps.height} y2={PANELS.steps.top + PANELS.steps.height} stroke="var(--border)" />
         {columns.map(
           (c, i) =>
             c.steps != null && (
@@ -138,20 +138,20 @@ export function TrackingChart({ columns }: TrackingChartProps) {
                 y={barY('steps', c.steps, sMax)}
                 width={barW}
                 height={PANELS.steps.top + PANELS.steps.height - barY('steps', c.steps, sMax)}
-                fill="var(--color-brand-400)"
+                fill="var(--chart-1)"
                 opacity={i === selected ? 1 : 0.7}
               />
             ),
         )}
 
         {/* Calories */}
-        <text x={PAD_L} y={PANELS.calories.title} fontSize="9" fontWeight="700" fill="var(--color-slate-500)">
+        <text x={PAD_L} y={PANELS.calories.title} fontSize="9" fontWeight="700" fill="var(--text-muted)">
           Calories (kcal)
         </text>
-        <text x={PAD_L - 4} y={PANELS.calories.top + 7} fontSize="8" textAnchor="end" fill="var(--color-slate-400)">
+        <text x={PAD_L - 4} y={PANELS.calories.top + 7} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatTick(cMax)}
         </text>
-        <line x1={PAD_L} x2={W - PAD_R} y1={PANELS.calories.top + PANELS.calories.height} y2={PANELS.calories.top + PANELS.calories.height} stroke="var(--color-slate-200)" />
+        <line x1={PAD_L} x2={W - PAD_R} y1={PANELS.calories.top + PANELS.calories.height} y2={PANELS.calories.top + PANELS.calories.height} stroke="var(--border)" />
         {columns.map(
           (c, i) =>
             c.calories != null && (
@@ -161,28 +161,28 @@ export function TrackingChart({ columns }: TrackingChartProps) {
                 y={barY('calories', c.calories, cMax)}
                 width={barW}
                 height={PANELS.calories.top + PANELS.calories.height - barY('calories', c.calories, cMax)}
-                fill="var(--color-amber-500)"
+                fill="var(--chart-2)"
                 opacity={i === selected ? 1 : 0.7}
               />
             ),
         )}
 
         {/* Shared time axis */}
-        <text x={PAD_L} y={AXIS_Y} fontSize="9" fill="var(--color-slate-400)">
+        <text x={PAD_L} y={AXIS_Y} fontSize="9" fill="var(--text-muted)">
           {labelAt(0)}
         </text>
         {columns.length > 6 && (
-          <text x={x(Math.floor(columns.length / 2))} y={AXIS_Y} fontSize="9" textAnchor="middle" fill="var(--color-slate-400)">
+          <text x={x(Math.floor(columns.length / 2))} y={AXIS_Y} fontSize="9" textAnchor="middle" fill="var(--text-muted)">
             {labelAt(Math.floor(columns.length / 2))}
           </text>
         )}
-        <text x={W - PAD_R} y={AXIS_Y} fontSize="9" textAnchor="end" fill="var(--color-slate-400)">
+        <text x={W - PAD_R} y={AXIS_Y} fontSize="9" textAnchor="end" fill="var(--text-muted)">
           {formatDateFr(columns[columns.length - 1].end, { withYear: false })}
         </text>
       </svg>
 
-      <div className="mt-2 rounded-xl bg-slate-50 px-3.5 py-3">
-        <p className="mb-1.5 text-xs font-semibold text-slate-500">
+      <div className="mt-2 rounded-xl bg-surface-2 px-3.5 py-3">
+        <p className="mb-1.5 text-xs font-semibold text-muted">
           {cur.span === 1
             ? formatDateFr(cur.start)
             : `Semaine du ${formatDateFr(cur.start, { withYear: false })} au ${formatDateFr(cur.end, { withYear: false })} (moyennes)`}
@@ -200,9 +200,9 @@ export function TrackingChart({ columns }: TrackingChartProps) {
 function DetailValue({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div>
-      <p className="text-[11px] font-medium text-slate-400">{label}</p>
-      <p className="text-base font-bold tabular-nums text-slate-900">{value}</p>
-      {sub && <p className="text-[10px] text-slate-400">{sub}</p>}
+      <p className="text-[11px] font-medium text-muted">{label}</p>
+      <p className="text-base font-bold tabular-nums text-ink">{value}</p>
+      {sub && <p className="text-[10px] text-muted">{sub}</p>}
     </div>
   )
 }

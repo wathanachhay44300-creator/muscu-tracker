@@ -35,7 +35,7 @@ export function BackToTopButton() {
       type="button"
       onClick={goTop}
       aria-label="Remonter en haut"
-      className="animate-pop-in fixed bottom-24 left-4 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-surface text-accent shadow-lg active:bg-slate-100"
+      className="animate-pop-in fixed bottom-24 left-4 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-line bg-surface text-accent-ink shadow-lg active:bg-surface-3"
     >
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 15l6-6 6 6" />

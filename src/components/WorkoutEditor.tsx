@@ -86,16 +86,16 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
       {firstSetAt != null && !workout.finishedAt && <SessionTimer startedAt={firstSetAt} />}
 
       {exercises.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-center">
-          <p className="text-slate-500">Aucun exercice pour l'instant.</p>
-          <p className="mt-1 text-sm text-slate-400">
+        <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+          <p className="text-muted">Aucun exercice pour l'instant.</p>
+          <p className="mt-1 text-sm text-muted">
             Ajoutez un exercice pour commencer à noter vos séries.
           </p>
         </div>
       )}
 
       {exercises.length > 0 && (
-        <p className="text-center text-xs font-medium text-slate-400">
+        <p className="text-center text-xs font-medium text-muted">
           {exercises.length} exercice{exercises.length > 1 ? 's' : ''} · {setCount} série
           {setCount > 1 ? 's' : ''}
           {sessionVolume > 0 && <> · {formatVolume(sessionVolume)} kg au total</>}
@@ -126,21 +126,21 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
       <button
         type="button"
         onClick={() => setPickerOpen(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-4 font-semibold text-white shadow-sm active:bg-brand-700"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-4 font-semibold text-on-accent shadow-sm active:bg-accent-hover"
       >
         <PlusIcon className="h-5 w-5" />
         Ajouter un exercice
       </button>
 
       {exercises.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-700">Ressenti de la séance (RPE)</p>
+            <p className="text-sm font-semibold text-ink-2">Ressenti de la séance (RPE)</p>
             {workout.rpe != null && (
               <button
                 type="button"
                 onClick={() => updateWorkoutRpe(workoutId, null)}
-                className="text-xs font-medium text-slate-400 active:text-slate-600"
+                className="text-xs font-medium text-muted active:text-ink-2"
               >
                 Effacer
               </button>
@@ -154,8 +154,8 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
                 onClick={() => updateWorkoutRpe(workoutId, n)}
                 className={`h-9 w-9 rounded-full text-sm font-semibold ${
                   workout.rpe === n
-                    ? 'bg-brand-600 text-white'
-                    : 'bg-slate-100 text-slate-600 active:bg-slate-200'
+                    ? 'bg-accent text-on-accent'
+                    : 'bg-surface-3 text-ink-2 active:bg-surface-4'
                 }`}
               >
                 {n}
@@ -165,14 +165,14 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
-        <p className="mb-2 text-sm font-semibold text-slate-700">Notes de séance</p>
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+        <p className="mb-2 text-sm font-semibold text-ink-2">Notes de séance</p>
         <textarea
           value={notes}
           onChange={(e) => handleNotesChange(e.target.value)}
           placeholder="Fatigue, sommeil, douleurs, contexte…"
           rows={3}
-          className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-brand-400"
+          className="w-full resize-none rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-sm outline-none focus:border-accent-line"
         />
       </div>
 
@@ -188,7 +188,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         <button
           type="button"
           onClick={handleFinish}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 font-semibold text-white shadow-sm active:bg-emerald-700"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-good py-4 font-semibold text-on-good shadow-sm active:bg-good"
         >
           <CheckIcon className="h-5 w-5" />
           {workout.finishedAt ? 'Voir le bilan' : 'Terminer la séance'}

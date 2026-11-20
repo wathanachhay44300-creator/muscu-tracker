@@ -44,7 +44,7 @@ export function TemplateDetailScreen() {
   if (!detail) {
     return (
       <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-        <p className="text-slate-400">Programme introuvable.</p>
+        <p className="text-muted">Programme introuvable.</p>
       </div>
     )
   }
@@ -73,7 +73,7 @@ export function TemplateDetailScreen() {
         <button
           type="button"
           onClick={() => navigate('/programmes')}
-          className="-ml-2 rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour aux programmes"
         >
           <ChevronLeftIcon className="h-5 w-5" />
@@ -85,14 +85,14 @@ export function TemplateDetailScreen() {
             if (trimmed && trimmed !== template.name) renameTemplate(id!, trimmed)
             else e.target.value = template.name
           }}
-          className="flex-1 rounded-lg bg-transparent text-lg font-bold text-slate-900 outline-none focus:bg-slate-100"
+          className="flex-1 rounded-lg bg-transparent text-lg font-bold text-ink outline-none focus:bg-surface-3"
           aria-label="Nom du programme"
         />
       </div>
 
       {exercises.length === 0 ? (
-        <div className="mb-4 rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-center">
-          <p className="text-slate-500">Aucun exercice pour l'instant.</p>
+        <div className="mb-4 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+          <p className="text-muted">Aucun exercice pour l'instant.</p>
         </div>
       ) : (
         <div className="mb-4 space-y-2">
@@ -104,40 +104,40 @@ export function TemplateDetailScreen() {
               ref={row.containerProps.ref}
               style={row.containerProps.style}
               className={`flex items-center justify-between gap-2 rounded-xl border bg-surface px-4 py-3 ${
-                row.isDragging ? 'border-brand-300 shadow-lg' : 'border-slate-200'
+                row.isDragging ? 'border-accent-line shadow-lg' : 'border-line'
               }`}
             >
               <div className="flex min-w-0 items-center gap-1.5">
                 <button
                   type="button"
                   aria-label="Glisser pour réordonner"
-                  className="-ml-1 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-slate-300 active:cursor-grabbing active:text-slate-500"
+                  className="-ml-1 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-faint active:cursor-grabbing active:text-muted"
                   {...row.handleProps}
                 >
                   <GripIcon className="h-5 w-5" />
                 </button>
                 <div className="min-w-0">
-                  <p className="font-exercise truncate text-slate-900">{te.exercise.name}</p>
-                  <p className="text-xs text-slate-400">{te.exercise.muscleGroup}</p>
+                  <p className="font-exercise truncate text-ink">{te.exercise.name}</p>
+                  <p className="text-xs text-muted">{te.exercise.muscleGroup}</p>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <div className="flex items-center overflow-hidden rounded-lg bg-slate-100">
+                <div className="flex items-center overflow-hidden rounded-lg bg-surface-3">
                   <button
                     type="button"
                     onClick={() => updateTargetSets(te.id!, te.targetSets - 1)}
-                    className="px-2.5 py-1.5 text-slate-500 active:text-accent"
+                    className="px-2.5 py-1.5 text-muted active:text-accent-ink"
                     aria-label="Moins de séries"
                   >
                     −
                   </button>
-                  <span className="w-16 text-center text-xs font-medium text-slate-600">
+                  <span className="w-16 text-center text-xs font-medium text-ink-2">
                     {te.targetSets} série{te.targetSets > 1 ? 's' : ''}
                   </span>
                   <button
                     type="button"
                     onClick={() => updateTargetSets(te.id!, te.targetSets + 1)}
-                    className="px-2.5 py-1.5 text-slate-500 active:text-accent"
+                    className="px-2.5 py-1.5 text-muted active:text-accent-ink"
                     aria-label="Plus de séries"
                   >
                     +
@@ -146,7 +146,7 @@ export function TemplateDetailScreen() {
                 <button
                   type="button"
                   onClick={() => removeExerciseFromTemplate(te.id!)}
-                  className="p-1.5 text-slate-300 active:text-red-500"
+                  className="p-1.5 text-faint active:text-danger-ink"
                   aria-label={`Retirer ${te.exercise.name}`}
                 >
                   <TrashIcon className="h-4 w-4" />
@@ -161,7 +161,7 @@ export function TemplateDetailScreen() {
       <button
         type="button"
         onClick={() => setPickerOpen(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 py-3.5 font-semibold text-accent active:bg-slate-200"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-surface-3 py-3.5 font-semibold text-accent-ink active:bg-surface-4"
       >
         <PlusIcon className="h-5 w-5" />
         Ajouter un exercice
@@ -182,7 +182,7 @@ export function TemplateDetailScreen() {
             type="button"
             onClick={handleStartToday}
             disabled={starting}
-            className="w-full rounded-2xl bg-brand-600 py-4 font-semibold text-white shadow-sm active:bg-brand-700 disabled:opacity-50"
+            className="w-full rounded-2xl bg-accent py-4 font-semibold text-on-accent shadow-sm active:bg-accent-hover disabled:opacity-50"
           >
             Démarrer maintenant
           </button>
@@ -192,7 +192,7 @@ export function TemplateDetailScreen() {
       <button
         type="button"
         onClick={() => setDeleting(true)}
-        className="mt-6 flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-red-500 active:text-red-700"
+        className="mt-6 flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-danger-ink active:text-danger-ink"
       >
         <TrashIcon className="h-4 w-4" />
         Supprimer ce programme

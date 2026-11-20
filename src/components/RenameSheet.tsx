@@ -26,14 +26,14 @@ export function RenameSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-scrim/40 animate-fade-in-backdrop sm:items-center sm:p-4"
       onClick={onCancel}
     >
       <div
         className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-3 text-base font-semibold text-slate-900">{title}</h2>
+        <h2 className="mb-3 text-base font-semibold text-ink">{title}</h2>
         <input
           autoFocus
           value={name}
@@ -41,13 +41,13 @@ export function RenameSheet({
           onChange={(e) => setName(e.target.value)}
           onFocus={(e) => e.target.select()}
           onKeyDown={(e) => e.key === 'Enter' && canSubmit && onRename(name.trim())}
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base outline-none focus:border-brand-400"
+          className="w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-base outline-none focus:border-accent-line"
         />
         <div className="mt-5 flex gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-xl bg-slate-100 py-3 font-medium text-slate-600 active:bg-slate-200"
+            className="flex-1 rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
           >
             Annuler
           </button>
@@ -55,7 +55,7 @@ export function RenameSheet({
             type="button"
             onClick={() => canSubmit && onRename(name.trim())}
             disabled={!canSubmit}
-            className="flex-1 rounded-xl bg-brand-600 py-3 font-medium text-white disabled:opacity-40 active:bg-brand-700"
+            className="flex-1 rounded-xl bg-accent py-3 font-medium text-on-accent disabled:opacity-40 active:bg-accent-hover"
           >
             {confirmLabel}
           </button>

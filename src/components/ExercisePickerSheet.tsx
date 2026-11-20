@@ -26,10 +26,10 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
 
   return (
     <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
-      <div className="border-b border-slate-200 px-4 pt-safe pt-4 pb-2.5">
+      <div className="border-b border-line px-4 pt-safe pt-4 pb-2.5">
         <div className="flex items-center gap-2">
-          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
-            <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />
+          <div className="flex flex-1 items-center gap-2 rounded-xl bg-surface-3 px-3 py-2.5">
+            <SearchIcon className="h-4 w-4 shrink-0 text-muted" />
             <input
               autoFocus
               value={query}
@@ -38,10 +38,10 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
               enterKeyHint="search"
               autoCapitalize="off"
               autoCorrect="off"
-              className="w-full bg-transparent text-base outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-base outline-none placeholder:text-muted"
             />
             {query && (
-              <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-slate-400 active:bg-slate-200">
+              <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-muted active:bg-surface-4">
                 <XIcon className="h-4 w-4" />
               </button>
             )}
@@ -49,7 +49,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-full p-2 text-slate-500 active:bg-slate-100"
+            className="shrink-0 rounded-full p-2 text-muted active:bg-surface-3"
             aria-label="Fermer"
           >
             <XIcon className="h-6 w-6" />
@@ -83,7 +83,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
             <button
               type="button"
               onClick={() => setCreating(true)}
-              className="mt-4 flex min-h-12 w-full items-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-3 text-accent"
+              className="mt-4 flex min-h-12 w-full items-center gap-2 rounded-xl border border-dashed border-accent-line bg-accent-soft px-4 py-3 text-accent-ink"
             >
               <PlusIcon className="h-5 w-5" />
               <span className="font-medium">
@@ -100,7 +100,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
                   secondaryOnly={browser.secondaryOnly}
                 />
               ) : (
-                <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice trouvé pour « {query.trim()} ».</p>
+                <p className="mt-8 text-center text-sm text-muted">Aucun exercice trouvé pour « {query.trim()} ».</p>
               )
             ) : (
               <>
@@ -118,7 +118,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
                   />
                 )}
                 {browser.mode === 'grouped' && browser.results.length === 0 && (
-                  <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice pour ces filtres.</p>
+                  <p className="mt-8 text-center text-sm text-muted">Aucun exercice pour ces filtres.</p>
                 )}
               </>
             )}
@@ -143,18 +143,18 @@ function PickerSection({
 }) {
   return (
     <div className="mt-5">
-      <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h3>
-      <div className="overflow-hidden rounded-xl border border-slate-200">
+      <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted">{title}</h3>
+      <div className="overflow-hidden rounded-xl border border-line">
         {list.map((ex, i) => (
-          <div key={ex.id} className={`flex items-center ${i > 0 ? 'border-t border-slate-100' : ''}`}>
+          <div key={ex.id} className={`flex items-center ${i > 0 ? 'border-t border-line' : ''}`}>
             <button
               type="button"
               onClick={() => onSelect(ex)}
-              className="font-exercise flex-1 px-4 py-3 text-left text-base text-slate-900 active:bg-slate-50"
+              className="font-exercise flex-1 px-4 py-3 text-left text-base text-ink active:bg-surface-2"
             >
               {ex.name}
               {secondaryOnly?.has(ex.id!) && (
-                <span className="block font-sans text-[11px] font-medium text-slate-400">
+                <span className="block font-sans text-[11px] font-medium text-muted">
                   secondaire · {ex.muscleGroup}
                 </span>
               )}
@@ -167,9 +167,9 @@ function PickerSection({
               className="shrink-0 p-2 pr-3 active:opacity-70"
             >
               {ex.favoritedAt ? (
-                <StarIcon className="h-4 w-4 text-amber-500" />
+                <StarIcon className="h-4 w-4 text-highlight" />
               ) : (
-                <StarOutlineIcon className="h-4 w-4 text-slate-300" />
+                <StarOutlineIcon className="h-4 w-4 text-faint" />
               )}
             </button>
           </div>
@@ -232,17 +232,17 @@ function ExerciseForm({
   return (
     <div className="mt-4 space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-600">Nom de l'exercice</label>
+        <label className="mb-1 block text-sm font-medium text-ink-2">Nom de l'exercice</label>
         <input
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ex : Développé Smith machine"
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base outline-none focus:border-brand-400"
+          className="w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-base outline-none focus:border-accent-line"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-600">Muscle principal</label>
+        <label className="mb-1 block text-sm font-medium text-ink-2">Muscle principal</label>
         <PrincipalPicker
           value={group}
           onChange={(g) => {
@@ -253,13 +253,13 @@ function ExerciseForm({
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-600">
-          Muscles secondaires <span className="font-normal text-slate-400">(optionnel)</span>
+        <label className="mb-1 block text-sm font-medium text-ink-2">
+          Muscles secondaires <span className="font-normal text-muted">(optionnel)</span>
         </label>
         <SecondaryPicker principal={group} value={secondary} onChange={setSecondary} />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-600">Type de chargement</label>
+        <label className="mb-1 block text-sm font-medium text-ink-2">Type de chargement</label>
         <div className="flex flex-wrap gap-2">
           {LOAD_TYPES.map((lt) => (
             <button
@@ -271,8 +271,8 @@ function ExerciseForm({
               }}
               className={`rounded-full px-3.5 py-2 text-sm font-medium ${
                 loadType === lt
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-slate-100 text-slate-600 active:bg-slate-200'
+                  ? 'bg-accent text-on-accent'
+                  : 'bg-surface-3 text-ink-2 active:bg-surface-4'
               }`}
             >
               {lt}
@@ -284,7 +284,7 @@ function ExerciseForm({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 rounded-xl bg-slate-100 py-3 font-medium text-slate-600 active:bg-slate-200"
+          className="flex-1 rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
         >
           Annuler
         </button>
@@ -292,7 +292,7 @@ function ExerciseForm({
           type="button"
           onClick={handleSubmit}
           disabled={!name.trim() || saving}
-          className="flex-1 rounded-xl bg-brand-600 py-3 font-medium text-white disabled:opacity-40 active:bg-brand-700"
+          className="flex-1 rounded-xl bg-accent py-3 font-medium text-on-accent disabled:opacity-40 active:bg-accent-hover"
         >
           {submitLabel}
         </button>

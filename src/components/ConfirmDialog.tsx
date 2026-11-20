@@ -20,28 +20,28 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-scrim/40 animate-fade-in-backdrop sm:items-center sm:p-4"
       onClick={onCancel}
     >
       <div
         className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
-        <p className="mt-1.5 text-sm text-slate-500">{message}</p>
+        <h2 className="text-base font-semibold text-ink">{title}</h2>
+        <p className="mt-1.5 text-sm text-muted">{message}</p>
         <div className="mt-5 flex gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-xl bg-slate-100 py-3 font-medium text-slate-600 active:bg-slate-200"
+            className="flex-1 rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`flex-1 rounded-xl py-3 font-medium text-white ${
-              danger ? 'bg-red-600 active:bg-red-700' : 'bg-brand-600 active:bg-brand-700'
+            className={`flex-1 rounded-xl py-3 font-medium ${
+              danger ? 'bg-danger text-on-danger' : 'bg-accent text-on-accent active:bg-accent-hover'
             }`}
           >
             {confirmLabel}

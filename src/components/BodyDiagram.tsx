@@ -61,21 +61,21 @@ const MIRROR = 'matrix(-1 0 0 1 100 0)'
 type Level = 'primary' | 'secondary' | 'none'
 
 function fillFor(level: Level): { fill: string; opacity?: number } {
-  if (level === 'primary') return { fill: 'var(--color-brand-500)' }
-  if (level === 'secondary') return { fill: 'var(--color-brand-300)', opacity: 0.6 }
-  return { fill: 'var(--color-slate-300)', opacity: 0.3 }
+  if (level === 'primary') return { fill: 'var(--accent)' }
+  if (level === 'secondary') return { fill: 'var(--accent-line)', opacity: 0.6 }
+  return { fill: 'var(--text-faint)', opacity: 0.3 }
 }
 
 function Body({ regions, label, levels }: { regions: Region[]; label: string; levels: Map<MuscleId, Level> }) {
   return (
     <svg viewBox="0 0 100 216" className="h-52 w-auto" role="img" aria-label={label}>
       {/* head and neck are drawn once (not mirrored) */}
-      <ellipse cx="50" cy="14" rx="8.5" ry="10.5" fill="var(--color-slate-200)" />
-      <rect x="45" y="22" width="10" height="9" rx="2" fill="var(--color-slate-200)" />
+      <ellipse cx="50" cy="14" rx="8.5" ry="10.5" fill="var(--border)" />
+      <rect x="45" y="22" width="10" height="9" rx="2" fill="var(--border)" />
       {[false, true].map((mirrored) => (
         <g key={String(mirrored)} transform={mirrored ? MIRROR : undefined}>
           {SILHOUETTE.map((d, i) => (
-            <path key={i} d={d} fill="var(--color-slate-200)" />
+            <path key={i} d={d} fill="var(--border)" />
           ))}
         </g>
       ))}
@@ -116,20 +116,20 @@ export function BodyDiagram({ primary, secondary }: BodyDiagramProps) {
       <div className="flex items-end justify-center gap-6">
         <figure className="text-center">
           <Body regions={FRONT} label="Schéma du corps, vue de face" levels={levels} />
-          <figcaption className="mt-1 text-[11px] font-medium text-slate-400">Face</figcaption>
+          <figcaption className="mt-1 text-[11px] font-medium text-muted">Face</figcaption>
         </figure>
         <figure className="text-center">
           <Body regions={BACK} label="Schéma du corps, vue de dos" levels={levels} />
-          <figcaption className="mt-1 text-[11px] font-medium text-slate-400">Dos</figcaption>
+          <figcaption className="mt-1 text-[11px] font-medium text-muted">Dos</figcaption>
         </figure>
       </div>
-      <div className="mt-2 flex justify-center gap-4 text-[11px] text-slate-500">
+      <div className="mt-2 flex justify-center gap-4 text-[11px] text-muted">
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--color-brand-500)' }} />
+          <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--accent)' }} />
           Principal
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full opacity-60" style={{ background: 'var(--color-brand-300)' }} />
+          <span className="h-2.5 w-2.5 rounded-full opacity-60" style={{ background: 'var(--accent-line)' }} />
           Secondaire
         </span>
       </div>

@@ -25,7 +25,7 @@ export function HistoriqueDetailScreen() {
   if (!detail) {
     return (
       <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-        <p className="text-slate-400">Séance introuvable.</p>
+        <p className="text-muted">Séance introuvable.</p>
       </div>
     )
   }
@@ -43,16 +43,16 @@ export function HistoriqueDetailScreen() {
           type="button"
           // Back to wherever the session was opened from (history list or calendar).
           onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/historique'))}
-          className="rounded-full p-2 -ml-2 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2 -ml-2 text-muted active:bg-surface-3"
           aria-label="Retour à l'historique"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-lg font-bold text-slate-900">
+          <h1 className="text-lg font-bold text-ink">
             {detail.workout.title ?? template?.name ?? 'Séance libre'}
           </h1>
-          <p className="text-sm font-medium text-slate-600">{formatDateLong(detail.workout.date)}</p>
+          <p className="text-sm font-medium text-ink-2">{formatDateLong(detail.workout.date)}</p>
         </div>
       </div>
 
@@ -60,22 +60,22 @@ export function HistoriqueDetailScreen() {
 
       <div className="mt-6">
         {confirming ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-            <p className="mb-3 text-sm font-medium text-red-700">
+          <div className="rounded-2xl border border-danger-line bg-danger-soft p-4">
+            <p className="mb-3 text-sm font-medium text-danger-ink">
               Supprimer cette séance et toutes ses séries ?
             </p>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className="flex-1 rounded-xl bg-surface py-2.5 font-medium text-slate-600 active:bg-slate-100"
+                className="flex-1 rounded-xl bg-surface py-2.5 font-medium text-ink-2 active:bg-surface-3"
               >
                 Annuler
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="flex-1 rounded-xl bg-red-600 py-2.5 font-medium text-white active:bg-red-700"
+                className="flex-1 rounded-xl bg-danger py-2.5 font-medium text-on-danger active:bg-danger"
               >
                 Supprimer
               </button>
@@ -85,7 +85,7 @@ export function HistoriqueDetailScreen() {
           <button
             type="button"
             onClick={() => setConfirming(true)}
-            className="flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-red-500 active:text-red-700"
+            className="flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-danger-ink active:text-danger-ink"
           >
             <TrashIcon className="h-4 w-4" />
             Supprimer la séance

@@ -58,19 +58,19 @@ export function ExercicesScreen() {
     >
       <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-slate-900">Exercices</h1>
+        <h1 className="text-lg font-bold text-ink">Exercices</h1>
         <button
           type="button"
           onClick={() => setCreating(true)}
-          className="flex items-center gap-1 rounded-full bg-brand-600 py-2 pl-2.5 pr-3 text-sm font-semibold text-white active:bg-brand-700"
+          className="flex items-center gap-1 rounded-full bg-accent py-2 pl-2.5 pr-3 text-sm font-semibold text-on-accent active:bg-accent-hover"
         >
           <PlusIcon className="h-4 w-4" />
           Ajouter
         </button>
       </div>
 
-      <div className="mb-2 flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5">
-        <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />
+      <div className="mb-2 flex items-center gap-2 rounded-xl bg-surface-3 px-3 py-2.5">
+        <SearchIcon className="h-4 w-4 shrink-0 text-muted" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -78,10 +78,10 @@ export function ExercicesScreen() {
           enterKeyHint="search"
           autoCapitalize="off"
           autoCorrect="off"
-          className="w-full bg-transparent text-base outline-none placeholder:text-slate-400"
+          className="w-full bg-transparent text-base outline-none placeholder:text-muted"
         />
         {query && (
-          <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-slate-400 active:bg-slate-200">
+          <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-muted active:bg-surface-4">
             <XIcon className="h-4 w-4" />
           </button>
         )}
@@ -100,7 +100,7 @@ export function ExercicesScreen() {
       {browser.mode === 'search' ? (
         browser.results.length > 0 ? (
           <>
-            <p className="mb-1.5 px-1 text-xs font-medium text-slate-400">
+            <p className="mb-1.5 px-1 text-xs font-medium text-muted">
               {browser.results.length} résultat{browser.results.length > 1 ? 's' : ''}
             </p>
             <ExerciseSection
@@ -135,19 +135,19 @@ export function ExercicesScreen() {
             />
           )}
           {browser.mode === 'grouped' && browser.results.length === 0 && (
-            <p className="mt-8 text-center text-sm text-slate-400">Aucun exercice pour ces filtres.</p>
+            <p className="mt-8 text-center text-sm text-muted">Aucun exercice pour ces filtres.</p>
           )}
         </>
       )}
 
       {creating && (
         <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
-            <h2 className="text-lg font-bold text-slate-900">Nouvel exercice</h2>
+          <div className="flex items-center justify-between border-t border-line px-4 pt-safe pt-4 pb-3">
+            <h2 className="text-lg font-bold text-ink">Nouvel exercice</h2>
             <button
               type="button"
               onClick={() => setCreating(false)}
-              className="rounded-full p-2 text-slate-500 active:bg-slate-100"
+              className="rounded-full p-2 text-muted active:bg-surface-3"
               aria-label="Fermer"
             >
               <XIcon className="h-6 w-6" />
@@ -165,12 +165,12 @@ export function ExercicesScreen() {
 
       {editing && (
         <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-safe pt-4 pb-3">
-            <h2 className="text-lg font-bold text-slate-900">Modifier l'exercice</h2>
+          <div className="flex items-center justify-between border-t border-line px-4 pt-safe pt-4 pb-3">
+            <h2 className="text-lg font-bold text-ink">Modifier l'exercice</h2>
             <button
               type="button"
               onClick={() => setEditing(null)}
-              className="rounded-full p-2 text-slate-500 active:bg-slate-100"
+              className="rounded-full p-2 text-muted active:bg-surface-3"
               aria-label="Fermer"
             >
               <XIcon className="h-6 w-6" />
@@ -220,8 +220,8 @@ function ExerciseSection({
 }) {
   return (
     <div className="mb-5">
-      {title && <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h3>}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-surface">
+      {title && <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted">{title}</h3>}
+      <div className="overflow-hidden rounded-xl border border-line bg-surface">
         {exercises.map((ex, i) => (
           <ExerciseRow key={ex.id} exercise={ex} bordered={i > 0} secondaryNote={secondaryOnly?.has(ex.id!)} onEdit={() => onEdit(ex)} onDelete={() => onDelete(ex)} />
         ))}
@@ -254,7 +254,7 @@ function ExerciseRow({
 
   if (rename.editing) {
     return (
-      <div className={`flex items-center gap-1 pl-4 pr-2 ${bordered ? 'border-t border-slate-100' : ''}`}>
+      <div className={`flex items-center gap-1 pl-4 pr-2 ${bordered ? 'border-t border-line' : ''}`}>
         <input
           autoFocus
           data-no-long-press
@@ -264,14 +264,14 @@ function ExerciseRow({
           onFocus={(e) => e.target.select()}
           onKeyDown={rename.onKeyDown}
           onBlur={rename.onBlur}
-          className="font-exercise min-w-0 flex-1 bg-transparent py-3 text-[0.95rem] text-slate-900 outline-none"
+          className="font-exercise min-w-0 flex-1 bg-transparent py-3 text-[0.95rem] text-ink outline-none"
         />
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={rename.commit}
           aria-label="Valider le renommage"
-          className="shrink-0 rounded-full p-2 text-accent active:bg-slate-100"
+          className="shrink-0 rounded-full p-2 text-accent-ink active:bg-surface-3"
         >
           <CheckIcon className="h-4 w-4" />
         </button>
@@ -280,7 +280,7 @@ function ExerciseRow({
           onMouseDown={(e) => e.preventDefault()}
           onClick={rename.cancel}
           aria-label="Annuler le renommage"
-          className="shrink-0 rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="shrink-0 rounded-full p-2 text-muted active:bg-surface-3"
         >
           <XIcon className="h-4 w-4" />
         </button>
@@ -290,7 +290,7 @@ function ExerciseRow({
 
   return (
     <div
-      className={`flex items-center gap-1 pr-2 ${bordered ? 'border-t border-slate-100' : ''}`}
+      className={`flex items-center gap-1 pr-2 ${bordered ? 'border-t border-line' : ''}`}
       onContextMenu={longPress.onContextMenu}
       onPointerDown={longPress.onPointerDown}
       onPointerMove={longPress.onPointerMove}
@@ -307,19 +307,19 @@ function ExerciseRow({
         className="shrink-0 p-2 active:opacity-70"
       >
         {exercise.favoritedAt ? (
-          <StarIcon className="h-4 w-4 text-amber-500" />
+          <StarIcon className="h-4 w-4 text-highlight" />
         ) : (
-          <StarOutlineIcon className="h-4 w-4 text-slate-300" />
+          <StarOutlineIcon className="h-4 w-4 text-faint" />
         )}
       </button>
-      <Link to={`/exercices/${exercise.id}`} className="flex flex-1 items-center justify-between py-3 pl-1 active:bg-slate-50">
+      <Link to={`/exercices/${exercise.id}`} className="flex flex-1 items-center justify-between py-3 pl-1 active:bg-surface-2">
         <span className="min-w-0">
-          <span className="font-exercise block text-[0.95rem] text-slate-900">{exercise.name}</span>
+          <span className="font-exercise block text-[0.95rem] text-ink">{exercise.name}</span>
           {secondaryNote && (
-            <span className="block text-[11px] font-medium text-slate-400">secondaire · {exercise.muscleGroup}</span>
+            <span className="block text-[11px] font-medium text-muted">secondaire · {exercise.muscleGroup}</span>
           )}
         </span>
-        <ChevronRightIcon className="h-4 w-4 shrink-0 text-slate-300" />
+        <ChevronRightIcon className="h-4 w-4 shrink-0 text-faint" />
       </Link>
       <ExerciseInfoButton exercise={exercise} className="!p-1.5" />
       <button
@@ -327,7 +327,7 @@ function ExerciseRow({
         data-no-long-press
         data-no-swipe
         onClick={rename.start}
-        className="shrink-0 p-2 text-slate-300 active:text-accent"
+        className="shrink-0 p-2 text-faint active:text-accent-ink"
         aria-label={`Renommer ${exercise.name}`}
       >
         <PencilIcon className="h-4 w-4" />
@@ -338,7 +338,7 @@ function ExerciseRow({
           data-no-long-press
           data-no-swipe
           onClick={onDelete}
-          className="shrink-0 p-2 text-slate-300 active:text-red-500"
+          className="shrink-0 p-2 text-faint active:text-danger-ink"
           aria-label={`Supprimer ${exercise.name}`}
         >
           <TrashIcon className="h-4 w-4" />
@@ -365,12 +365,12 @@ function ExerciseRow({
 /** Shown when a search finds nothing: offers to create the exercise with the typed text. */
 export function NoResults({ query, onCreate }: { query: string; onCreate: () => void }) {
   return (
-    <div className="mt-6 rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center">
-      <p className="text-sm text-slate-500">Aucun exercice trouvé pour « {query.trim()} ».</p>
+    <div className="mt-6 rounded-2xl border border-dashed border-line-strong px-4 py-8 text-center">
+      <p className="text-sm text-muted">Aucun exercice trouvé pour « {query.trim()} ».</p>
       <button
         type="button"
         onClick={onCreate}
-        className="mt-3 inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white active:bg-brand-700"
+        className="mt-3 inline-flex min-h-12 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-on-accent active:bg-accent-hover"
       >
         <PlusIcon className="h-4 w-4" />
         Créer « {query.trim()} »

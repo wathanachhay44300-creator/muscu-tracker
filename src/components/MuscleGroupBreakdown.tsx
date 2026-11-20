@@ -14,19 +14,19 @@ export function MuscleGroupBreakdown({ items, title = 'Répartition par muscle' 
   if (breakdown.length === 0) return null
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
-      <p className="mb-2.5 text-sm font-semibold text-slate-700">{title}</p>
+    <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+      <p className="mb-2.5 text-sm font-semibold text-ink-2">{title}</p>
       <div className="space-y-2">
         {breakdown.map(({ group, count }) => (
           <div key={group} className="flex items-center justify-between text-sm">
-            <span className="text-slate-600">{group}</span>
-            <span className="font-semibold text-slate-900">
+            <span className="text-ink-2">{group}</span>
+            <span className="font-semibold text-ink">
               {count} série{count > 1 ? 's' : ''}
             </span>
           </div>
         ))}
       </div>
-      <p className="mt-2.5 text-[11px] text-slate-400">
+      <p className="mt-2.5 text-[11px] text-muted">
         Seul le muscle principal de chaque exercice est compté.
       </p>
     </div>

@@ -51,42 +51,42 @@ export function CalendrierScreen() {
         <button
           type="button"
           onClick={() => navigate('/historique')}
-          className="-ml-2 rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour à l'historique"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-bold text-slate-900">Calendrier</h1>
+        <h1 className="text-lg font-bold text-ink">Calendrier</h1>
       </div>
 
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"
           onClick={() => changeMonth(-1)}
-          className="rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Mois précédent"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <p className="text-sm font-semibold capitalize text-slate-800">{formatMonthFr(monthStart)}</p>
+        <p className="text-sm font-semibold capitalize text-ink">{formatMonthFr(monthStart)}</p>
         <button
           type="button"
           onClick={() => changeMonth(1)}
-          className="rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Mois suivant"
         >
           <ChevronRightIcon className="h-5 w-5" />
         </button>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-2xl border border-slate-200 bg-surface px-4 py-3 text-center shadow-sm">
-        <p className="text-sm font-medium text-slate-600">
+      <div className="mb-4 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-2xl border border-line bg-surface px-4 py-3 text-center shadow-sm">
+        <p className="text-sm font-medium text-ink-2">
           {monthCount} séance{monthCount > 1 ? 's' : ''} ce mois-ci
         </p>
         {streak >= 1 && (
           <>
-            <span className="hidden text-slate-300 sm:inline">·</span>
-            <p className="text-sm font-semibold text-amber-600">
+            <span className="hidden text-faint sm:inline">·</span>
+            <p className="text-sm font-semibold text-highlight-ink">
               🔥 {streak} semaine{streak > 1 ? 's' : ''} de suite
             </p>
           </>
@@ -95,7 +95,7 @@ export function CalendrierScreen() {
 
       <div ref={swipe.ref} {...swipe.handlers} className="touch-pan-y">
         <div key={monthStart} className={getSlideClass(enterDir, swipe.reducedMotion)}>
-          <div className="mb-1.5 grid grid-cols-7 text-center text-xs font-medium text-slate-400">
+          <div className="mb-1.5 grid grid-cols-7 text-center text-xs font-medium text-muted">
             {WEEKDAY_LABELS.map((d) => (
               <div key={d}>{d}</div>
             ))}
@@ -118,9 +118,9 @@ export function CalendrierScreen() {
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors ${
                       workoutId
-                        ? 'bg-brand-600 font-semibold text-white active:bg-brand-700'
-                        : 'font-medium text-slate-600'
-                    } ${today ? 'ring-2 ring-brand-400 ring-offset-2 ring-offset-surface' : ''}`}
+                        ? 'bg-accent font-semibold text-on-accent active:bg-accent-hover'
+                        : 'font-medium text-ink-2'
+                    } ${today ? 'ring-2 ring-accent-line ring-offset-2 ring-offset-surface' : ''}`}
                   >
                     {day}
                   </span>
@@ -132,7 +132,7 @@ export function CalendrierScreen() {
       </div>
 
       {monthCount === 0 && (
-        <p className="mt-6 text-center text-sm text-slate-400">Aucune séance enregistrée ce mois-ci.</p>
+        <p className="mt-6 text-center text-sm text-muted">Aucune séance enregistrée ce mois-ci.</p>
       )}
     </div>
   )

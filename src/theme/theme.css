@@ -1,0 +1,407 @@
+/*
+ * ============================================================================
+ *  THEME — the single place where the app's look is defined.
+ * ============================================================================
+ *
+ *  1. Each theme is one block of semantic tokens below ([data-theme="…"]).
+ *     To add a theme: copy a block, change the values, and register it in
+ *     src/theme/themes.ts. Components never need to change.
+ *     A theme block also works on any element (e.g. the previews in the
+ *     settings), not only on <html>.
+ *  2. The mapping at the bottom (@theme) exposes the tokens to Tailwind as
+ *     utility names (bg-surface, text-muted, border-line, rounded-2xl…), so
+ *     components only ever reference tokens, never raw colors.
+ *
+ *  Token roles
+ *  - Surfaces: --bg (page), --surface (cards), --surface-2 (fields, chips),
+ *    --surface-3 / --surface-4 (stronger chips, pressed states), --nav-bg.
+ *  - Lines: --border (light), --border-strong.
+ *  - Text: --text, --text-2 (secondary), --text-muted (discreet),
+ *    --text-faint (decorative only: chevrons, inactive icons).
+ *  - Accent: --accent (fills, active elements), --accent-hover,
+ *    --on-accent (text on the accent), --accent-ink (accent used as text on
+ *    surfaces), --accent-soft (soft background), --accent-line (borders,
+ *    focus rings).
+ *  - Highlight (records, notices): --highlight, --highlight-ink,
+ *    --highlight-soft, --highlight-line, --on-highlight.
+ *  - Feedback: --good* (success), --danger* (destructive), and the
+ *    comparison states --progress / --stable / --decline.
+ *  - Misc: --knob (switch knobs), --scrim / --on-scrim (overlays, text on
+ *    photos), --toast-*, --chart-1 / --chart-2, --star-glow.
+ *  - Type: --font-body / --font-title / --font-exercise / --font-numbers,
+ *    title & exercise-name casing, tracking and sizes.
+ *  - Shape: --radius-*, --shadow-*, --space-unit.
+ *  - Decoration: --decor-angkor (display value of the Khmer motif).
+ */
+
+/* ---------------------------------------------------------------- Iron Night
+ * Default theme (also used when no theme attribute is set). */
+:root,
+[data-theme='iron-night'] {
+  --scheme: dark;
+
+  --bg: #0b0b0f;
+  --surface: #15161b;
+  --surface-2: #1e2027;
+  --surface-3: #262830;
+  --surface-4: #2e3138;
+  --nav-bg: #101115;
+
+  --border: #24262e;
+  --border-strong: #2e3138;
+
+  --text: #f2f2f2;
+  --text-2: #d5d8de;
+  --text-muted: #9aa0ab;
+  --text-faint: #5c616c;
+
+  --accent: #c8ff00;
+  --accent-hover: #e4ff80;
+  --on-accent: #0b0b0f;
+  --accent-ink: #c8ff00;
+  --accent-soft: #1f2410;
+  --accent-line: #8fb800;
+
+  --highlight: #c8ff00;
+  --highlight-ink: #c8ff00;
+  --highlight-soft: #1f2410;
+  --highlight-line: #3a4614;
+  --on-highlight: #0b0b0f;
+
+  --good: #c8ff00;
+  --good-ink: #c8ff00;
+  --good-soft: #1f2410;
+  --on-good: #0b0b0f;
+
+  --danger: #ff6b57;
+  --danger-ink: #ff8a7a;
+  --danger-soft: #2a1512;
+  --danger-line: #5a2620;
+  --on-danger: #0b0b0f;
+
+  --progress: #c8ff00;
+  --stable: #9aa0ab;
+  --decline: #ff8a5c;
+
+  --knob: #f2f2f2;
+  --scrim: #000000;
+  --on-scrim: #ffffff;
+  --toast-bg: #1e2027;
+  --toast-text: #f2f2f2;
+  --toast-action: #c8ff00;
+  --chart-1: #c8ff00;
+  --chart-2: #9aa0ab;
+  --star-glow: rgb(200 255 0 / 0.55);
+
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-title: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-exercise: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-numbers: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --title-weight: 800;
+  --title-case: uppercase;
+  --title-tracking: 0.02em;
+  --h1-size: 1.75rem;
+  --h2-size: 1.3rem;
+  --exercise-weight: 700;
+  --exercise-case: uppercase;
+  --exercise-tracking: 0.02em;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-field: 12px;
+  --radius-card: 16px;
+  --radius-hero: 22px;
+  --shadow-card: 0 0 #0000;
+  --shadow-raised: 0 4px 12px rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.6);
+  --space-unit: 0.25rem;
+
+  --decor-angkor: none;
+}
+
+/* --------------------------------------------------------------- Khmer clair */
+[data-theme='khmer-light'] {
+  --scheme: light;
+
+  --bg: #f3e9d7;
+  --surface: #fffbf3;
+  --surface-2: #f6eedf;
+  --surface-3: #efe2c8;
+  --surface-4: #e7d5b5;
+  --nav-bg: #fffbf3;
+
+  --border: #e7d5b5;
+  --border-strong: #b39670;
+
+  --text: #2b1b12;
+  --text-2: #5a4030;
+  --text-muted: #7f5f43;
+  --text-faint: #b39670;
+
+  --accent: #8b1e1e;
+  --accent-hover: #6f1717;
+  --on-accent: #fffbf3;
+  --accent-ink: #8b1e1e;
+  --accent-soft: #f7e6de;
+  --accent-line: #b04a40;
+
+  --highlight: #c9a227;
+  --highlight-ink: #6b5209;
+  --highlight-soft: #fbf3d9;
+  --highlight-line: #e6d089;
+  --on-highlight: #2b1b12;
+
+  --good: #047857;
+  --good-ink: #047857;
+  --good-soft: #ecfdf5;
+  --on-good: #ffffff;
+
+  --danger: #c0392b;
+  --danger-ink: #b91c1c;
+  --danger-soft: #fef2f2;
+  --danger-line: #fecaca;
+  --on-danger: #ffffff;
+
+  --progress: #047857;
+  --stable: #7f5f43;
+  --decline: #b45309;
+
+  --knob: #ffffff;
+  --scrim: #000000;
+  --on-scrim: #ffffff;
+  --toast-bg: #2b1b12;
+  --toast-text: #f3e9d7;
+  --toast-action: #c9a227;
+  --chart-1: #b04a40;
+  --chart-2: #c9a227;
+  --star-glow: rgb(245 158 11 / 0.85);
+
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-title: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --font-exercise: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-numbers: var(--font-body);
+  --title-weight: 700;
+  --title-case: none;
+  --title-tracking: normal;
+  --h1-size: 1.2rem;
+  --h2-size: 1.05rem;
+  --exercise-weight: 800;
+  --exercise-case: none;
+  --exercise-tracking: normal;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-field: 12px;
+  --radius-card: 16px;
+  --radius-hero: 22px;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-raised: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-overlay: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --space-unit: 0.25rem;
+
+  --decor-angkor: block;
+}
+
+/* -------------------------------------------------------------- Khmer sombre */
+[data-theme='khmer-dark'] {
+  --scheme: dark;
+
+  --bg: #241712;
+  --surface: #2e1f17;
+  --surface-2: #241712;
+  --surface-3: #3d2b21;
+  --surface-4: #4f3a2c;
+  --nav-bg: #2e1f17;
+
+  --border: #4f3a2c;
+  --border-strong: #8a715d;
+
+  --text: #f3e9d7;
+  --text-2: #d9c8b0;
+  --text-muted: #b79f86;
+  --text-faint: #8a715d;
+
+  --accent: #a82626;
+  --accent-hover: #c9564b;
+  --on-accent: #fffbf3;
+  --accent-ink: #e0625b;
+  --accent-soft: #42201b;
+  --accent-line: #c9564b;
+
+  --highlight: #c9a227;
+  --highlight-ink: #e3c04e;
+  --highlight-soft: #3a2c10;
+  --highlight-line: #6b5216;
+  --on-highlight: #241712;
+
+  --good: #059669;
+  --good-ink: #34d399;
+  --good-soft: #10302a;
+  --on-good: #ffffff;
+
+  --danger: #c0392b;
+  --danger-ink: #f87171;
+  --danger-soft: #3f1212;
+  --danger-line: #7f1d1d;
+  --on-danger: #ffffff;
+
+  --progress: #34d399;
+  --stable: #b79f86;
+  --decline: #f0a35c;
+
+  --knob: #fffbf3;
+  --scrim: #000000;
+  --on-scrim: #ffffff;
+  --toast-bg: #f3e9d7;
+  --toast-text: #2b1b12;
+  --toast-action: #8b1e1e;
+  --chart-1: #c9564b;
+  --chart-2: #c9a227;
+  --star-glow: rgb(245 158 11 / 0.85);
+
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-title: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --font-exercise: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-numbers: var(--font-body);
+  --title-weight: 700;
+  --title-case: none;
+  --title-tracking: normal;
+  --h1-size: 1.2rem;
+  --h2-size: 1.05rem;
+  --exercise-weight: 800;
+  --exercise-case: none;
+  --exercise-tracking: normal;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-field: 12px;
+  --radius-card: 16px;
+  --radius-hero: 22px;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.25), 0 1px 2px -1px rgb(0 0 0 / 0.25);
+  --shadow-raised: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-overlay: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --space-unit: 0.25rem;
+
+  --decor-angkor: block;
+}
+
+/* =========================================================================
+ *  Tailwind mapping — shared by every theme, never edited per theme.
+ *  The default Tailwind palette is removed so a raw color class (bg-red-500,
+ *  text-white…) can't creep back into a component.
+ * ========================================================================= */
+@theme inline {
+  --color-*: initial;
+
+  --color-page: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-nav: var(--nav-bg);
+
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+
+  --color-highlight: var(--highlight);
+  --color-highlight-ink: var(--highlight-ink);
+  --color-highlight-soft: var(--highlight-soft);
+  --color-highlight-line: var(--highlight-line);
+  --color-on-highlight: var(--on-highlight);
+
+  --color-good: var(--good);
+  --color-good-ink: var(--good-ink);
+  --color-good-soft: var(--good-soft);
+  --color-on-good: var(--on-good);
+
+  --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  --color-on-danger: var(--on-danger);
+
+  --color-progress: var(--progress);
+  --color-stable: var(--stable);
+  --color-decline: var(--decline);
+
+  --color-knob: var(--knob);
+  --color-scrim: var(--scrim);
+  --color-on-scrim: var(--on-scrim);
+  --color-toast: var(--toast-bg);
+  --color-toast-text: var(--toast-text);
+  --color-toast-action: var(--toast-action);
+
+  --font-sans: var(--font-body);
+  --font-display: var(--font-title);
+  --font-exercise: var(--font-exercise);
+
+  --radius-md: var(--radius-xs);
+  --radius-lg: var(--radius-sm);
+  --radius-xl: var(--radius-field);
+  --radius-2xl: var(--radius-card);
+  --radius-3xl: var(--radius-hero);
+
+  --shadow-sm: var(--shadow-card);
+  --shadow: var(--shadow-raised);
+  --shadow-md: var(--shadow-raised);
+  --shadow-lg: var(--shadow-overlay);
+
+  --spacing: var(--space-unit);
+}
+
+/* ------------------------------------------------------------ Global usage */
+[data-theme] {
+  color-scheme: var(--scheme);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+h1,
+h2 {
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  text-transform: var(--title-case);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.15;
+}
+h1 {
+  font-size: var(--h1-size);
+}
+h2 {
+  font-size: var(--h2-size);
+}
+
+/* Exercise names. Declared after h1/h2 so it also wins on an exercise's h1. */
+.font-exercise {
+  font-family: var(--font-exercise);
+  font-weight: var(--exercise-weight);
+  text-transform: var(--exercise-case);
+  letter-spacing: var(--exercise-tracking);
+}
+
+/* Big figures: weights, reps, timers, summary tiles. */
+.font-numbers {
+  font-family: var(--font-numbers);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Theme-specific decorations (e.g. the Angkor motif) toggle through a token. */
+.decor-angkor {
+  display: var(--decor-angkor);
+}

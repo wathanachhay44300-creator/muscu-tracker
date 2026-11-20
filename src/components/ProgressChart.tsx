@@ -53,11 +53,11 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
 
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full touch-manipulation" role="img" aria-label="Graphique de progression">
-      <path d={areaPath} fill="var(--color-brand-50)" />
+      <path d={areaPath} fill="var(--accent-soft)" />
       <path
         d={path}
         fill="none"
-        stroke="var(--color-brand-600)"
+        stroke="var(--accent)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -75,8 +75,8 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
           {c.isPR ? (
             <path
               d={starPath(c.x, c.y, i === activeIndex ? 6.5 : 5.5)}
-              fill="var(--color-amber-500)"
-              stroke="var(--color-surface)"
+              fill="var(--highlight)"
+              stroke="var(--surface)"
               strokeWidth={1.2}
               strokeLinejoin="round"
             />
@@ -85,8 +85,8 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
               cx={c.x}
               cy={c.y}
               r={i === activeIndex ? 4 : 2.5}
-              fill={i === activeIndex ? 'var(--color-brand-600)' : 'var(--color-surface)'}
-              stroke="var(--color-brand-600)"
+              fill={i === activeIndex ? 'var(--accent)' : 'var(--surface)'}
+              stroke="var(--accent)"
               strokeWidth="1.5"
             />
           )}
@@ -96,16 +96,16 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
         x={active.x}
         y={labelY}
         fontSize="10"
-        fill="var(--color-brand-600)"
+        fill="var(--accent-ink)"
         fontWeight="700"
         textAnchor={labelAnchor}
       >
         {formatVal(active.value)} {unit}
       </text>
-      <text x={PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--color-slate-400)">
+      <text x={PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--text-muted)">
         {formatDateFr(points[0].date, { withYear: false })}
       </text>
-      <text x={WIDTH - PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--color-slate-400)" textAnchor="end">
+      <text x={WIDTH - PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--text-muted)" textAnchor="end">
         {formatDateFr(points[points.length - 1].date, { withYear: false })}
       </text>
     </svg>

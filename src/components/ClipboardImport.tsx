@@ -45,7 +45,7 @@ export function ClipboardImport() {
         type="button"
         onClick={handleClipboard}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3.5 text-sm font-semibold text-white active:bg-brand-700 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-sm font-semibold text-on-accent active:bg-accent-hover disabled:opacity-60"
       >
         <ClipboardPasteIcon className="h-5 w-5" />
         Importer depuis le presse-papiers
@@ -63,13 +63,13 @@ export function ClipboardImport() {
             aria-label="Texte à importer"
             autoCapitalize="off"
             autoCorrect="off"
-            className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:border-brand-400"
+            className="min-w-0 flex-1 rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-accent-line"
           />
           <button
             type="button"
             onClick={() => run(manual)}
             disabled={busy || !manual.trim()}
-            className="shrink-0 rounded-xl bg-slate-100 px-4 text-sm font-semibold text-slate-700 active:bg-slate-200 disabled:opacity-40"
+            className="shrink-0 rounded-xl bg-surface-3 px-4 text-sm font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-40"
           >
             Importer
           </button>
@@ -77,7 +77,7 @@ export function ClipboardImport() {
       )}
 
       {result && (
-        <p role="status" className={`mt-2 text-xs font-medium ${result.ok ? 'text-emerald-600' : 'text-red-600'}`}>
+        <p role="status" className={`mt-2 text-xs font-medium ${result.ok ? 'text-good-ink' : 'text-danger-ink'}`}>
           {result.text}
         </p>
       )}

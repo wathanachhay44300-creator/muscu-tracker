@@ -114,10 +114,10 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
     <div className="relative overflow-hidden rounded-xl">
       <div
         ref={swipe.revealRef}
-        className="absolute inset-0 flex items-center justify-end bg-red-500 pr-4 opacity-0"
+        className="absolute inset-0 flex items-center justify-end bg-danger pr-4 opacity-0"
         aria-hidden="true"
       >
-        <TrashIcon className="h-5 w-5 text-white" />
+        <TrashIcon className="h-5 w-5 text-on-danger" />
       </div>
 
       <div
@@ -149,7 +149,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
       >
         <span
           className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-            isPR ? 'bg-amber-100 text-amber-500' : 'text-slate-400'
+            isPR ? 'bg-highlight-soft text-highlight' : 'text-muted'
           }`}
           title={isPR ? 'Nouveau record personnel' : undefined}
         >
@@ -159,12 +159,12 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
         <div
           data-no-long-press
           data-no-swipe
-          className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+          className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-line bg-surface-2"
         >
           <button
             type="button"
             onClick={() => stepWeight(-2.5)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
             aria-label="Moins 2.5 kg"
           >
             −
@@ -175,7 +175,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
             onFocus={(e) => e.target.select()}
             onBlur={(e) => commitWeight(e.target.value)}
             inputMode="decimal"
-            className={`w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
+            className={`w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold font-numbers tabular-nums text-ink outline-none transition-transform duration-150 ${
               weightPulse ? 'scale-110' : 'scale-100'
             }`}
             aria-label="Poids en kg"
@@ -183,7 +183,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <button
             type="button"
             onClick={() => stepWeight(2.5)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
             aria-label="Plus 2.5 kg"
           >
             +
@@ -195,7 +195,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
             data-no-long-press
             data-no-swipe
             onClick={() => setCalculatorOpen(true)}
-            className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-slate-400 active:text-accent"
+            className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-muted active:text-accent-ink"
             aria-label="Calculateur de plaques"
             title="Calculateur de plaques"
           >
@@ -203,18 +203,18 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
             kg
           </button>
         ) : (
-          <span className="shrink-0 text-[10px] font-medium text-slate-400">kg</span>
+          <span className="shrink-0 text-[10px] font-medium text-muted">kg</span>
         )}
 
         <div
           data-no-long-press
           data-no-swipe
-          className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+          className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-line bg-surface-2"
         >
           <button
             type="button"
             onClick={() => stepReps(-1)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
             aria-label="Moins une répétition"
           >
             −
@@ -225,7 +225,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
             onFocus={(e) => e.target.select()}
             onBlur={(e) => commitReps(e.target.value)}
             inputMode="numeric"
-            className={`w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold tabular-nums text-slate-900 outline-none transition-transform duration-150 ${
+            className={`w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold font-numbers tabular-nums text-ink outline-none transition-transform duration-150 ${
               repsPulse ? 'scale-110' : 'scale-100'
             }`}
             aria-label="Répétitions"
@@ -233,20 +233,20 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <button
             type="button"
             onClick={() => stepReps(1)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-slate-400 active:text-accent"
+            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
             aria-label="Plus une répétition"
           >
             +
           </button>
         </div>
-        <span className="shrink-0 text-[10px] font-medium text-slate-400">reps</span>
+        <span className="shrink-0 text-[10px] font-medium text-muted">reps</span>
 
         <button
           type="button"
           data-no-long-press
           data-no-swipe
           onClick={onRemove}
-          className="shrink-0 p-1 text-slate-300 active:text-red-500"
+          className="shrink-0 p-1 text-faint active:text-danger-ink"
           aria-label="Supprimer la série"
         >
           <TrashIcon className="h-4 w-4" />

@@ -68,12 +68,12 @@ export function DonneesScreen() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="rounded-full p-2 -ml-2 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2 -ml-2 text-muted active:bg-surface-3"
           aria-label="Retour"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-bold text-slate-900">Export / import des données</h1>
+        <h1 className="text-lg font-bold text-ink">Export / import des données</h1>
       </div>
 
       {summary && (
@@ -88,7 +88,7 @@ export function DonneesScreen() {
       {message && (
         <p
           className={`mb-4 rounded-xl px-3.5 py-2.5 text-sm font-medium ${
-            message.tone === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+            message.tone === 'success' ? 'bg-good-soft text-good-ink' : 'bg-danger-soft text-danger-ink'
           }`}
         >
           {message.text}
@@ -96,9 +96,9 @@ export function DonneesScreen() {
       )}
 
       <div className="space-y-3">
-        <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
-          <p className="mb-1 text-sm font-semibold text-slate-700">Sauvegarde complète (JSON)</p>
-          <p className="mb-3 text-xs text-slate-400">
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+          <p className="mb-1 text-sm font-semibold text-ink-2">Sauvegarde complète (JSON)</p>
+          <p className="mb-3 text-xs text-muted">
             Toutes vos données (séances, exercices, programmes, mesures, pas, poids, calories, objectif). À conserver pour restaurer plus
             tard, sur cet appareil ou un autre.
           </p>
@@ -106,16 +106,16 @@ export function DonneesScreen() {
             type="button"
             onClick={handleExportJSON}
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3 font-semibold text-white active:bg-brand-700 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 font-semibold text-on-accent active:bg-accent-hover disabled:opacity-60"
           >
             <DownloadIcon className="h-4 w-4" />
             Exporter en JSON
           </button>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
-          <p className="mb-1 text-sm font-semibold text-slate-700">Historique (CSV)</p>
-          <p className="mb-3 text-xs text-slate-400">
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+          <p className="mb-1 text-sm font-semibold text-ink-2">Historique (CSV)</p>
+          <p className="mb-3 text-xs text-muted">
             Le détail des séries de vos séances, pour l'ouvrir dans un tableur. Ne contient pas les
             mensurations.
           </p>
@@ -123,7 +123,7 @@ export function DonneesScreen() {
             type="button"
             onClick={handleExportCSV}
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 py-3 font-semibold text-slate-700 active:bg-slate-200 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface-3 py-3 font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-60"
           >
             <DownloadIcon className="h-4 w-4" />
             Exporter en CSV
@@ -132,9 +132,9 @@ export function DonneesScreen() {
 
         <TrackingImportCard />
 
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-          <p className="mb-1 text-sm font-semibold text-red-700">Importer des données</p>
-          <p className="mb-3 text-xs text-red-600">
+        <div className="rounded-2xl border border-danger-line bg-danger-soft p-4">
+          <p className="mb-1 text-sm font-semibold text-danger-ink">Importer des données</p>
+          <p className="mb-3 text-xs text-danger-ink">
             Restaure une sauvegarde JSON exportée depuis Muscu Tracker. Cela remplace définitivement toutes les
             données actuellement sur cet appareil.
           </p>
@@ -143,7 +143,7 @@ export function DonneesScreen() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 font-semibold text-white active:bg-red-700 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-danger py-3 font-semibold text-on-danger active:bg-danger disabled:opacity-60"
           >
             <UploadIcon className="h-4 w-4" />
             Importer un fichier JSON
@@ -167,9 +167,9 @@ export function DonneesScreen() {
 
 function SummaryTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-surface px-2 py-3 text-center shadow-sm">
-      <p className="text-lg font-bold text-slate-900">{value}</p>
-      <p className="text-[11px] font-medium text-slate-400">{label}</p>
+    <div className="rounded-2xl border border-line bg-surface px-2 py-3 text-center shadow-sm">
+      <p className="text-lg font-bold text-ink">{value}</p>
+      <p className="text-[11px] font-medium text-muted">{label}</p>
     </div>
   )
 }

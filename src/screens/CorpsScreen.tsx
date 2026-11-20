@@ -74,11 +74,11 @@ export function CorpsScreen() {
 
   const singleValue = (w: Weighing, note: string) => (
     <div className="py-4 text-center">
-      <button type="button" onClick={() => setEditing({ entry: w })} className="rounded-2xl px-6 py-2 active:bg-slate-100">
-        <span className="block text-3xl font-bold tabular-nums text-slate-900">{formatKg(w.weight)} kg</span>
-        <span className="block text-xs text-slate-400">{relativeDateLabel(w.date)}</span>
+      <button type="button" onClick={() => setEditing({ entry: w })} className="rounded-2xl px-6 py-2 active:bg-surface-3">
+        <span className="block text-3xl font-bold font-numbers tabular-nums text-ink">{formatKg(w.weight)} kg</span>
+        <span className="block text-xs text-muted">{relativeDateLabel(w.date)}</span>
       </button>
-      <p className="mt-2 text-sm text-slate-400">{note}</p>
+      <p className="mt-2 text-sm text-muted">{note}</p>
     </div>
   )
 
@@ -88,27 +88,27 @@ export function CorpsScreen() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="-ml-2 rounded-full p-2 text-slate-400 active:bg-slate-100"
+          className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
           aria-label="Retour"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <ScaleIcon className="h-5 w-5 text-accent" />
-        <h1 className="text-lg font-bold text-slate-900">Poids &amp; mensurations</h1>
+        <ScaleIcon className="h-5 w-5 text-accent-ink" />
+        <h1 className="text-lg font-bold text-ink">Poids &amp; mensurations</h1>
       </div>
 
       {/* Weight: chart first */}
-      <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-slate-700">Poids</p>
-          <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium">
+          <p className="text-sm font-semibold text-ink-2">Poids</p>
+          <div className="flex rounded-lg bg-surface-3 p-0.5 text-xs font-medium">
             {PERIODS.map((p) => (
               <button
                 key={p.key}
                 type="button"
                 onClick={() => setPeriod(p.key)}
                 aria-pressed={period === p.key}
-                className={`min-h-9 rounded-md px-2.5 ${period === p.key ? 'bg-surface text-accent shadow-sm' : 'text-slate-500'}`}
+                className={`min-h-9 rounded-md px-2.5 ${period === p.key ? 'bg-surface text-accent-ink shadow-sm' : 'text-muted'}`}
               >
                 {p.label}
               </button>
@@ -118,14 +118,14 @@ export function CorpsScreen() {
 
         {measurements === undefined ? null : weighings.length === 0 ? (
           <div className="py-6 text-center">
-            <ScaleIcon className="mx-auto mb-2 h-8 w-8 text-slate-300" />
-            <p className="font-medium text-slate-600">Aucune pesée pour l'instant</p>
-            <p className="mt-0.5 text-sm text-slate-400">Ajoutez votre premier poids pour suivre son évolution.</p>
+            <ScaleIcon className="mx-auto mb-2 h-8 w-8 text-faint" />
+            <p className="font-medium text-ink-2">Aucune pesée pour l'instant</p>
+            <p className="mt-0.5 text-sm text-muted">Ajoutez votre premier poids pour suivre son évolution.</p>
           </div>
         ) : weighings.length === 1 ? (
           singleValue(weighings[0], 'Une seule pesée : ajoutez-en une autre pour voir une courbe.')
         ) : inPeriod.length === 0 ? (
-          <p className="py-8 text-center text-sm text-slate-400">Aucune pesée sur cette période.</p>
+          <p className="py-8 text-center text-sm text-muted">Aucune pesée sur cette période.</p>
         ) : inPeriod.length === 1 ? (
           singleValue(inPeriod[0], 'Une seule pesée sur cette période.')
         ) : (
@@ -136,7 +136,7 @@ export function CorpsScreen() {
               end={today}
               onPick={(date) => setEditing({ entry: { date, weight: weightByDate.get(date)! } })}
             />
-            <p className="mt-1 text-center text-[11px] text-slate-400">
+            <p className="mt-1 text-center text-[11px] text-muted">
               Courbe : moyenne sur 7 jours · points : pesées (touchez-en une pour la modifier)
             </p>
           </>
@@ -145,7 +145,7 @@ export function CorpsScreen() {
         <button
           type="button"
           onClick={() => setEditing({ entry: null })}
-          className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 text-sm font-semibold text-white active:bg-brand-700"
+          className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-on-accent active:bg-accent-hover"
         >
           <PlusIcon className="h-4 w-4" />
           Ajouter une pesée
@@ -156,8 +156,8 @@ export function CorpsScreen() {
         <>
           {/* Latest weigh-ins */}
           <div className="mt-5">
-            <p className="mb-2 px-1 text-sm font-semibold text-slate-700">Dernières pesées</p>
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-surface shadow-sm">
+            <p className="mb-2 px-1 text-sm font-semibold text-ink-2">Dernières pesées</p>
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
               {(showAllWeighings ? weighings : weighings.slice(0, RECENT_WEIGHINGS)).map((w, i) => (
                 <WeighingRow key={w.date} entry={w} bordered={i > 0} onOpen={() => setEditing({ entry: w })} />
               ))}
@@ -166,7 +166,7 @@ export function CorpsScreen() {
               <button
                 type="button"
                 onClick={() => setShowAllWeighings(true)}
-                className="mt-2 w-full rounded-2xl bg-slate-100 py-3.5 text-sm font-semibold text-slate-700 active:bg-slate-200"
+                className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
               >
                 Voir plus ({weighings.length - RECENT_WEIGHINGS} pesée{weighings.length - RECENT_WEIGHINGS > 1 ? 's' : ''})
               </button>
@@ -175,8 +175,8 @@ export function CorpsScreen() {
 
           {/* Weekly summary */}
           <div className="mt-5">
-            <p className="mb-2 px-1 text-sm font-semibold text-slate-700">Par semaine</p>
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-surface shadow-sm">
+            <p className="mb-2 px-1 text-sm font-semibold text-ink-2">Par semaine</p>
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
               {(showAllWeeks ? weeks : weeks.slice(0, WEEKS_SHOWN)).map((week, i) => (
                 <WeekRow
                   key={week.monday}
@@ -194,12 +194,12 @@ export function CorpsScreen() {
               <button
                 type="button"
                 onClick={() => setShowAllWeeks(true)}
-                className="mt-2 w-full rounded-2xl bg-slate-100 py-3.5 text-sm font-semibold text-slate-700 active:bg-slate-200"
+                className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
               >
                 Voir plus ({weeks.length - WEEKS_SHOWN} semaine{weeks.length - WEEKS_SHOWN > 1 ? 's' : ''})
               </button>
             )}
-            <p className="mt-1.5 px-1 text-[11px] text-slate-400">
+            <p className="mt-1.5 px-1 text-[11px] text-muted">
               Poids moyen de la semaine et écart avec la semaine précédente. Touchez une semaine pour voir ses pesées.
             </p>
           </div>
@@ -225,19 +225,19 @@ function WeighingRow({ entry, bordered, onOpen }: { entry: Weighing; bordered: b
     <button
       type="button"
       onClick={onOpen}
-      className={`flex min-h-12 w-full items-center justify-between px-4 text-left active:bg-slate-50 ${
-        bordered ? 'border-t border-slate-100' : ''
+      className={`flex min-h-12 w-full items-center justify-between px-4 text-left active:bg-surface-2 ${
+        bordered ? 'border-t border-line' : ''
       }`}
     >
-      <span className="text-sm text-slate-600">
-        <span className="font-medium text-slate-800">{relativeDateLabel(entry.date)}</span>
+      <span className="text-sm text-ink-2">
+        <span className="font-medium text-ink">{relativeDateLabel(entry.date)}</span>
         {relativeDateLabel(entry.date) !== formatDateFr(entry.date) && (
-          <span className="text-slate-400"> · {formatDateFr(entry.date, { withYear: false })}</span>
+          <span className="text-muted"> · {formatDateFr(entry.date, { withYear: false })}</span>
         )}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="font-bold tabular-nums text-slate-900">{formatKg(entry.weight)} kg</span>
-        <ChevronRightIcon className="h-4 w-4 text-slate-300" />
+        <span className="font-bold tabular-nums text-ink">{formatKg(entry.weight)} kg</span>
+        <ChevronRightIcon className="h-4 w-4 text-faint" />
       </span>
     </button>
   )
@@ -270,25 +270,25 @@ function WeekRow({
   const delta = week.weightDelta
   const tone = delta != null ? deltaTone(goal, delta) : 'neutral'
   return (
-    <div className={bordered ? 'border-t border-slate-100' : ''}>
+    <div className={bordered ? 'border-t border-line' : ''}>
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="flex min-h-12 w-full items-center justify-between gap-2 px-4 text-left active:bg-slate-50"
+        className="flex min-h-12 w-full items-center justify-between gap-2 px-4 text-left active:bg-surface-2"
       >
         <span className="flex items-center gap-2 text-sm">
           <ChevronRightIcon
-            className="h-4 w-4 shrink-0 text-slate-400"
+            className="h-4 w-4 shrink-0 text-muted"
             style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 200ms ease' }}
           />
-          <span className="text-slate-600">Sem. du {formatDateFr(week.monday, { withYear: false })}</span>
+          <span className="text-ink-2">Sem. du {formatDateFr(week.monday, { withYear: false })}</span>
         </span>
         <span className="flex items-center gap-2">
-          <span className="font-bold tabular-nums text-slate-900">{formatKg(week.weight!)} kg</span>
+          <span className="font-bold tabular-nums text-ink">{formatKg(week.weight!)} kg</span>
           <span
             className={`min-w-[4.25rem] rounded-full px-2 py-0.5 text-center text-xs font-semibold tabular-nums ${
-              tone === 'good' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+              tone === 'good' ? 'bg-good-soft text-good-ink' : 'bg-surface-3 text-muted'
             }`}
           >
             {delta != null ? `${formatSigned(delta)} kg` : '—'}
@@ -302,16 +302,16 @@ function WeekRow({
           transition: 'grid-template-rows 220ms cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >
-        <div className="overflow-hidden bg-slate-50" inert={!expanded}>
+        <div className="overflow-hidden bg-surface-2" inert={!expanded}>
           {weighings.map((w) => (
             <button
               key={w.date}
               type="button"
               onClick={() => onOpen(w)}
-              className="flex min-h-11 w-full items-center justify-between pl-10 pr-4 text-left text-sm active:bg-slate-100"
+              className="flex min-h-11 w-full items-center justify-between pl-10 pr-4 text-left text-sm active:bg-surface-3"
             >
-              <span className="text-slate-500">{formatDateFr(w.date, { withYear: false })}</span>
-              <span className="font-semibold tabular-nums text-slate-800">{formatKg(w.weight)} kg</span>
+              <span className="text-muted">{formatDateFr(w.date, { withYear: false })}</span>
+              <span className="font-semibold tabular-nums text-ink">{formatKg(w.weight)} kg</span>
             </button>
           ))}
         </div>
@@ -335,25 +335,25 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
 
   return (
     <div className="mt-8">
-      <h2 className="mb-3 px-1 text-base font-semibold text-slate-800">Mensurations</h2>
+      <h2 className="mb-3 px-1 text-base font-semibold text-ink">Mensurations</h2>
 
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={() => setDate((d) => addDays(d, -1))}
-          className="rounded-full p-2.5 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2.5 text-muted active:bg-surface-3"
           aria-label="Jour précédent"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div className="text-center">
-          <p className="font-semibold text-slate-900">{relativeDateLabel(date)}</p>
-          {relativeDateLabel(date) !== formatDateFr(date) && <p className="text-xs text-slate-400">{formatDateFr(date)}</p>}
+          <p className="font-semibold text-ink">{relativeDateLabel(date)}</p>
+          {relativeDateLabel(date) !== formatDateFr(date) && <p className="text-xs text-muted">{formatDateFr(date)}</p>}
         </div>
         <button
           type="button"
           onClick={() => setDate((d) => addDays(d, 1))}
-          className="rounded-full p-2.5 text-slate-400 active:bg-slate-100"
+          className="rounded-full p-2.5 text-muted active:bg-surface-3"
           aria-label="Jour suivant"
         >
           <ChevronRightIcon className="h-5 w-5" />
@@ -362,7 +362,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
 
       <MeasurementForm key={date} date={date} entry={entry} />
 
-      <div className="mt-4 rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
+      <div className="mt-4 rounded-2xl border border-line bg-surface p-4 shadow-sm">
         <div className="mb-3 flex flex-wrap gap-1.5">
           {MEASURES.map((m) => (
             <button
@@ -370,7 +370,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
               type="button"
               onClick={() => setSelected(m.key)}
               className={`min-h-9 rounded-full px-3 text-xs font-semibold ${
-                selected === m.key ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-500 active:bg-slate-200'
+                selected === m.key ? 'bg-accent text-on-accent' : 'bg-surface-3 text-muted active:bg-surface-4'
               }`}
             >
               {m.label}
@@ -380,7 +380,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
         {points.length >= 2 ? (
           <ProgressChart points={points} unit={label.unit} />
         ) : (
-          <p className="py-6 text-center text-sm text-slate-400">
+          <p className="py-6 text-center text-sm text-muted">
             Ajoutez au moins 2 mesures de {label.label.toLowerCase()} pour voir un graphique.
           </p>
         )}
@@ -388,15 +388,15 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
 
       {withMeasures.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="px-1 text-sm font-semibold text-slate-700">Historique des mensurations</p>
+          <p className="px-1 text-sm font-semibold text-ink-2">Historique des mensurations</p>
           {[...withMeasures].reverse().map((m) => (
             <div
               key={m.id}
-              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 py-2 shadow-sm"
+              className="flex items-center justify-between rounded-2xl border border-line bg-surface px-4 py-2 shadow-sm"
             >
               <div>
-                <p className="text-sm font-semibold text-slate-900">{relativeDateLabel(m.date)}</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-sm font-semibold text-ink">{relativeDateLabel(m.date)}</p>
+                <p className="text-xs text-muted">
                   {MEASURES.filter((k) => m[k.key] != null)
                     .map((k) => `${k.label} ${m[k.key]}${k.unit}`)
                     .join(' · ')}
@@ -405,7 +405,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
               <button
                 type="button"
                 onClick={() => setDeletingDate(m.date)}
-                className="rounded-full p-3 text-slate-300 active:bg-slate-100 active:text-red-500"
+                className="rounded-full p-3 text-faint active:bg-surface-3 active:text-danger-ink"
                 aria-label="Supprimer ces mensurations"
               >
                 <TrashIcon className="h-4 w-4" />
@@ -467,11 +467,11 @@ function MeasurementForm({ date, entry }: { date: string; entry: BodyMeasurement
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-surface p-4 shadow-sm">
+    <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
       <div className="grid grid-cols-2 gap-3">
         {MEASURES.map((m) => (
           <div key={m.key}>
-            <label className="mb-1 block text-xs font-medium text-slate-500">
+            <label className="mb-1 block text-xs font-medium text-muted">
               {m.label} ({m.unit})
             </label>
             <input
@@ -480,7 +480,7 @@ function MeasurementForm({ date, entry }: { date: string; entry: BodyMeasurement
               onFocus={(e) => e.target.select()}
               inputMode="decimal"
               placeholder="—"
-              className="w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-sm font-semibold outline-none focus:border-brand-400"
+              className="w-full min-w-0 rounded-xl border border-line bg-surface-2 px-3 py-3 text-center text-sm font-semibold outline-none focus:border-accent-line"
             />
           </div>
         ))}

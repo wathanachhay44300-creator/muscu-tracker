@@ -18,7 +18,7 @@ interface ContextMenuSheetProps {
 export function ContextMenuSheet({ title, actions, onClose }: ContextMenuSheetProps) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-scrim/40 animate-fade-in-backdrop sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -26,7 +26,7 @@ export function ContextMenuSheet({ title, actions, onClose }: ContextMenuSheetPr
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
-          <p className="truncate px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <p className="truncate px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted">
             {title}
           </p>
         )}
@@ -39,8 +39,8 @@ export function ContextMenuSheet({ title, actions, onClose }: ContextMenuSheetPr
                 onClose()
                 action.onSelect()
               }}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-base font-medium active:bg-slate-100 ${
-                action.danger ? 'text-red-600' : 'text-slate-800'
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-base font-medium active:bg-surface-3 ${
+                action.danger ? 'text-danger-ink' : 'text-ink'
               }`}
             >
               <action.icon className="h-5 w-5 shrink-0" />

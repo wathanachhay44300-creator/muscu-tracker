@@ -5,33 +5,26 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#8b1e1e" />
+    <meta name="theme-color" content="#0b0b0f" />
     <script>
-      // Applies the saved theme before first paint, so there's no flash of
-      // the wrong theme while React boots. Kept in sync with src/lib/theme.ts.
+      // Applies the saved theme before first paint (no flash of another theme).
+      // Kept in sync with src/theme/themes.ts; the colors themselves live in
+      // src/theme/theme.css only.
       (function () {
         try {
-          var stored = localStorage.getItem('muscu-tracker:theme');
-          if (stored === 'light' || stored === 'dark') {
-            document.documentElement.setAttribute('data-theme', stored);
-          }
-          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var resolved = stored === 'light' || stored === 'dark' ? stored : (prefersDark ? 'dark' : 'light');
-          var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', resolved === 'dark' ? '#241712' : '#8b1e1e');
-        } catch (e) {}
+          var stored = localStorage.getItem('muscu-tracker:theme-v2');
+          var known = ['iron-night', 'khmer-light', 'khmer-dark'];
+          document.documentElement.setAttribute('data-theme', known.indexOf(stored) >= 0 ? stored : 'iron-night');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'iron-night');
+        }
       })();
     </script>
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="Muscu" />
     <meta name="description" content="Suivi de musculation hors-ligne, rapide et sans compte." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Non-render-blocking: the app paints immediately with fallback fonts (display=swap), fonts swap in when ready. -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Manrope:wght@800&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Manrope:wght@800&display=swap" /></noscript>
     <title>Muscu Tracker</title>
   </head>
   <body>

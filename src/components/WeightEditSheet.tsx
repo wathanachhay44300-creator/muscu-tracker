@@ -42,34 +42,34 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 animate-fade-in-backdrop sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-scrim/40 animate-fade-in-backdrop sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
         className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-3 text-base font-semibold text-slate-900">{entry ? 'Modifier la pesée' : 'Ajouter une pesée'}</h2>
+        <h2 className="mb-3 text-base font-semibold text-ink">{entry ? 'Modifier la pesée' : 'Ajouter une pesée'}</h2>
 
         {entry ? (
-          <p className="mb-3 text-sm font-medium text-slate-500">
+          <p className="mb-3 text-sm font-medium text-muted">
             {relativeDateLabel(entry.date)} · {formatDateFr(entry.date)}
           </p>
         ) : (
           <label className="mb-3 block">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Date</span>
+            <span className="mb-1 block text-xs font-medium text-muted">Date</span>
             <input
               type="date"
               value={date}
               max={today}
               onChange={(e) => e.target.value && setDate(e.target.value > today ? today : e.target.value)}
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-base outline-none focus:border-brand-400"
+              className="h-12 w-full rounded-xl border border-line bg-surface-2 px-4 text-base outline-none focus:border-accent-line"
             />
           </label>
         )}
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium text-slate-500">Poids (kg)</span>
+          <span className="mb-1 block text-xs font-medium text-muted">Poids (kg)</span>
           <input
             autoFocus
             value={text}
@@ -83,14 +83,14 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
             onFocus={(e) => e.target.select()}
             onKeyDown={(e) => e.key === 'Enter' && save()}
             aria-invalid={error ? true : undefined}
-            className={`h-14 w-full rounded-xl border bg-slate-50 px-4 text-center text-2xl font-bold tabular-nums outline-none focus:border-brand-400 ${
-              error ? 'border-red-400' : 'border-slate-200'
+            className={`h-14 w-full rounded-xl border bg-surface-2 px-4 text-center text-2xl font-bold font-numbers tabular-nums outline-none focus:border-accent-line ${
+              error ? 'border-danger' : 'border-line'
             }`}
           />
         </label>
-        {error && <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>}
+        {error && <p className="mt-1.5 text-xs font-medium text-danger-ink">{error}</p>}
         {replacing && !error && (
-          <p className="mt-1.5 text-xs text-slate-500">
+          <p className="mt-1.5 text-xs text-muted">
             Une pesée existe déjà ce jour-là ({formatKg(existing.get(date)!)} kg) : elle sera remplacée.
           </p>
         )}
@@ -99,14 +99,14 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-xl bg-slate-100 py-3.5 font-medium text-slate-600 active:bg-slate-200"
+            className="flex-1 rounded-xl bg-surface-3 py-3.5 font-medium text-ink-2 active:bg-surface-4"
           >
             Annuler
           </button>
           <button
             type="button"
             onClick={save}
-            className="flex-1 rounded-xl bg-brand-600 py-3.5 font-medium text-white active:bg-brand-700"
+            className="flex-1 rounded-xl bg-accent py-3.5 font-medium text-on-accent active:bg-accent-hover"
           >
             Enregistrer
           </button>
@@ -115,7 +115,7 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
           <button
             type="button"
             onClick={remove}
-            className="mt-2 w-full py-3 text-sm font-medium text-red-500 active:text-red-700"
+            className="mt-2 w-full py-3 text-sm font-medium text-danger-ink active:text-danger-ink"
           >
             Supprimer cette pesée
           </button>

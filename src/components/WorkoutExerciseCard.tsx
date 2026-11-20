@@ -110,7 +110,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
       ref={containerRef}
       style={containerStyle}
       className={`animate-fade-in rounded-2xl border bg-surface ${
-        isDragging ? 'border-brand-300 shadow-lg' : 'border-slate-200 shadow-sm'
+        isDragging ? 'border-accent-line shadow-lg' : 'border-line shadow-sm'
       }`}
       onPointerDown={(e) => {
         longPress.onPointerDown(e)
@@ -134,10 +134,10 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
       <div className="relative overflow-hidden rounded-2xl">
       <div
         ref={swipe.revealRef}
-        className="absolute inset-0 flex items-center justify-end bg-red-500 pr-6 opacity-0"
+        className="absolute inset-0 flex items-center justify-end bg-danger pr-6 opacity-0"
         aria-hidden="true"
       >
-        <TrashIcon className="h-6 w-6 text-white" />
+        <TrashIcon className="h-6 w-6 text-on-danger" />
       </div>
       <div ref={swipe.contentRef} data-swipe-to-delete className="relative bg-surface p-4">
       <div className="mb-3 flex items-start justify-between gap-2">
@@ -146,7 +146,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             <button
               type="button"
               aria-label="Glisser pour réordonner"
-              className="-ml-1.5 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-slate-300 active:cursor-grabbing active:text-slate-500"
+              className="-ml-1.5 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-faint active:cursor-grabbing active:text-muted"
               {...dragHandleProps}
             >
               <GripIcon className="h-5 w-5" />
@@ -156,23 +156,23 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             <button
               type="button"
               onClick={() => navigate(`/exercices/${we.exercise.id}`)}
-              className="font-exercise text-[0.95rem] text-slate-900 active:opacity-60 text-left"
+              className="font-exercise text-[0.95rem] text-ink active:opacity-60 text-left"
             >
               {we.exercise.name}
             </button>
-            <p className="text-xs font-medium text-slate-400">{we.exercise.muscleGroup}</p>
+            <p className="text-xs font-medium text-muted">{we.exercise.muscleGroup}</p>
             {lastTime?.note && (
-              <p className="mt-1 text-xs italic text-amber-600">
+              <p className="mt-1 text-xs italic text-highlight-ink">
                 Dernière fois : {lastTime.note}
               </p>
             )}
             {!noteOpen && noteText.trim() && (
-              <p className="mt-1 whitespace-pre-wrap text-xs text-accent">{noteText}</p>
+              <p className="mt-1 whitespace-pre-wrap text-xs text-accent-ink">{noteText}</p>
             )}
           </div>
         </div>
         <div className="flex shrink-0 items-center">
-          <ExerciseInfoButton exercise={we.exercise} className="!rounded-lg !p-1.5 !text-slate-300" />
+          <ExerciseInfoButton exercise={we.exercise} className="!rounded-lg !p-1.5 !text-faint" />
           <button
             type="button"
             data-no-long-press
@@ -180,8 +180,8 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             onClick={() => setNoteOpen((v) => !v)}
             aria-label="Note sur cet exercice"
             aria-expanded={noteOpen}
-            className={`shrink-0 rounded-lg p-1.5 active:bg-slate-100 ${
-              noteText.trim() ? 'text-accent' : 'text-slate-300'
+            className={`shrink-0 rounded-lg p-1.5 active:bg-surface-3 ${
+              noteText.trim() ? 'text-accent-ink' : 'text-faint'
             }`}
           >
             <NoteIcon className="h-5 w-5" />
@@ -198,13 +198,13 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           onChange={(e) => handleNoteChange(e.target.value)}
           placeholder="Note (ressenti, douleur, forme…)"
           rows={2}
-          className="mb-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-brand-400"
+          className="mb-3 w-full resize-none rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm outline-none focus:border-accent-line"
         />
       )}
 
       {lastTime && (
-        <p className="mb-3 rounded-lg bg-slate-50 px-2.5 py-2 text-xs text-slate-500">
-          <span className="font-medium text-slate-600">
+        <p className="mb-3 rounded-lg bg-surface-2 px-2.5 py-2 text-xs text-muted">
+          <span className="font-medium text-ink-2">
             Dernière fois ({relativeDateLabel(lastTime.date).toLowerCase()})
           </span>{' '}
           : {lastTime.sets.map((s) => `${formatWeight(s.weight)}kg×${s.reps}`).join(', ')}
@@ -217,7 +217,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           data-no-long-press
           data-no-swipe
           onClick={() => handleAddSet({ weight: suggestion.weight, reps: suggestion.reps })}
-          className="mb-3 flex w-full items-center justify-between gap-2 rounded-lg bg-emerald-50 px-2.5 py-2 text-left text-xs text-emerald-700 active:bg-emerald-100"
+          className="mb-3 flex w-full items-center justify-between gap-2 rounded-lg bg-good-soft px-2.5 py-2 text-left text-xs text-good-ink active:bg-good-soft"
         >
           <span>
             💪 Objectifs atteints la dernière fois — essayer{' '}
@@ -248,14 +248,14 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
         data-no-long-press
         data-no-swipe
         onClick={() => handleAddSet()}
-        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-accent active:bg-slate-100"
+        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-surface-2 py-2.5 text-sm font-semibold text-accent-ink active:bg-surface-3"
       >
         <PlusIcon className="h-4 w-4" />
         Ajouter une série
       </button>
 
       {volume > 0 && (
-        <p className="mt-2.5 text-right text-xs font-medium text-slate-400">
+        <p className="mt-2.5 text-right text-xs font-medium text-muted">
           Volume : {formatVolume(volume)} kg
         </p>
       )}

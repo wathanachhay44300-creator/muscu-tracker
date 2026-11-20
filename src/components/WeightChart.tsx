@@ -76,20 +76,20 @@ export function WeightChart({ byDate, start, end, onPick }: WeightChartProps) {
     >
       {gridYs.map((v, i) => (
         <g key={i}>
-          <line x1={PAD_L} x2={W - PAD_R} y1={y(v)} y2={y(v)} stroke="var(--color-slate-200)" strokeDasharray={i === 1 ? '3 3' : undefined} />
-          <text x={PAD_L - 5} y={y(v) + 3} fontSize="9" textAnchor="end" fill="var(--color-slate-400)">
+          <line x1={PAD_L} x2={W - PAD_R} y1={y(v)} y2={y(v)} stroke="var(--border)" strokeDasharray={i === 1 ? '3 3' : undefined} />
+          <text x={PAD_L - 5} y={y(v) + 3} fontSize="9" textAnchor="end" fill="var(--text-muted)">
             {formatKg(v)}
           </text>
         </g>
       ))}
-      {path && <path d={path} fill="none" stroke="var(--color-accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />}
+      {path && <path d={path} fill="none" stroke="var(--accent-ink)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />}
       {raw.map((p) => (
-        <circle key={p.date} cx={x(p.i)} cy={y(p.v)} r={days.length > 120 ? 1.6 : 2.6} fill="var(--color-slate-400)" />
+        <circle key={p.date} cx={x(p.i)} cy={y(p.v)} r={days.length > 120 ? 1.6 : 2.6} fill="var(--text-muted)" />
       ))}
-      <text x={PAD_L} y={H - 7} fontSize="9" fill="var(--color-slate-400)">
+      <text x={PAD_L} y={H - 7} fontSize="9" fill="var(--text-muted)">
         {formatDateFr(days[0], { withYear: false })}
       </text>
-      <text x={W - PAD_R} y={H - 7} fontSize="9" textAnchor="end" fill="var(--color-slate-400)">
+      <text x={W - PAD_R} y={H - 7} fontSize="9" textAnchor="end" fill="var(--text-muted)">
         {formatDateFr(days[days.length - 1], { withYear: false })}
       </text>
     </svg>

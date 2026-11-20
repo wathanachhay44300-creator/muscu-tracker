@@ -10,7 +10,8 @@ interface ConfettiPiece {
   drift: number
 }
 
-const COLORS = ['#8b1e1e', '#c9a227', '#e0b64a', '#b04a40', '#f3e9d7']
+// Theme tokens, so the burst follows the active theme.
+const COLORS = ['var(--accent)', 'var(--highlight)', 'var(--accent-line)', 'var(--chart-2)', 'var(--text)']
 const PIECE_COUNT = 26
 
 function prefersReducedMotion(): boolean {

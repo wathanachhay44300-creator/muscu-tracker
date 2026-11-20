@@ -20,7 +20,8 @@ const PATH = [
   'M62 92V84H98V92ZM202 92V84H238V92Z',
 ].join('')
 
-/** Stylised, simplified Angkor-style towers. Decorative only: purely a low-opacity accent-colored background. */
+/** Stylised, simplified Angkor-style towers. Decorative only: purely a low-opacity accent-colored background.
+ * Shown only by themes that enable it (`--decor-angkor` in theme.css). */
 export function AngkorSilhouette({ className = '' }: { className?: string }) {
   return (
     <svg
@@ -28,7 +29,7 @@ export function AngkorSilhouette({ className = '' }: { className?: string }) {
       preserveAspectRatio="xMidYMax meet"
       aria-hidden="true"
       focusable="false"
-      className={`pointer-events-none absolute -z-10 text-accent opacity-15 ${className}`}
+      className={`decor-angkor pointer-events-none absolute -z-10 text-accent-ink opacity-15 ${className}`}
     >
       <path d={PATH} fill="currentColor" />
     </svg>
