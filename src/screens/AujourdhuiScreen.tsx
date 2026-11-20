@@ -6,7 +6,7 @@ import { useTemplates } from '../hooks/useTemplates'
 import { getOrCreateWorkout } from '../lib/workoutActions'
 import { startWorkoutFromPreviousSession, startWorkoutFromTemplate } from '../lib/sessionStart'
 import { relativeDateLabel, todayISO } from '../lib/date'
-import { formatWeight } from '../lib/stats'
+import { formatReps, formatWeight } from '../lib/stats'
 import { formatKg } from '../lib/tracking'
 import { DuplicateSessionSheet } from '../components/DuplicateSessionSheet'
 import { CheckIcon, ChevronRightIcon, CopyIcon, PlayIcon, PlusIcon, SettingsIcon, StarIcon } from '../components/Icons'
@@ -204,7 +204,7 @@ export function AujourdhuiScreen() {
               <p className="font-exercise truncate text-[1.05rem] text-ink">{stats.latestRecord.exerciseName}</p>
               <p className="text-sm text-ink-2">
                 <span className="font-numbers font-bold text-highlight-ink">
-                  {formatWeight(stats.latestRecord.weight)} kg × {stats.latestRecord.reps}
+                  {formatWeight(stats.latestRecord.weight)} kg × {formatReps(stats.latestRecord.reps)}
                 </span>{' '}
                 · {relativeDateLabel(stats.latestRecord.date).toLowerCase()}
               </p>

@@ -88,8 +88,8 @@ export function SetRow({ set, index, loadType, weightStep, isPR, onChangeWeight,
         <MiniRulerField
           value={set.weight}
           step={weightStep}
-          max={500}
-          decimal
+          // 0,25 kg marks: the ruler stops at 250 kg (typed values go higher), to keep it light.
+          max={Math.min(500, weightStep * 1000)}
           unit="kg"
           haptics={!!preferences?.hapticsEnabled}
           label={t('set.weightLabel', { n: index + 1 })}
@@ -114,6 +114,7 @@ export function SetRow({ set, index, loadType, weightStep, isPR, onChangeWeight,
           value={set.reps}
           step={1}
           max={50}
+          typedStep={0.5}
           unit={t('editor.repsUnit')}
           haptics={!!preferences?.hapticsEnabled}
           label={t('set.repsLabel', { n: index + 1 })}

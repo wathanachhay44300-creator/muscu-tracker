@@ -182,8 +182,8 @@ export async function exportHistoryCSV(): Promise<void> {
             csvEscape(exercise?.muscleGroup ? groupLabel(exercise.muscleGroup) : ''),
             String(i + 1),
             csvNumber(set.weight),
-            String(set.reps),
-            csvNumber(set.weight * set.reps),
+            csvNumber(set.reps),
+            csvNumber(Math.round(set.weight * set.reps * 1000) / 1000),
           ].join(';'),
         )
       })

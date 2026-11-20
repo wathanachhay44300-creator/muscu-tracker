@@ -293,7 +293,7 @@ export function ReglagesScreen() {
         <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
           <p className="font-semibold text-ink">{t('settings.weightStep')}</p>
           <p className="mb-3 text-xs text-muted">{t('settings.weightStepHint')}</p>
-          <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label={t('settings.weightStep')}>
+          <div className="grid grid-cols-4 gap-1.5" role="radiogroup" aria-label={t('settings.weightStep')}>
             {WEIGHT_STEPS.map((st) => {
               const on = (preferences?.weightStep ?? 2.5) === st
               return (

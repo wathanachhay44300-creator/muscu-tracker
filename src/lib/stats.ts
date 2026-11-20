@@ -16,6 +16,11 @@ export function formatWeight(n: number): string {
   return formatDecimal(n)
 }
 
+/** Reps, half reps included: "6,5" in French, "6.5" in English. */
+export function formatReps(n: number): string {
+  return formatDecimal(n, 1)
+}
+
 /** Thousand-separated integer in the current language: "4 250" / "4,250". */
 export function formatVolume(n: number): string {
   return formatNumber(Math.round(n), 0)

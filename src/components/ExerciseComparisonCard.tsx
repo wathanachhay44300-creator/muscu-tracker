@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { WorkoutExerciseWithSets } from '../types'
 import type { ExerciseComparison, SetComparison } from '../hooks/useWorkoutComparison'
-import { formatWeight } from '../lib/stats'
+import { formatReps, formatWeight } from '../lib/stats'
 import { StarIcon } from './Icons'
 import { groupLabel, t } from '../i18n'
 
@@ -82,7 +82,7 @@ function SetComparisonRow({
         {set.isPR && <StarIcon className="pr-star-glow h-3.5 w-3.5 shrink-0 text-highlight" />}
         <span className="shrink-0 text-muted">{t('set.title', { n: index + 1 })}</span>
         <span className="truncate font-semibold text-ink">
-          {formatWeight(set.weight)}kg × {set.reps}
+          {formatWeight(set.weight)}kg × {formatReps(set.reps)}
         </span>
       </div>
       {hasPreviousSet ? (
@@ -102,7 +102,7 @@ function SetComparisonRow({
 function formatDelta(weightDelta: number, repsDelta: number): string {
   const parts: string[] = []
   if (weightDelta !== 0) parts.push(`${weightDelta > 0 ? '+' : ''}${formatWeight(weightDelta)}kg`)
-  if (repsDelta !== 0) parts.push(t('compare.reps', { n: `${repsDelta > 0 ? '+' : ''}${repsDelta}` }))
+  if (repsDelta !== 0) parts.push(t('compare.reps', { n: `${repsDelta > 0 ? '+' : ''}${formatReps(round2(repsDelta))}` }))
   return parts.length > 0 ? parts.join(', ') : t('compare.same')
 }
 

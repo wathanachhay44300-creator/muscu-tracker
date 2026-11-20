@@ -20,7 +20,7 @@ import {
 } from '../lib/workoutActions'
 import { getSuggestedProgression } from '../lib/progression'
 import { hapticLight, hapticMenuOpen } from '../lib/haptics'
-import { formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats'
+import { formatReps, formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats'
 import { relativeDateLabel } from '../lib/date'
 import { SetRow } from './SetRow'
 import { ContextMenuSheet } from './ContextMenuSheet'
@@ -28,8 +28,9 @@ import { ExerciseInfoButton } from './ExerciseInfoSheet'
 import { CheckIcon, CopyIcon, GripIcon, NoteIcon, PlusIcon, SettingsIcon, TrashIcon } from './Icons'
 import { setExerciseWeightStep } from '../lib/exerciseActions'
 import { formatDecimal, groupLabel, t } from '../i18n'
+import { WEIGHT_STEPS } from '../lib/settingsActions'
 
-const WEIGHT_STEP_CHOICES = [1, 1.25, 2, 2.5, 5]
+const WEIGHT_STEP_CHOICES = WEIGHT_STEPS
 
 /** Draws nothing: keeps menu labels aligned with the ticked one. */
 function NoIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -223,7 +224,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           <span className="font-medium text-ink-2">
             {t('card.lastTime', { when: relativeDateLabel(lastTime.date).toLowerCase() })}
           </span>{' '}
-          : {lastTime.sets.map((s) => `${formatWeight(s.weight)}kg×${s.reps}`).join(', ')}
+          : {lastTime.sets.map((s) => `${formatWeight(s.weight)}kg×${formatReps(s.reps)}`).join(', ')}
         </p>
       )}
 

@@ -16,7 +16,8 @@ interface MiniRulerFieldProps {
   /** Value of one graduation (e.g. 2.5 kg, 1 rep). */
   step: number
   max: number
-  decimal?: boolean
+  /** Typed values are rounded to this (0.01 for the weight, 0.5 for half reps). */
+  typedStep?: number
   unit: string
   /** Accessible label, e.g. "Poids en kg, série 2". */
   label: string
@@ -30,14 +31,16 @@ interface MiniRulerFieldProps {
  * scrolls the graduations under a fixed centre mark (native scrolling, so
  * it follows the finger, keeps its momentum and snaps to a graduation);
  * pushing left raises the value. A tap without sliding opens the keyboard
- * (decimal pad for the weight, comma accepted); a typed value between two
- * graduations is kept as is. A vertical swipe still scrolls the page.
+ * (decimal pad, comma or point, rounded to `typedStep`); a typed value
+ * between two graduations is kept as is, and the next swipe goes to the
+ * neighbouring graduation in the direction of the gesture (62,5 → 65 or 60
+ * with a 2,5 step). A vertical swipe still scrolls the page.
  */
 export function MiniRulerField({
   value,
   step,
   max,
-  decimal = false,
+  typedStep = 0.01,
   unit,
   label,
   haptics = false,
@@ -56,6 +59,9 @@ export function MiniRulerField({
   const expectedLeft = useRef<number | null>(null)
   const interacting = useRef(false)
   const offGrid = useRef(false)
+  /** Off-grid value being left: its fractional index and the scroll offset it sits at. */
+  const leaving = useRef<{ index: number; left: number } | null>(null)
+  const offGridAt = useRef<{ index: number; left: number } | null>(null)
   const lastIndex = useRef(0)
   const settleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const latest = useRef({ step, count, value, onCommit, haptics })
@@ -81,19 +87,38 @@ export function MiniRulerField({
     const left = exact * GAP
     expectedLeft.current = left
     el.scrollLeft = left
-    lastIndex.current = Math.round(exact)
+    offGridAt.current = onGrid ? null : { index: exact, left: el.scrollLeft }
+    // The fractional index makes the first tick of the next swipe always change the shown value.
+    lastIndex.current = onGrid ? Math.round(exact) : exact
+    leaving.current = null
   }, [current, step, max])
+
+  /** Graduation under the centre mark; from an off-grid value, the first one in the gesture's direction. */
+  function indexAt(left: number): number {
+    const { count } = latest.current
+    let index = Math.round(left / GAP)
+    const from = leaving.current
+    if (from) index = left >= from.left ? Math.max(index, Math.ceil(from.index)) : Math.min(index, Math.floor(from.index))
+    return Math.min(Math.max(index, 0), count)
+  }
 
   function settle() {
     const el = scrollerRef.current
     interacting.current = false
     setAdjusting(false)
     if (!el) return
-    const { step, count, value, onCommit } = latest.current
-    const index = Math.min(Math.max(Math.round(el.scrollLeft / GAP), 0), count)
+    const { step, value, onCommit } = latest.current
+    const index = indexAt(el.scrollLeft)
+    leaving.current = null
     const v = round2(index * step)
     lastIndex.current = index
     setCurrent(v)
+    // Snapping may have stopped on the other side of the off-grid value: put the ruler on the kept one.
+    const target = index * GAP
+    if (Math.abs(el.scrollLeft - target) >= 1) {
+      expectedLeft.current = target
+      el.scrollLeft = target
+    }
     if (v !== value) onCommit(v)
   }
 
@@ -109,10 +134,11 @@ export function MiniRulerField({
     }
     if (offGrid.current) {
       offGrid.current = false
+      leaving.current = offGridAt.current
       el.style.scrollSnapType = 'x mandatory'
     }
-    const { step, count, haptics } = latest.current
-    const index = Math.min(Math.max(Math.round(left / GAP), 0), count)
+    const { step, haptics } = latest.current
+    const index = indexAt(left)
     if (index !== lastIndex.current) {
       const dir: 1 | -1 = index > lastIndex.current ? 1 : -1
       lastIndex.current = index
@@ -150,17 +176,19 @@ export function MiniRulerField({
 
   function commitText() {
     const raw = inputRef.current?.value ?? text
-    const n = decimal ? parseDecimal(raw) : parseInt(raw, 10)
+    const n = parseDecimal(raw)
     setEditing(false)
     if (!Number.isFinite(n)) return
-    const v = Math.min(Math.max(0, decimal ? round2(n) : Math.round(n)), 999)
+    const v = Math.min(Math.max(0, round2(Math.round(n / typedStep) * typedStep)), 999)
     setCurrent(v)
     if (v !== value) onCommit(v)
   }
 
   function stepBy(delta: 1 | -1) {
-    const base = Math.round(current / step)
-    const v = round2(Math.min(Math.max(base + delta, 0), count) * step)
+    // From an off-grid value, the neighbouring graduation on that side.
+    const exact = current / step
+    const next = delta > 0 ? Math.floor(exact + 1e-6) + 1 : Math.ceil(exact - 1e-6) - 1
+    const v = round2(Math.min(Math.max(next, 0), count) * step)
     if (v === current) return
     setCurrent(v)
     setBump((b) => ({ n: (b?.n ?? 0) + 1, dir: delta }))
@@ -269,7 +297,7 @@ export function MiniRulerField({
         onKeyDown={(e) => {
           if (e.key === 'Enter') e.currentTarget.blur()
         }}
-        inputMode={decimal ? 'decimal' : 'numeric'}
+        inputMode="decimal"
         enterKeyHint="done"
         autoComplete="off"
         aria-label={label}

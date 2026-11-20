@@ -5,7 +5,7 @@ import { usePersonalRecords } from '../hooks/usePersonalRecords'
 import { ChevronLeftIcon, StarIcon } from '../components/Icons'
 import { ProgressChart } from '../components/ProgressChart'
 import { formatDateShort, relativeDateLabel } from '../lib/date'
-import { formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats'
+import { formatReps, formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats'
 import { groupLabel, t } from '../i18n'
 
 type Metric = 'weight' | 'volume'
@@ -172,7 +172,7 @@ export function ExerciseDetailScreen() {
                         ) : (
                           <span className="text-muted">{i + 1}·</span>
                         )}
-                        {formatWeight(set.weight)}kg × {set.reps}
+                        {formatWeight(set.weight)}kg × {formatReps(set.reps)}
                       </span>
                     ))}
                   </div>

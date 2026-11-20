@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { addDays, relativeDateLabel, todayISO } from '../lib/date'
-import { formatWeight } from '../lib/stats'
+import { formatReps, formatWeight } from '../lib/stats'
 import { formatInt, formatKg } from '../lib/tracking'
 import { ActivityIcon, ChartIcon, ChevronRightIcon, ScaleIcon, SearchIcon, StarIcon } from '../components/Icons'
 import { t, tn } from '../i18n'
@@ -166,7 +166,7 @@ export function ProgresScreen() {
                 <span className="flex shrink-0 items-center gap-1 rounded-full bg-highlight-soft px-2.5 py-1 text-highlight-ink">
                   <StarIcon className="h-3.5 w-3.5" />
                   <span className="font-numbers text-sm font-bold">
-                    {formatWeight(e.bestWeight)} kg × {e.bestReps}
+                    {formatWeight(e.bestWeight)} kg × {formatReps(e.bestReps)}
                   </span>
                 </span>
               )}
