@@ -155,3 +155,8 @@ export function equipmentLabel(equipment: string): string {
 export function muscleLabel(muscle: string): string {
   return tDynamic(`muscle.${muscle}`)
 }
+
+/** Short muscle name for the pills on exercise cards ("Épaules avant", "Front delts"). */
+export function muscleShortLabel(muscle: string): string {
+  return tDynamic(`muscleShort.${muscle}`)
+}

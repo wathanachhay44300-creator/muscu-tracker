@@ -4,7 +4,7 @@ import type { LibraryExercise } from '../data/exerciseLibrary'
 import type { Equipment, Exercise, MuscleId } from '../types'
 import { equipmentOf, libraryEntryOf } from './exerciseSearch'
 import { musclesOfGroup, musclesOfGroups, secondaryGroupsOf } from './muscleGroups'
-import { getLang, t } from '../i18n'
+import { getLang, groupLabel, muscleShortLabel, t } from '../i18n'
 
 export interface ExerciseInfo {
   entry: LibraryExercise | undefined
@@ -50,6 +50,27 @@ export function normalizeVideoUrl(raw: string): string | null {
     return url.hostname.includes('.') ? url.toString() : null
   } catch {
     return null
+  }
+}
+
+/** The exercise's main and secondary muscles, for the body diagram (light: no instructions). */
+export function exerciseMuscles(ex: Exercise): { primary: MuscleId[]; secondary: MuscleId[] } {
+  return musclesFor(ex, libraryEntryOf(ex))
+}
+
+/**
+ * Short names for the pills under an exercise's name: its precise muscles
+ * when they're known, otherwise (the user's own exercises) its groups.
+ */
+export function muscleChips(ex: Exercise): { primary: string[]; secondary: string[] } {
+  const entry = libraryEntryOf(ex)
+  if (entry || ex.primaryMuscles?.length) {
+    const { primary, secondary } = musclesFor(ex, entry)
+    return { primary: primary.map(muscleShortLabel), secondary: secondary.map(muscleShortLabel) }
+  }
+  return {
+    primary: ex.muscleGroup === 'Autre' ? [] : [groupLabel(ex.muscleGroup)],
+    secondary: secondaryGroupsOf(ex).map(groupLabel),
   }
 }
 

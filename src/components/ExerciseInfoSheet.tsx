@@ -4,13 +4,13 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { updateExerciseDetails } from '../lib/exerciseActions'
 import { demoSearchUrl, getExerciseInfo, normalizeVideoUrl } from '../lib/exerciseInfo'
-import { EQUIPMENT_LABEL, type Exercise, type MuscleId } from '../types'
+import { EQUIPMENT_LABEL, type Exercise } from '../types'
 import { secondaryGroupsOf } from '../lib/muscleGroups'
 import { BodyDiagram } from './BodyDiagram'
 import { PrincipalPicker, SecondaryPicker } from './MuscleGroupPickers'
 import { ExerciseImages } from './ExerciseImages'
 import { InfoIcon, PlayCircleIcon, XIcon } from './Icons'
-import { equipmentLabel, groupLabel, muscleLabel, t } from '../i18n'
+import { equipmentLabel, groupLabel, t } from '../i18n'
 
 /** The little "i" that opens an exercise's sheet; usable anywhere an exercise is listed. */
 export function ExerciseInfoButton({ exercise, className = '' }: { exercise: Exercise; className?: string }) {
@@ -149,21 +149,11 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
         </div>
 
         <div className="space-y-5 overflow-y-auto px-5 pb-8 pt-2" style={{ overscrollBehavior: 'contain' }}>
-          <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('exerciseInfo.workedMuscles')}</h3>
-            {info.primary.length + info.secondary.length === 0 ? (
-              <p className="text-sm text-muted">{t('exerciseInfo.noMuscles')}</p>
-            ) : (
-              <div className="space-y-2">
-                {info.primary.length > 0 && (
-                  <MuscleList label={t('exerciseInfo.primary')} muscles={info.primary} strong />
-                )}
-                {info.secondary.length > 0 && <MuscleList label={t('exerciseInfo.secondary')} muscles={info.secondary} />}
-              </div>
+          <section aria-label={t('exerciseInfo.workedMuscles')}>
+            <BodyDiagram primary={info.primary} secondary={info.secondary} />
+            {info.primary.length + info.secondary.length === 0 && (
+              <p className="mt-2 text-sm text-muted">{t('exerciseInfo.noMuscles')}</p>
             )}
-            <div className="mt-3">
-              <BodyDiagram primary={info.primary} secondary={info.secondary} />
-            </div>
             {!entry && <MuscleEditor exercise={exercise} />}
           </section>
 
@@ -229,24 +219,6 @@ function Badge({ children, tone = 'neutral' }: { children: React.ReactNode; tone
     >
       {children}
     </span>
-  )
-}
-
-function MuscleList({ label, muscles, strong = false }: { label: string; muscles: MuscleId[]; strong?: boolean }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="mr-0.5 text-xs font-medium text-muted">{label}</span>
-      {muscles.map((m) => (
-        <span
-          key={m}
-          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-            strong ? 'bg-accent text-on-accent' : 'bg-accent-soft text-accent-ink'
-          }`}
-        >
-          {muscleLabel(m)}
-        </span>
-      ))}
-    </div>
   )
 }
 

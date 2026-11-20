@@ -28,6 +28,10 @@
  *    comparison states --progress / --stable / --decline.
  *  - Misc: --knob (switch knobs), --scrim / --on-scrim (overlays, text on
  *    photos), --toast-*, --chart-1 / --chart-2, --star-glow.
+ *  - Body diagram: --muscle-primary (main muscles; text on it:
+ *    --on-muscle-primary), --muscle-secondary,
+ *    --muscle-idle (muscles not worked), --body (silhouette). Primary and
+ *    secondary differ in lightness, not only in hue.
  *  - Type: --font-body / --font-title / --font-exercise / --font-numbers,
  *    title & exercise-name casing, tracking and sizes.
  *  - Shape: --radius-*, --shadow-*, --space-unit.
@@ -92,6 +96,11 @@
   --chart-1: #c8ff00;
   --chart-2: #9aa0ab;
   --star-glow: rgb(200 255 0 / 0.55);
+  --muscle-primary: #FF5A47;
+  --on-muscle-primary: #0b0b0f;
+  --muscle-secondary: #A8453B;
+  --muscle-idle: #3A3E48;
+  --body: #2A2D35;
 
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-title: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
@@ -175,6 +184,11 @@
   --chart-1: #b04a40;
   --chart-2: #c9a227;
   --star-glow: rgb(245 158 11 / 0.85);
+  --muscle-primary: #C62E1F;
+  --on-muscle-primary: #ffffff;
+  --muscle-secondary: #E59A8F;
+  --muscle-idle: #D9C9AE;
+  --body: #EADFCB;
 
   --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-title: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
@@ -258,6 +272,11 @@
   --chart-1: #c9564b;
   --chart-2: #c9a227;
   --star-glow: rgb(245 158 11 / 0.85);
+  --muscle-primary: #FF5A47;
+  --on-muscle-primary: #1a0f0a;
+  --muscle-secondary: #A8453B;
+  --muscle-idle: #5A4335;
+  --body: #3D2C22;
 
   --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-title: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
@@ -327,6 +346,11 @@
   --color-on-good: var(--on-good);
 
   --color-danger: var(--danger);
+  --color-muscle-primary: var(--muscle-primary);
+  --color-on-muscle-primary: var(--on-muscle-primary);
+  --color-muscle-secondary: var(--muscle-secondary);
+  --color-muscle-idle: var(--muscle-idle);
+  --color-body: var(--body);
   --color-danger-ink: var(--danger-ink);
   --color-danger-soft: var(--danger-soft);
   --color-danger-line: var(--danger-line);
