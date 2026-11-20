@@ -16,10 +16,9 @@ function isActive(pathname: string, match: string[]): boolean {
 
 export function BottomNav() {
   const { pathname } = useLocation()
-  // Session mode replaces the tab bar with its own previous/next buttons.
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-nav/95 pb-safe backdrop-blur">
+    <nav data-tab-bar className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-nav/95 pb-safe backdrop-blur">
       <div className="mx-auto flex max-w-md">
         {TABS.map((tab) => {
           const active = isActive(pathname, tab.match)

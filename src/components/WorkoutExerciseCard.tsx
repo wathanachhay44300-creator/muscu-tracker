@@ -49,6 +49,8 @@ interface WorkoutExerciseCardProps {
     onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void
     onPointerCancel: (e: ReactPointerEvent<HTMLElement>) => void
   }
+  /** Called after "Ajouter une série" (the session screen starts the rest timer). */
+  onSetAdded?: () => void
 }
 
 export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
@@ -58,6 +60,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
   containerStyle,
   isDragging,
   dragHandleProps,
+  onSetAdded,
 }: WorkoutExerciseCardProps) {
   const records = usePersonalRecords(we.exerciseId)
   const lastTime = useLastPerformance(we.exerciseId, workoutId)
@@ -98,6 +101,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
   async function handleAddSet(override?: { weight: number; reps: number }) {
     await addSet(we.id!, override)
     hapticLight(!!preferences?.hapticsEnabled)
+    onSetAdded?.()
   }
 
   async function handleRemoveExercise() {

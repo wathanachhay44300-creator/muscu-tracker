@@ -23,14 +23,15 @@ function formatCountdown(ms: number): string {
  * events; only the pill / card themselves are interactive, so the content
  * underneath stays fully usable. Tap the pill to expand (±15s, pause,
  * reset, presets) or collapse. With no timer it only offers itself on the
- * session screens, where starting a rest makes sense (always by hand).
+ * session screens, where starting a rest makes sense.
  */
 export function RestTimerWidget() {
   const timer = useRestTimer()
   const [expanded, setExpanded] = useState(false)
   const { pathname } = useLocation()
-  // Started by hand from the session screen (or a past session being edited).
-  const onSessionScreen = pathname.startsWith('/seance') || /^\/historique\/\d+$/.test(pathname)
+  // The session screen docks its own timer; a past session being edited can start one here.
+  const onSessionScreen = /^\/historique\/\d+$/.test(pathname)
+  if (pathname.startsWith('/seance')) return null
 
   if (!timer.hasTimer && !onSessionScreen) return null
 

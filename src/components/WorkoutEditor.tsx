@@ -23,9 +23,13 @@ import { t, tn } from '../i18n'
 
 interface WorkoutEditorProps {
   workoutId: number
+  /** The session screen shows the chrono and summary in its own sticky header. */
+  hideSummary?: boolean
+  /** A set was added (the session screen starts the rest timer). Keep it stable: cards are memoized. */
+  onSetAdded?: () => void
 }
 
-export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
+export function WorkoutEditor({ workoutId, hideSummary = false, onSetAdded }: WorkoutEditorProps) {
   const detail = useWorkoutDetail(workoutId)
   const [pickerOpen, setPickerOpen] = useState(false)
   const navigate = useNavigate()
@@ -66,7 +70,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   return (
     <div className="space-y-4">
       {/* Chrono pill + summary */}
-      {(showChrono || exercises.length > 0) && (
+      {!hideSummary && (showChrono || exercises.length > 0) && (
         <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
           {showChrono && <SessionTimer startedAt={startedAt} label={t('editor.chrono')} />}
           {exercises.length > 0 && (
@@ -104,6 +108,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
             containerStyle={row.containerProps.style}
             isDragging={row.isDragging}
             dragHandleProps={row.handleProps}
+            onSetAdded={onSetAdded}
           />
         )
       })}

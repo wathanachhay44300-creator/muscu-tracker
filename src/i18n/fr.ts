@@ -200,6 +200,13 @@ export const fr = {
     weightChart: 'Graphique du poids : touchez une pesée pour la modifier',
   },
   session: {
+    finish: 'Terminer',
+    rest: 'Repos',
+    restDone: 'Repos terminé',
+    startRest: 'Lancer {d} de repos',
+    pauseRest: 'Mettre le repos en pause',
+    resumeRest: 'Reprendre le repos',
+    stopRest: 'Arrêter le repos',
     rpe: 'Ressenti de la séance (RPE)',
     notes: 'Notes de séance',
     notesPlaceholder: 'Fatigue, sommeil, douleurs, contexte…',

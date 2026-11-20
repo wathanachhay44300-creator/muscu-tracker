@@ -199,6 +199,13 @@ export const en: Dictionary = {
     weightChart: 'Weight chart: tap a weigh-in to edit it',
   },
   session: {
+    finish: 'Finish',
+    rest: 'Rest',
+    restDone: 'Rest over',
+    startRest: 'Start {d} rest',
+    pauseRest: 'Pause rest',
+    resumeRest: 'Resume rest',
+    stopRest: 'Stop rest',
     rpe: 'Workout effort (RPE)',
     notes: 'Workout notes',
     notesPlaceholder: 'Fatigue, sleep, pain, context…',
