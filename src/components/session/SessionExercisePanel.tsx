@@ -28,11 +28,12 @@ import { ExerciseInfoSheet } from '../ExerciseInfoSheet'
 import { PlateCalculatorSheet } from '../PlateCalculatorSheet'
 import { CopyIcon, DumbbellIcon, InfoIcon, ListIcon, MoreIcon, NoteIcon, PlusIcon, StarIcon, TrashIcon, XIcon } from '../Icons'
 import { SET_GRID, SessionSetRow } from './SessionSetRow'
+import { equipmentLabel, groupLabel, t } from '../../i18n'
 
 const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
 
 function kg(n: number): string {
-  return formatWeight(n).replace('.', ',')
+  return formatWeight(n)
 }
 
 /** "60 kg × 8 · 8 · 7" when every set used the same weight, else "60×8 · 62,5×6". */
@@ -110,7 +111,7 @@ export function SessionExercisePanel({
   async function handleRemoveSet(setId: number) {
     const removed = we.sets.find((s) => s.id === setId)
     await removeSet(setId)
-    if (removed) showSnackbar('Série supprimée', () => restoreSet(removed))
+    if (removed) showSnackbar(t('card.setRemoved'), () => restoreSet(removed))
   }
 
   async function handleToggle(setId: number, done: boolean) {
@@ -126,7 +127,7 @@ export function SessionExercisePanel({
     const sets = [...we.sets]
     await removeExerciseFromWorkout(we.id!)
     onRemoved()
-    showSnackbar('Exercice supprimé', () => restoreExercise(link, sets))
+    showSnackbar(t('card.exerciseRemoved'), () => restoreExercise(link, sets))
   }
 
   return (
@@ -138,12 +139,12 @@ export function SessionExercisePanel({
           className="-ml-1 flex min-h-11 items-center gap-1.5 rounded-xl px-1 text-sm font-semibold text-muted active:bg-surface-3"
         >
           <ListIcon className="h-4 w-4" />
-          Exercice {position} sur {total}
+          {t('panel.position', { position, total })}
         </button>
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          aria-label="Options de l'exercice"
+          aria-label={t('panel.options')}
           className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-surface-3"
         >
           <MoreIcon className="h-5 w-5" />
@@ -152,7 +153,7 @@ export function SessionExercisePanel({
 
       <h1 className="font-exercise !text-[2.4rem] !leading-[1.02] text-ink">{we.exercise.name}</h1>
       <p className="mt-1.5 text-sm text-muted">
-        {[equipment ? EQUIPMENT_LABEL[equipment] : null, [we.exercise.muscleGroup, ...secondary].join(', ')]
+        {[equipment ? equipmentLabel(EQUIPMENT_LABEL[equipment]) : null, [we.exercise.muscleGroup, ...secondary].map(groupLabel).join(', ')]
           .filter(Boolean)
           .join(' · ')}
       </p>
@@ -161,19 +162,19 @@ export function SessionExercisePanel({
         <div className="mt-3 flex flex-wrap gap-1.5">
           {lastTime && (
             <span className="rounded-full bg-surface-3 px-3 py-1.5 text-xs font-semibold text-ink-2">
-              Dernière fois <span className="font-numbers text-[0.85rem] text-ink">{formatLastTime(lastTime.sets)}</span>
+              {t('panel.lastTime')} <span className="font-numbers text-[0.85rem] text-ink">{formatLastTime(lastTime.sets)}</span>
             </span>
           )}
           {bestSet && (
             <span className="flex items-center gap-1 rounded-full bg-highlight-soft px-3 py-1.5 text-xs font-semibold text-highlight-ink">
               <StarIcon className="h-3.5 w-3.5" />
-              Record <span className="font-numbers text-[0.85rem]">{kg(bestSet.weight)} kg × {bestSet.reps}</span>
+              {t('panel.record')} <span className="font-numbers text-[0.85rem]">{kg(bestSet.weight)} kg × {bestSet.reps}</span>
             </span>
           )}
         </div>
       )}
 
-      {lastTime?.note && <p className="mt-2 text-xs italic text-highlight-ink">Note de la dernière fois : {lastTime.note}</p>}
+      {lastTime?.note && <p className="mt-2 text-xs italic text-highlight-ink">{t('panel.lastNote', { note: lastTime.note })}</p>}
       {!noteOpen && noteText.trim() && (
         <button type="button" onClick={() => setNoteOpen(true)} className="mt-2 block text-left text-xs text-accent-ink">
           {noteText}
@@ -185,7 +186,7 @@ export function SessionExercisePanel({
           value={noteText}
           onChange={(e) => changeNote(e.target.value)}
           onBlur={() => setNoteOpen(false)}
-          placeholder="Note (ressenti, douleur, réglage…)"
+          placeholder={t('panel.notePlaceholder')}
           rows={2}
           className="mt-3 w-full resize-none rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm outline-none focus:border-accent-line"
         />
@@ -198,19 +199,18 @@ export function SessionExercisePanel({
           className="mt-3 flex w-full items-center justify-between gap-2 rounded-xl bg-good-soft px-3 py-2.5 text-left text-xs text-good-ink active:opacity-80"
         >
           <span>
-            Objectifs atteints la dernière fois : essayer <span className="font-semibold">{kg(suggestion.weight)} kg</span> (+
-            {kg(suggestion.step)} kg) ?
+            {t('panel.suggest', { weight: `${kg(suggestion.weight)} kg`, step: kg(suggestion.step) })}
           </span>
-          <span className="shrink-0 font-semibold underline">Appliquer</span>
+          <span className="shrink-0 font-semibold underline">{t('card.apply')}</span>
         </button>
       )}
 
       <div className="mt-4">
         <div className={`${SET_GRID} px-1 pb-1.5 text-center text-[11px] font-bold uppercase tracking-wide text-muted`}>
-          <span>Série</span>
-          <span>Kg</span>
-          <span>Reps</span>
-          <span>OK</span>
+          <span>{t('panel.colSet')}</span>
+          <span>{t('panel.colKg')}</span>
+          <span>{t('panel.colReps')}</span>
+          <span>{t('panel.colOk')}</span>
         </div>
         <div className="space-y-1.5">
           {we.sets.map((set, i) => (
@@ -234,17 +234,17 @@ export function SessionExercisePanel({
           className="mt-2 flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-line-strong text-sm font-semibold text-ink-2 active:bg-surface-3"
         >
           <PlusIcon className="h-4 w-4" />
-          Ajouter une série
+          {t('card.addSet')}
         </button>
         {showHint && we.sets.length > 0 && (
           <div className="mt-2 flex items-center gap-1">
             <p className="flex-1 text-center text-xs text-muted">
-              Glisse un chiffre vers la gauche ou la droite · touche-le pour taper
+              {t('panel.hint')}
             </p>
             <button
               type="button"
               onClick={onDismissHint}
-              aria-label="Masquer l'aide"
+              aria-label={t('panel.hideHint')}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-faint active:bg-surface-3"
             >
               <XIcon className="h-4 w-4" />
@@ -257,12 +257,12 @@ export function SessionExercisePanel({
         <ContextMenuSheet
           title={we.exercise.name}
           actions={[
-            { label: 'Fiche de l’exercice', icon: InfoIcon, onSelect: () => setInfoOpen(true) },
-            { label: noteText.trim() ? 'Modifier la note' : 'Ajouter une note', icon: NoteIcon, onSelect: () => setNoteOpen(true) },
-            ...(canPlate ? [{ label: 'Calculateur de plaques', icon: DumbbellIcon, onSelect: () => setPlateOpen(true) }] : []),
-            { label: 'Tous les exercices de la séance', icon: ListIcon, onSelect: onOpenOverview },
-            { label: 'Dupliquer l’exercice', icon: CopyIcon, onSelect: () => duplicateExerciseInWorkout(we.id!) },
-            { label: 'Retirer de la séance', icon: TrashIcon, onSelect: handleRemoveExercise, danger: true },
+            { label: t('panel.details'), icon: InfoIcon, onSelect: () => setInfoOpen(true) },
+            { label: noteText.trim() ? t('panel.editNote') : t('panel.addNote'), icon: NoteIcon, onSelect: () => setNoteOpen(true) },
+            ...(canPlate ? [{ label: t('set.plateCalc'), icon: DumbbellIcon, onSelect: () => setPlateOpen(true) }] : []),
+            { label: t('panel.allExercises'), icon: ListIcon, onSelect: onOpenOverview },
+            { label: t('panel.duplicate'), icon: CopyIcon, onSelect: () => duplicateExerciseInWorkout(we.id!) },
+            { label: t('card.removeFromWorkout'), icon: TrashIcon, onSelect: handleRemoveExercise, danger: true },
           ]}
           onClose={() => setMenuOpen(false)}
         />

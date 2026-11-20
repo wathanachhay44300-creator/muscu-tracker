@@ -18,6 +18,7 @@ import { SessionNotes, SessionRpe } from './SessionExtras'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
 import type { Exercise, WorkoutExerciseWithSets } from '../types'
+import { t, tn } from '../i18n'
 
 interface WorkoutEditorProps {
   workoutId: number
@@ -65,18 +66,17 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
       {exercises.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
-          <p className="text-muted">Aucun exercice pour l'instant.</p>
+          <p className="text-muted">{t('editor.empty')}</p>
           <p className="mt-1 text-sm text-muted">
-            Ajoutez un exercice pour commencer à noter vos séries.
+            {t('editor.emptyHint')}
           </p>
         </div>
       )}
 
       {exercises.length > 0 && (
         <p className="text-center text-xs font-medium text-muted">
-          {exercises.length} exercice{exercises.length > 1 ? 's' : ''} · {setCount} série
-          {setCount > 1 ? 's' : ''}
-          {sessionVolume > 0 && <> · {formatVolume(sessionVolume)} kg au total</>}
+          {tn('common.exercises', exercises.length)} · {tn('common.sets', setCount)}
+          {sessionVolume > 0 && <> · {t('editor.totalVolume', { v: formatVolume(sessionVolume) })}</>}
         </p>
       )}
 
@@ -107,7 +107,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-4 font-semibold text-on-accent shadow-sm active:bg-accent-hover"
       >
         <PlusIcon className="h-5 w-5" />
-        Ajouter un exercice
+        {t('session.addExercise')}
       </button>
 
       {exercises.length > 0 && <SessionRpe workout={workout} />}
@@ -129,7 +129,7 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-good py-4 font-semibold text-on-good shadow-sm active:bg-good"
         >
           <CheckIcon className="h-5 w-5" />
-          {workout.finishedAt ? 'Voir le bilan' : 'Terminer la séance'}
+          {workout.finishedAt ? t('editor.seeSummary') : t('editor.finish')}
         </button>
       )}
 

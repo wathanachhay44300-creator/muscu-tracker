@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useSnackbar } from '../contexts/SnackbarContext'
 import { upsertBodyMeasurement } from '../lib/bodyActions'
-import { formatDateFr, relativeDateLabel, todayISO } from '../lib/date'
+import { formatDateShort, relativeDateLabel, todayISO } from '../lib/date'
 import { formatKg, parseNumber, validValue } from '../lib/tracking'
+import { formatDecimal, t } from '../i18n'
 
 interface WeightEditSheetProps {
   /** Existing weigh-in to edit/delete, or null to add a new one. */
@@ -17,7 +18,7 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
   const { showSnackbar } = useSnackbar()
   const today = todayISO()
   const [date, setDate] = useState(entry?.date ?? today)
-  const [text, setText] = useState(entry ? String(entry.weight).replace('.', ',') : '')
+  const [text, setText] = useState(entry ? formatDecimal(entry.weight) : '')
   const [error, setError] = useState<string | null>(null)
 
   const replacing = !entry && existing.has(date)
@@ -25,7 +26,7 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
   async function save() {
     const value = validValue('weight', parseNumber(text))
     if (value == null) {
-      setError('Entrez un poids valide en kg (entre 20 et 400).')
+      setError(t('weighIn.invalid'))
       return
     }
     await upsertBodyMeasurement(date, { weight: value })
@@ -37,7 +38,7 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
     const previous = entry.weight
     await upsertBodyMeasurement(entry.date, { weight: undefined })
     onClose()
-    showSnackbar('Pesée supprimée', () => upsertBodyMeasurement(entry.date, { weight: previous }))
+    showSnackbar(t('weighIn.deleted'), () => upsertBodyMeasurement(entry.date, { weight: previous }))
   }
 
   return (
@@ -49,15 +50,15 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
         className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-3 text-base font-semibold text-ink">{entry ? 'Modifier la pesée' : 'Ajouter une pesée'}</h2>
+        <h2 className="mb-3 text-base font-semibold text-ink">{entry ? t('weighIn.edit') : t('weighIn.add')}</h2>
 
         {entry ? (
           <p className="mb-3 text-sm font-medium text-muted">
-            {relativeDateLabel(entry.date)} · {formatDateFr(entry.date)}
+            {relativeDateLabel(entry.date)} · {formatDateShort(entry.date)}
           </p>
         ) : (
           <label className="mb-3 block">
-            <span className="mb-1 block text-xs font-medium text-muted">Date</span>
+            <span className="mb-1 block text-xs font-medium text-muted">{t('weighIn.date')}</span>
             <input
               type="date"
               value={date}
@@ -69,13 +70,13 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
         )}
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium text-muted">Poids (kg)</span>
+          <span className="mb-1 block text-xs font-medium text-muted">{t('weighIn.weightKg')}</span>
           <input
             autoFocus
             value={text}
             inputMode="decimal"
             enterKeyHint="done"
-            placeholder="78,4"
+            placeholder={formatDecimal(78.4)}
             onChange={(e) => {
               setText(e.target.value)
               setError(null)
@@ -91,7 +92,7 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
         {error && <p className="mt-1.5 text-xs font-medium text-danger-ink">{error}</p>}
         {replacing && !error && (
           <p className="mt-1.5 text-xs text-muted">
-            Une pesée existe déjà ce jour-là ({formatKg(existing.get(date)!)} kg) : elle sera remplacée.
+            {t('weighIn.replacing', { v: formatKg(existing.get(date)!) })}
           </p>
         )}
 
@@ -101,14 +102,14 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
             onClick={onClose}
             className="flex-1 rounded-xl bg-surface-3 py-3.5 font-medium text-ink-2 active:bg-surface-4"
           >
-            Annuler
+            {t('common.cancel')}
           </button>
           <button
             type="button"
             onClick={save}
             className="flex-1 rounded-xl bg-accent py-3.5 font-medium text-on-accent active:bg-accent-hover"
           >
-            Enregistrer
+            {t('common.save')}
           </button>
         </div>
         {entry && (
@@ -117,7 +118,7 @@ export function WeightEditSheet({ entry, existing, onClose }: WeightEditSheetPro
             onClick={remove}
             className="mt-2 w-full py-3 text-sm font-medium text-danger-ink active:text-danger-ink"
           >
-            Supprimer cette pesée
+            {t('weighIn.delete')}
           </button>
         )}
       </div>

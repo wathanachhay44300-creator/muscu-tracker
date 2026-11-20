@@ -1,7 +1,8 @@
 import { useWorkoutHistory } from '../hooks/useHistory'
-import { formatDateFr, relativeDateLabel } from '../lib/date'
+import { formatDateShort, relativeDateLabel } from '../lib/date'
 import { formatVolume } from '../lib/stats'
 import { ChevronRightIcon, ClipboardIcon, XIcon } from './Icons'
+import { t, tn } from '../i18n'
 
 interface DuplicateSessionSheetProps {
   onSelect: (workoutId: number) => void
@@ -25,12 +26,12 @@ export function DuplicateSessionSheet({ onSelect, onClose }: DuplicateSessionShe
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <h2 className="text-base font-semibold text-ink">Dupliquer une séance précédente</h2>
+          <h2 className="text-base font-semibold text-ink">{t('duplicate.title')}</h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full p-1.5 text-muted active:bg-surface-3"
-            aria-label="Fermer"
+            aria-label={t('common.close')}
           >
             <XIcon className="h-5 w-5" />
           </button>
@@ -40,7 +41,7 @@ export function DuplicateSessionSheet({ onSelect, onClose }: DuplicateSessionShe
           {withExercises.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
               <ClipboardIcon className="h-8 w-8 text-faint" />
-              <p className="text-sm text-muted">Aucune séance à dupliquer pour l'instant.</p>
+              <p className="text-sm text-muted">{t('duplicate.empty')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -53,10 +54,9 @@ export function DuplicateSessionSheet({ onSelect, onClose }: DuplicateSessionShe
                 >
                   <div>
                     <p className="font-semibold text-ink">{relativeDateLabel(workout.date)}</p>
-                    <p className="text-xs text-muted">{formatDateFr(workout.date)}</p>
+                    <p className="text-xs text-muted">{formatDateShort(workout.date)}</p>
                     <p className="mt-1 text-sm text-muted">
-                      {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''} · {setCount} série
-                      {setCount > 1 ? 's' : ''}
+                      {tn('common.exercises', exerciseCount)} · {tn('common.sets', setCount)}
                       {volume > 0 && <> · {formatVolume(volume)} kg</>}
                     </p>
                   </div>

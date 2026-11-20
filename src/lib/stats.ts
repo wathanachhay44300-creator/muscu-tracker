@@ -1,3 +1,4 @@
+import { formatDecimal, formatNumber } from '../i18n'
 import type { MuscleGroup, SetEntry } from '../types'
 
 /** Volume of a single set: weight × reps. */
@@ -10,14 +11,14 @@ export function totalVolume(sets: Pick<SetEntry, 'weight' | 'reps'>[]): number {
   return sets.reduce((sum, s) => sum + setVolume(s), 0)
 }
 
-/** "1234.5" -> "1234.5", "10" -> "10" (trims trailing .0 without rounding away real decimals). */
+/** A weight in the current language, without useless decimals: "62,5" / "62.5", "60". */
 export function formatWeight(n: number): string {
-  return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')
+  return formatDecimal(n)
 }
 
-/** French thousand-separated integer, e.g. 4250 -> "4 250". */
+/** Thousand-separated integer in the current language: "4 250" / "4,250". */
 export function formatVolume(n: number): string {
-  return Math.round(n).toLocaleString('fr-FR')
+  return formatNumber(Math.round(n), 0)
 }
 
 export interface MuscleGroupCount {

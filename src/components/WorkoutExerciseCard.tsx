@@ -26,6 +26,7 @@ import { SetRow } from './SetRow'
 import { ContextMenuSheet } from './ContextMenuSheet'
 import { ExerciseInfoButton } from './ExerciseInfoSheet'
 import { CopyIcon, GripIcon, NoteIcon, PlusIcon, TrashIcon } from './Icons'
+import { groupLabel, t } from '../i18n'
 
 interface WorkoutExerciseCardProps {
   we: WorkoutExerciseWithSets
@@ -92,7 +93,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
     const link = { id: we.id, workoutId: we.workoutId, exerciseId: we.exerciseId, order: we.order, note: we.note }
     const sets = [...we.sets]
     await removeExerciseFromWorkout(we.id!)
-    showSnackbar('Exercice supprimé', () => restoreExercise(link, sets))
+    showSnackbar(t('card.exerciseRemoved'), () => restoreExercise(link, sets))
   }
 
   const swipe = useSwipeToDelete(handleRemoveExercise)
@@ -101,7 +102,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
     const removed = we.sets.find((s) => s.id === setId)
     await removeSet(setId)
     if (removed) {
-      showSnackbar('Série supprimée', () => restoreSet(removed))
+      showSnackbar(t('card.setRemoved'), () => restoreSet(removed))
     }
   }
 
@@ -145,7 +146,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           {dragHandleProps && (
             <button
               type="button"
-              aria-label="Glisser pour réordonner"
+              aria-label={t('card.drag')}
               className="-ml-1.5 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-faint active:cursor-grabbing active:text-muted"
               {...dragHandleProps}
             >
@@ -160,10 +161,10 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             >
               {we.exercise.name}
             </button>
-            <p className="text-xs font-medium text-muted">{we.exercise.muscleGroup}</p>
+            <p className="text-xs font-medium text-muted">{groupLabel(we.exercise.muscleGroup)}</p>
             {lastTime?.note && (
               <p className="mt-1 text-xs italic text-highlight-ink">
-                Dernière fois : {lastTime.note}
+                {t('panel.lastNote', { note: lastTime.note })}
               </p>
             )}
             {!noteOpen && noteText.trim() && (
@@ -178,7 +179,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             data-no-long-press
             data-no-swipe
             onClick={() => setNoteOpen((v) => !v)}
-            aria-label="Note sur cet exercice"
+            aria-label={t('card.note')}
             aria-expanded={noteOpen}
             className={`shrink-0 rounded-lg p-1.5 active:bg-surface-3 ${
               noteText.trim() ? 'text-accent-ink' : 'text-faint'
@@ -196,7 +197,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           autoFocus
           value={noteText}
           onChange={(e) => handleNoteChange(e.target.value)}
-          placeholder="Note (ressenti, douleur, forme…)"
+          placeholder={t('card.notePlaceholder')}
           rows={2}
           className="mb-3 w-full resize-none rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm outline-none focus:border-accent-line"
         />
@@ -205,7 +206,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
       {lastTime && (
         <p className="mb-3 rounded-lg bg-surface-2 px-2.5 py-2 text-xs text-muted">
           <span className="font-medium text-ink-2">
-            Dernière fois ({relativeDateLabel(lastTime.date).toLowerCase()})
+            {t('card.lastTime', { when: relativeDateLabel(lastTime.date).toLowerCase() })}
           </span>{' '}
           : {lastTime.sets.map((s) => `${formatWeight(s.weight)}kg×${s.reps}`).join(', ')}
         </p>
@@ -220,10 +221,9 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           className="mb-3 flex w-full items-center justify-between gap-2 rounded-lg bg-good-soft px-2.5 py-2 text-left text-xs text-good-ink active:bg-good-soft"
         >
           <span>
-            💪 Objectifs atteints la dernière fois — essayer{' '}
-            <span className="font-semibold">{formatWeight(suggestion.weight)} kg</span> (+{suggestion.step} kg) ?
+            {t('card.suggest', { weight: `${formatWeight(suggestion.weight)} kg`, step: formatWeight(suggestion.step) })}
           </span>
-          <span className="shrink-0 font-semibold underline">Appliquer</span>
+          <span className="shrink-0 font-semibold underline">{t('card.apply')}</span>
         </button>
       )}
 
@@ -251,12 +251,12 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
         className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-surface-2 py-2.5 text-sm font-semibold text-accent-ink active:bg-surface-3"
       >
         <PlusIcon className="h-4 w-4" />
-        Ajouter une série
+        {t('card.addSet')}
       </button>
 
       {volume > 0 && (
         <p className="mt-2.5 text-right text-xs font-medium text-muted">
-          Volume : {formatVolume(volume)} kg
+          {t('card.volume', { v: formatVolume(volume) })}
         </p>
       )}
 
@@ -268,12 +268,12 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
           title={we.exercise.name}
           actions={[
             {
-              label: 'Dupliquer cet exercice',
+              label: t('card.duplicate'),
               icon: CopyIcon,
               onSelect: () => duplicateExerciseInWorkout(we.id!),
             },
             {
-              label: 'Supprimer de la séance',
+              label: t('card.removeFromWorkout'),
               icon: TrashIcon,
               onSelect: handleRemoveExercise,
               danger: true,

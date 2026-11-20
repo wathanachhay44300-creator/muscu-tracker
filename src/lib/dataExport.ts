@@ -13,6 +13,7 @@ import type {
   WorkoutExercise,
   WorkoutTemplate,
 } from '../types'
+import { getLang, groupLabel, t } from '../i18n'
 
 const EXPORT_VERSION = 1
 
@@ -107,10 +108,10 @@ export async function importDataJSON(file: File): Promise<void> {
   try {
     data = JSON.parse(text)
   } catch {
-    throw new Error('Ce fichier n’est pas un export JSON valide.')
+    throw new Error(t('data.invalidJson'))
   }
   if (!data || typeof data !== 'object' || !Array.isArray(data.workouts) || !Array.isArray(data.exercises)) {
-    throw new Error('Ce fichier n’est pas un export Muscu Tracker valide.')
+    throw new Error(t('data.invalidExport'))
   }
 
   await db.transaction(
@@ -159,14 +160,14 @@ function csvEscape(value: string): string {
 /** French-locale number formatting for the CSV (comma decimal separator),
  * consistent with the semicolon field delimiter used below. */
 function csvNumber(n: number): string {
-  return String(n).replace('.', ',')
+  return getLang() === 'fr' ? String(n).replace('.', ',') : String(n)
 }
 
 /** Exports session history as a flattened CSV (one row per set) — a bonus
  * alongside the JSON export, handy for opening in a spreadsheet. */
 export async function exportHistoryCSV(): Promise<void> {
   const workouts = await db.workouts.orderBy('date').toArray()
-  const rows = ['Date;Exercice;Groupe musculaire;Série;Poids (kg);Répétitions;Volume (kg)']
+  const rows = [t('data.csvHeader')]
 
   for (const workout of workouts) {
     const links = await db.workoutExercises.where('workoutId').equals(workout.id!).sortBy('order')
@@ -178,7 +179,7 @@ export async function exportHistoryCSV(): Promise<void> {
           [
             workout.date,
             csvEscape(exercise?.name ?? ''),
-            csvEscape(exercise?.muscleGroup ?? ''),
+            csvEscape(exercise?.muscleGroup ? groupLabel(exercise.muscleGroup) : ''),
             String(i + 1),
             csvNumber(set.weight),
             String(set.reps),
@@ -192,6 +193,6 @@ export async function exportHistoryCSV(): Promise<void> {
   // UTF-8 BOM so Excel detects the encoding correctly on Windows.
   downloadBlob(
     new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' }),
-    `muscu-tracker-historique-${todayISO()}.csv`,
+    t('data.csvFileName', { date: todayISO() }),
   )
 }

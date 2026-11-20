@@ -20,6 +20,7 @@ import { SessionOverviewSheet } from '../components/session/SessionOverviewSheet
 import { SessionRestTimer } from '../components/session/SessionRestTimer'
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '../components/Icons'
 import type { Exercise } from '../types'
+import { t } from '../i18n'
 
 const REST_KEY = 'muscu-tracker:restSec'
 const DEFAULT_REST = 90
@@ -121,7 +122,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
   if (exists === false) return <Navigate to="/" replace />
   if (!detail) return null
   const { workout } = detail
-  const title = workout.title ?? template?.name ?? 'Séance libre'
+  const title = workout.title ?? template?.name ?? t('common.freeSession')
   const setCount = exercises.reduce((n, we) => n + we.sets.length, 0)
   const isToday = workout.date === todayISO()
 
@@ -177,7 +178,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
     setConfirmEmpty(false)
     const snapshot = await deleteWorkoutWithUndo(workoutId)
     navigate('/', { replace: true })
-    showSnackbar('Séance vide abandonnée', () => restoreWorkoutSnapshot(snapshot))
+    showSnackbar(t('session.emptyAbandoned'), () => restoreWorkoutSnapshot(snapshot))
   }
 
   const isLast = index >= exercises.length - 1
@@ -190,7 +191,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
           <button
             type="button"
             onClick={() => navigate('/')}
-            aria-label="Quitter le mode séance (la séance continue)"
+            aria-label={t('session.leave')}
             className="-ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-surface-3"
           >
             <ChevronLeftIcon className="h-6 w-6" />
@@ -208,7 +209,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
             onClick={handleFinish}
             className="flex min-h-11 shrink-0 items-center rounded-xl border-2 border-accent px-3.5 text-sm font-bold text-accent-ink active:bg-accent-soft"
           >
-            Terminer
+            {t('session.finish')}
           </button>
         </div>
 
@@ -252,15 +253,15 @@ function SessionView({ workoutId }: { workoutId: number }) {
           </div>
         ) : (
           <div className="mt-8 rounded-3xl border-2 border-dashed border-line-strong px-5 py-12 text-center">
-            <p className="font-display text-ink">Séance vide</p>
-            <p className="mt-1 text-sm text-muted">Ajoute ton premier exercice pour commencer.</p>
+            <p className="font-display text-ink">{t('session.empty')}</p>
+            <p className="mt-1 text-sm text-muted">{t('session.emptyHint')}</p>
             <button
               type="button"
               onClick={() => setPickerOpen(true)}
               className="mx-auto mt-5 flex min-h-12 items-center gap-2 rounded-2xl bg-accent px-6 font-bold text-on-accent active:bg-accent-hover"
             >
               <PlusIcon className="h-5 w-5" />
-              Ajouter un exercice
+              {t('session.addExercise')}
             </button>
           </div>
         )}
@@ -278,7 +279,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
               className="flex min-h-14 flex-1 items-center justify-center gap-1 rounded-2xl bg-surface-3 text-sm font-bold text-ink-2 active:bg-surface-4 disabled:opacity-40"
             >
               <ChevronLeftIcon className="h-5 w-5" />
-              Exercice préc.
+              {t('session.prevExercise')}
             </button>
             {isLast ? (
               <button
@@ -287,7 +288,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
                 className="flex min-h-14 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-accent text-sm font-bold text-on-accent active:bg-accent-hover"
               >
                 <PlusIcon className="h-5 w-5" />
-                Ajouter un exercice
+                {t('session.addExercise')}
               </button>
             ) : (
               <button
@@ -295,7 +296,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
                 onClick={() => go(1)}
                 className="flex min-h-14 flex-1 items-center justify-center gap-1 rounded-2xl bg-accent text-sm font-bold text-on-accent active:bg-accent-hover"
               >
-                Exercice suivant
+                {t('session.nextExercise')}
                 <ChevronRightIcon className="h-5 w-5" />
               </button>
             )}
@@ -324,9 +325,9 @@ function SessionView({ workoutId }: { workoutId: number }) {
       )}
       {confirmEmpty && (
         <ConfirmDialog
-          title="Abandonner cette séance ?"
-          message="Aucune série n'a été enregistrée. La séance vide sera supprimée (tu pourras annuler juste après)."
-          confirmLabel="Abandonner"
+          title={t('session.abandonTitle')}
+          message={t('session.abandonMessage')}
+          confirmLabel={t('session.abandon')}
           danger
           onConfirm={abandonEmpty}
           onCancel={() => setConfirmEmpty(false)}

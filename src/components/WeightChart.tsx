@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { formatDateFr } from '../lib/date'
+import { formatDateShort } from '../lib/date'
 import { eachDay, formatKg, trailingWeightAverage, type DayEntry } from '../lib/tracking'
+import { t } from '../i18n'
 
 const W = 340
 const H = 176
@@ -71,7 +72,7 @@ export function WeightChart({ byDate, start, end, onPick }: WeightChartProps) {
       viewBox={`0 0 ${W} ${H}`}
       className="w-full cursor-pointer touch-manipulation"
       role="img"
-      aria-label="Graphique du poids : touchez une pesée pour la modifier"
+      aria-label={t('charts.weightChart')}
       onClick={handleClick}
     >
       {gridYs.map((v, i) => (
@@ -87,10 +88,10 @@ export function WeightChart({ byDate, start, end, onPick }: WeightChartProps) {
         <circle key={p.date} cx={x(p.i)} cy={y(p.v)} r={days.length > 120 ? 1.6 : 2.6} fill="var(--text-muted)" />
       ))}
       <text x={PAD_L} y={H - 7} fontSize="9" fill="var(--text-muted)">
-        {formatDateFr(days[0], { withYear: false })}
+        {formatDateShort(days[0], { withYear: false })}
       </text>
       <text x={W - PAD_R} y={H - 7} fontSize="9" textAnchor="end" fill="var(--text-muted)">
-        {formatDateFr(days[days.length - 1], { withYear: false })}
+        {formatDateShort(days[days.length - 1], { withYear: false })}
       </text>
     </svg>
   )

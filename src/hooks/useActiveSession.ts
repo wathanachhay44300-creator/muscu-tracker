@@ -3,6 +3,7 @@ import { db } from '../db'
 import { todayISO } from '../lib/date'
 import { getWorkoutForDate } from '../lib/workoutActions'
 import type { Workout } from '../types'
+import { t } from '../i18n'
 
 export interface ActiveSession {
   workout: Workout
@@ -27,7 +28,7 @@ export function useActiveSession(): ActiveSession | null | undefined {
     const template = workout.templateId ? await db.workoutTemplates.get(workout.templateId) : undefined
     return {
       workout,
-      title: workout.title ?? template?.name ?? 'Séance libre',
+      title: workout.title ?? template?.name ?? t('common.freeSession'),
       exerciseCount: links.length,
       setCount,
     }

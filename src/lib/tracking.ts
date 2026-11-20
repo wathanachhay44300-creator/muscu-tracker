@@ -1,5 +1,6 @@
 import type { BodyMeasurement, WeightGoal } from '../types'
 import { addDays, mondayOf } from './date'
+import { formatDecimal, formatNumber, getLocale, t, tDynamic } from '../i18n'
 
 /** One day of weight / steps / calories. Every field is optional. */
 export interface DayEntry {
@@ -62,15 +63,15 @@ export function shortDate(iso: string): string {
 }
 
 export function formatInt(n: number): string {
-  return Math.round(n).toLocaleString('fr-FR')
+  return formatNumber(Math.round(n), 0)
 }
 
 export function formatKg(n: number, digits = 1): string {
-  return n.toFixed(digits).replace('.', ',')
+  return n.toLocaleString(getLocale(), { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: false })
 }
 
 export function formatSigned(n: number, digits = 1): string {
-  const s = Math.abs(n).toFixed(digits).replace('.', ',')
+  const s = formatKg(Math.abs(n), digits)
   if (Math.abs(n) < Math.pow(10, -digits) / 2) return s
   return `${n > 0 ? '+' : '−'}${s}`
 }
@@ -98,9 +99,9 @@ export function parseDeepLink(params: URLSearchParams, today: string): DeepLinkR
   let date = today
   if (rawDate != null && rawDate !== '') {
     const parsed = parseAnyDate(rawDate)
-    if (!parsed) return { kind: 'ignored', reason: 'date invalide' }
+    if (!parsed) return { kind: 'ignored', reason: t('importMsg.invalidDate') }
     // One day of slack: a phone in another timezone can already be "tomorrow".
-    if (parsed > addDays(today, 1)) return { kind: 'ignored', reason: 'date dans le futur' }
+    if (parsed > addDays(today, 1)) return { kind: 'ignored', reason: t('importMsg.futureDate') }
     date = parsed
   }
 
@@ -113,7 +114,7 @@ export function parseDeepLink(params: URLSearchParams, today: string): DeepLinkR
   if (calories != null) entry.calories = calories
 
   if (entry.steps == null && entry.weight == null && entry.calories == null) {
-    return { kind: 'ignored', reason: 'aucune valeur valide' }
+    return { kind: 'ignored', reason: t('importMsg.noValue') }
   }
   return { kind: 'entry', entry }
 }
@@ -121,22 +122,22 @@ export function parseDeepLink(params: URLSearchParams, today: string): DeepLinkR
 /** Human confirmation, e.g. "Pas du 06/10 importés : 8 500 · Poids 78,4 kg". */
 export function describeImport(entry: DayEntry): string {
   const parts: string[] = []
-  if (entry.steps != null) parts.push(`Pas du ${shortDate(entry.date)} importés : ${formatInt(entry.steps)}`)
+  if (entry.steps != null) parts.push(t('importMsg.stepsImported', { date: shortDate(entry.date), n: formatInt(entry.steps) }))
   const extras: string[] = []
-  if (entry.weight != null) extras.push(`poids ${formatKg(entry.weight)} kg`)
+  if (entry.weight != null) extras.push(t('importMsg.weight', { v: formatKg(entry.weight) }))
   if (entry.calories != null) extras.push(`${formatInt(entry.calories)} kcal`)
   if (parts.length === 0) {
     const text = extras.join(' · ')
-    return `Données du ${shortDate(entry.date)} importées : ${text}`
+    return t('importMsg.dataImported', { date: shortDate(entry.date), text })
   }
   return extras.length ? `${parts[0]} · ${extras.join(' · ')}` : parts[0]
 }
 
 /** Extracts parameters from a pasted URL or a bare "steps=8500&date=…" string. */
 export function paramsFromText(text: string): URLSearchParams {
-  const t = text.trim()
-  const q = t.indexOf('?')
-  let query = q >= 0 ? t.slice(q + 1) : t
+  const s = text.trim()
+  const q = s.indexOf('?')
+  let query = q >= 0 ? s.slice(q + 1) : s
   const hash = query.indexOf('#')
   if (hash >= 0) query = query.slice(0, hash)
   return new URLSearchParams(query)
@@ -146,9 +147,7 @@ export function paramsFromText(text: string): URLSearchParams {
 
 export type ClipboardParse = { ok: true; entries: DayEntry[] } | { ok: false; error: string }
 
-export const CLIPBOARD_FORMAT = 'AAAA-MM-JJ;pas;poids;kcal'
 
-const FIELD_LABEL: Record<TrackedField, string> = { steps: 'pas', weight: 'poids', calories: 'calories' }
 
 /**
  * Reads what the iOS Shortcut copied: one `AAAA-MM-JJ;pas;poids;kcal` line per
@@ -158,13 +157,13 @@ const FIELD_LABEL: Record<TrackedField, string> = { steps: 'pas', weight: 'poids
  */
 export function parseClipboardText(text: string, today: string): ClipboardParse {
   const trimmed = text.trim()
-  if (!trimmed) return { ok: false, error: 'Le presse-papiers est vide.' }
+  if (!trimmed) return { ok: false, error: t('importMsg.empty') }
 
   if (/(^|[?&])(steps|weight|kcal|calories)=/.test(trimmed)) {
     const link = parseDeepLink(paramsFromText(trimmed), today)
     return link.kind === 'entry'
       ? { ok: true, entries: [link.entry] }
-      : { ok: false, error: `Lien d'import ignoré : ${link.reason}.` }
+      : { ok: false, error: t('importMsg.linkIgnored', { reason: link.reason }) }
   }
 
   const lines = trimmed.split(/\r\n|\n|\r/).map((l) => l.trim()).filter(Boolean)
@@ -173,11 +172,11 @@ export function parseClipboardText(text: string, today: string): ClipboardParse 
     const cells = line.split(/;|\t/).map((c) => c.trim())
     if (cells.length < 2 || cells.length > 4 || !/^\d{4}-\d{2}-\d{2}$/.test(cells[0])) {
       if (entries.length === 0 && /^date$/i.test(cells[0])) continue // header line
-      return { ok: false, error: `Format non reconnu. Attendu : ${CLIPBOARD_FORMAT} (ex. ${today};8500;78,4;2400).` }
+      return { ok: false, error: t('importMsg.badFormat', { format: t('clipboard.placeholder'), example: `${today};8500;${formatDecimal(78.4)};2400` }) }
     }
     const date = cells[0]
-    if (!isValidISODate(date)) return { ok: false, error: `Date invalide : « ${date} ».` }
-    if (date > addDays(today, 1)) return { ok: false, error: `Date dans le futur : « ${date} ».` }
+    if (!isValidISODate(date)) return { ok: false, error: t('importMsg.badDate', { date }) }
+    if (date > addDays(today, 1)) return { ok: false, error: t('importMsg.futureDateFull', { date }) }
 
     const entry: DayEntry = { date }
     const fields: TrackedField[] = ['steps', 'weight', 'calories']
@@ -186,12 +185,12 @@ export function parseClipboardText(text: string, today: string): ClipboardParse 
       if (raw == null || raw === '') continue
       const value = validValue(fields[i], parseNumber(raw))
       if (value == null) {
-        return { ok: false, error: `Valeur invalide pour « ${FIELD_LABEL[fields[i]]} » : « ${raw} » (nombre positif attendu).` }
+        return { ok: false, error: t('importMsg.badValue', { field: tDynamic(`importMsg.field_${fields[i]}`), raw }) }
       }
       entry[fields[i]] = value
     }
     if (entry.steps == null && entry.weight == null && entry.calories == null) {
-      return { ok: false, error: `Aucune valeur à importer pour le ${date}.` }
+      return { ok: false, error: t('importMsg.noValueFor', { date }) }
     }
     entries.push(entry)
   }
@@ -200,7 +199,7 @@ export function parseClipboardText(text: string, today: string): ClipboardParse 
 
 /** "Pas du 06/10 importés : 8 500" for one day, "3 jours importés" for several. */
 export function describeImports(entries: DayEntry[]): string {
-  return entries.length === 1 ? describeImport(entries[0]) : `${entries.length} jours importés`
+  return entries.length === 1 ? describeImport(entries[0]) : t('importMsg.days', { n: entries.length })
 }
 
 /* ------------------------------ series ------------------------------ */
@@ -365,44 +364,44 @@ export function adviceFor(goal: WeightGoal, rateKg: number, actualKgPerWeek: num
   const diff = actualKgPerWeek - target // > 0: heavier than planned
 
   if (Math.abs(diff) <= tolerance) {
-    return { tone: 'ok', title: 'Dans la cible', text: 'Continue comme ça.' }
+    return { tone: 'ok', title: t('advice.onTarget'), text: t('advice.keepGoing') }
   }
   if (goal === 'loss') {
     return diff > 0
       ? {
           tone: 'calories-down',
-          title: 'Perte plus lente que prévu',
-          text: 'Tu peux ajuster légèrement les calories ou augmenter tes pas.',
+          title: t('advice.lossSlow'),
+          text: t('advice.adjustOrSteps'),
         }
       : {
           tone: 'calories-up',
-          title: 'Perte plus rapide que prévu',
-          text: 'Tu peux corriger un peu les calories.',
+          title: t('advice.lossFast'),
+          text: t('advice.correct'),
         }
   }
   if (goal === 'gain') {
     return diff < 0
       ? {
           tone: 'calories-up',
-          title: 'Prise plus lente que prévu',
-          text: 'Tu peux ajuster légèrement les calories.',
+          title: t('advice.gainSlow'),
+          text: t('advice.adjust'),
         }
       : {
           tone: 'calories-down',
-          title: 'Prise plus rapide que prévu',
-          text: 'Tu peux corriger un peu les calories.',
+          title: t('advice.gainFast'),
+          text: t('advice.correct'),
         }
   }
   return diff < 0
     ? {
         tone: 'calories-up',
-        title: 'Perte plus rapide que prévu',
-        text: 'Tu peux corriger un peu les calories.',
+        title: t('advice.lossFast'),
+        text: t('advice.correct'),
       }
     : {
         tone: 'calories-down',
-        title: 'Poids en hausse plus que prévu',
-        text: 'Tu peux ajuster légèrement les calories ou augmenter tes pas.',
+        title: t('advice.upMore'),
+        text: t('advice.adjustOrSteps'),
       }
 }
 

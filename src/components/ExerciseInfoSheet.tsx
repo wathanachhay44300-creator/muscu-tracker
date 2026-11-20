@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { createPortal } from 'react-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { MUSCLES } from '../data/muscles'
 import { updateExerciseDetails } from '../lib/exerciseActions'
 import { demoSearchUrl, getExerciseInfo, normalizeVideoUrl } from '../lib/exerciseInfo'
 import { EQUIPMENT_LABEL, type Exercise, type MuscleId } from '../types'
@@ -11,6 +10,7 @@ import { BodyDiagram } from './BodyDiagram'
 import { PrincipalPicker, SecondaryPicker } from './MuscleGroupPickers'
 import { ExerciseImages } from './ExerciseImages'
 import { InfoIcon, PlayCircleIcon, XIcon } from './Icons'
+import { equipmentLabel, groupLabel, muscleLabel, t } from '../i18n'
 
 /** The little "i" that opens an exercise's sheet; usable anywhere an exercise is listed. */
 export function ExerciseInfoButton({ exercise, className = '' }: { exercise: Exercise; className?: string }) {
@@ -25,7 +25,7 @@ export function ExerciseInfoButton({ exercise, className = '' }: { exercise: Exe
           e.stopPropagation()
           setOpen(true)
         }}
-        aria-label={`Voir la fiche de ${exercise.name}`}
+        aria-label={`${t('exerciseInfo.openDetails')} ${exercise.name}`}
         className={`shrink-0 rounded-full p-2 text-muted active:bg-surface-3 active:text-accent-ink ${className}`}
       >
         <InfoIcon className="h-5 w-5" />
@@ -115,7 +115,7 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label={`Fiche : ${exercise.name}`}
+        aria-label={`${t('exerciseInfo.details')}: ${exercise.name}`}
         className="flex max-h-[92dvh] w-full max-w-md animate-slide-up flex-col rounded-t-2xl bg-surface shadow-lg sm:rounded-2xl"
         onClick={stop}
       >
@@ -131,16 +131,16 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
             <div className="min-w-0">
               <h2 className="font-exercise !text-lg leading-tight text-ink">{exercise.name}</h2>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {info.equipment && <Badge>{EQUIPMENT_LABEL[info.equipment]}</Badge>}
-                <Badge>{exercise.muscleGroup}</Badge>
-                {!entry && <Badge tone="accent">Perso</Badge>}
+                {info.equipment && <Badge>{equipmentLabel(EQUIPMENT_LABEL[info.equipment])}</Badge>}
+                <Badge>{groupLabel(exercise.muscleGroup)}</Badge>
+                {!entry && <Badge tone="accent">{t('exerciseInfo.personal')}</Badge>}
               </div>
             </div>
             <button
               type="button"
               onClick={onClose}
               onPointerDown={stop}
-              aria-label="Fermer la fiche"
+              aria-label={t('exerciseInfo.close')}
               className="-mr-2 -mt-1 shrink-0 rounded-full p-2.5 text-muted active:bg-surface-3"
             >
               <XIcon className="h-6 w-6" />
@@ -150,15 +150,15 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
 
         <div className="space-y-5 overflow-y-auto px-5 pb-8 pt-2" style={{ overscrollBehavior: 'contain' }}>
           <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Muscles travaillés</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('exerciseInfo.workedMuscles')}</h3>
             {info.primary.length + info.secondary.length === 0 ? (
-              <p className="text-sm text-muted">Aucun muscle renseigné.</p>
+              <p className="text-sm text-muted">{t('exerciseInfo.noMuscles')}</p>
             ) : (
               <div className="space-y-2">
                 {info.primary.length > 0 && (
-                  <MuscleList label="Principaux" muscles={info.primary} strong />
+                  <MuscleList label={t('exerciseInfo.primary')} muscles={info.primary} strong />
                 )}
-                {info.secondary.length > 0 && <MuscleList label="Secondaires" muscles={info.secondary} />}
+                {info.secondary.length > 0 && <MuscleList label={t('exerciseInfo.secondary')} muscles={info.secondary} />}
               </div>
             )}
             <div className="mt-3">
@@ -169,7 +169,7 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
 
           {info.steps.length > 0 && (
             <section>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Comment faire</h3>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('exerciseInfo.howTo')}</h3>
               <ol className="space-y-2.5">
                 {info.steps.map((s, i) => (
                   <li key={i} className="flex gap-2.5 text-sm text-ink-2">
@@ -182,7 +182,7 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
               </ol>
               {info.tips.length > 0 && (
                 <div className="mt-4 rounded-xl bg-highlight-soft px-3.5 py-3">
-                  <p className="mb-1 text-xs font-semibold text-highlight-ink">Conseils et erreurs fréquentes</p>
+                  <p className="mb-1 text-xs font-semibold text-highlight-ink">{t('exerciseInfo.tips')}</p>
                   <ul className="list-disc space-y-1 pl-4 text-sm text-highlight-ink">
                     {info.tips.map((t, i) => (
                       <li key={i}>{t}</li>
@@ -197,7 +197,7 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
           {entry && <ExerciseImages seedId={entry.seedId} name={exercise.name} />}
 
           <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Vidéo</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('exerciseInfo.video')}</h3>
             <a
               href={demoSearchUrl(exercise.name)}
               target="_blank"
@@ -205,10 +205,10 @@ export function ExerciseInfoSheet({ exerciseId, fallback, onClose }: ExerciseInf
               className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-on-accent active:bg-accent-hover"
             >
               <PlayCircleIcon className="h-5 w-5" />
-              Voir une démonstration
+              {t('exerciseInfo.demo')}
             </a>
             <p className="mt-1.5 text-center text-[11px] text-muted">
-              Ouvre une recherche vidéo « comment faire {exercise.name} » dans un nouvel onglet.
+              {t('exerciseInfo.searchVideo', { name: exercise.name })}
             </p>
           </section>
 
@@ -243,7 +243,7 @@ function MuscleList({ label, muscles, strong = false }: { label: string; muscles
             strong ? 'bg-accent text-on-accent' : 'bg-accent-soft text-accent-ink'
           }`}
         >
-          {MUSCLES[m].label}
+          {muscleLabel(m)}
         </span>
       ))}
     </div>
@@ -256,7 +256,7 @@ function MuscleEditor({ exercise }: { exercise: Exercise }) {
   return (
     <div className="mt-4 space-y-3">
       <div>
-        <p className="mb-1.5 text-xs font-medium text-muted">Muscle principal</p>
+        <p className="mb-1.5 text-xs font-medium text-muted">{t('exerciseInfo.mainMuscle')}</p>
         <PrincipalPicker
           value={exercise.muscleGroup}
           onChange={(g) =>
@@ -271,7 +271,7 @@ function MuscleEditor({ exercise }: { exercise: Exercise }) {
         />
       </div>
       <div>
-        <p className="mb-1.5 text-xs font-medium text-muted">Muscles secondaires (optionnel)</p>
+        <p className="mb-1.5 text-xs font-medium text-muted">{t('exerciseInfo.secondaryOptional')}</p>
         <SecondaryPicker
           principal={exercise.muscleGroup}
           value={secondary}
@@ -325,16 +325,16 @@ function PersonalFields({ exercise }: { exercise: Exercise }) {
 
   return (
     <section>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Mes notes et ma vidéo</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('exerciseInfo.personalNotes')}</h3>
       <textarea
         value={notes}
         onChange={(e) => changeNotes(e.target.value)}
         rows={3}
-        placeholder="Réglages de la machine, sensations, astuces…"
+        placeholder={t('exerciseInfo.notesPlaceholder')}
         className="w-full resize-none rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-accent-line"
       />
       <label className="mt-3 block">
-        <span className="mb-1 block text-xs font-medium text-muted">Lien vidéo (optionnel)</span>
+        <span className="mb-1 block text-xs font-medium text-muted">{t('exerciseInfo.videoLink')}</span>
         <input
           value={video}
           onChange={(e) => changeVideo(e.target.value)}
@@ -348,7 +348,7 @@ function PersonalFields({ exercise }: { exercise: Exercise }) {
           }`}
         />
       </label>
-      {videoError && <p className="mt-1 text-xs font-medium text-danger-ink">Ce lien n’est pas valide.</p>}
+      {videoError && <p className="mt-1 text-xs font-medium text-danger-ink">{t('exerciseInfo.invalidLink')}</p>}
       {savedVideo && !videoError && (
         <a
           href={savedVideo}
@@ -357,7 +357,7 @@ function PersonalFields({ exercise }: { exercise: Exercise }) {
           className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-surface-3 text-sm font-semibold text-ink-2 active:bg-surface-4"
         >
           <PlayCircleIcon className="h-5 w-5" />
-          Ouvrir ma vidéo
+          {t('exerciseInfo.openVideo')}
         </a>
       )}
     </section>

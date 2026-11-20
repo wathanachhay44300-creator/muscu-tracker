@@ -1,6 +1,7 @@
 import { useMemo, useState, type PointerEvent as ReactPointerEvent } from 'react'
-import { formatDateFr } from '../lib/date'
+import { formatDateShort } from '../lib/date'
 import { formatInt, formatKg, type ChartColumn } from '../lib/tracking'
+import { t } from '../i18n'
 
 const W = 340
 const PAD_L = 38
@@ -77,7 +78,7 @@ export function TrackingChart({ columns }: TrackingChartProps) {
   const { colW, x, wy, wMin, wMax, sMax, cMax, barY, smoothPath } = geometry
   const barW = Math.max(1, colW * 0.68)
   const cur = columns[selected]
-  const labelAt = (i: number) => formatDateFr(columns[i].start, { withYear: false })
+  const labelAt = (i: number) => formatDateShort(columns[i].start, { withYear: false })
 
   return (
     <div>
@@ -86,7 +87,7 @@ export function TrackingChart({ columns }: TrackingChartProps) {
         className="w-full select-none"
         style={{ touchAction: 'pan-y' }}
         role="img"
-        aria-label="Graphique du poids, des pas et des calories"
+        aria-label={t('charts.trackingChart')}
         onPointerDown={pick}
         onPointerMove={(e) => e.buttons === 1 && pick(e)}
       >
@@ -102,7 +103,7 @@ export function TrackingChart({ columns }: TrackingChartProps) {
 
         {/* Weight */}
         <text x={PAD_L} y={PANELS.weight.title} fontSize="9" fontWeight="700" fill="var(--text-muted)">
-          Poids (kg)
+          {t('charts.weightKg')}
         </text>
         <text x={PAD_L - 4} y={PANELS.weight.top + 7} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatKg(wMax)}
@@ -123,7 +124,7 @@ export function TrackingChart({ columns }: TrackingChartProps) {
 
         {/* Steps */}
         <text x={PAD_L} y={PANELS.steps.title} fontSize="9" fontWeight="700" fill="var(--text-muted)">
-          Pas
+          {t('charts.steps')}
         </text>
         <text x={PAD_L - 4} y={PANELS.steps.top + 7} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatTick(sMax)}
@@ -146,7 +147,7 @@ export function TrackingChart({ columns }: TrackingChartProps) {
 
         {/* Calories */}
         <text x={PAD_L} y={PANELS.calories.title} fontSize="9" fontWeight="700" fill="var(--text-muted)">
-          Calories (kcal)
+          {t('charts.caloriesKcal')}
         </text>
         <text x={PAD_L - 4} y={PANELS.calories.top + 7} fontSize="8" textAnchor="end" fill="var(--text-muted)">
           {formatTick(cMax)}
@@ -177,20 +178,20 @@ export function TrackingChart({ columns }: TrackingChartProps) {
           </text>
         )}
         <text x={W - PAD_R} y={AXIS_Y} fontSize="9" textAnchor="end" fill="var(--text-muted)">
-          {formatDateFr(columns[columns.length - 1].end, { withYear: false })}
+          {formatDateShort(columns[columns.length - 1].end, { withYear: false })}
         </text>
       </svg>
 
       <div className="mt-2 rounded-xl bg-surface-2 px-3.5 py-3">
         <p className="mb-1.5 text-xs font-semibold text-muted">
           {cur.span === 1
-            ? formatDateFr(cur.start)
-            : `Semaine du ${formatDateFr(cur.start, { withYear: false })} au ${formatDateFr(cur.end, { withYear: false })} (moyennes)`}
+            ? formatDateShort(cur.start)
+            : t('charts.weekAverages', { start: formatDateShort(cur.start, { withYear: false }), end: formatDateShort(cur.end, { withYear: false }) })}
         </p>
         <div className="grid grid-cols-3 gap-2 text-center">
-          <DetailValue label="Poids" value={cur.weight != null ? `${formatKg(cur.weight)} kg` : '—'} sub={cur.smooth != null ? `lissé ${formatKg(cur.smooth)}` : undefined} />
-          <DetailValue label="Pas" value={cur.steps != null ? formatInt(cur.steps) : '—'} />
-          <DetailValue label="Calories" value={cur.calories != null ? `${formatInt(cur.calories)}` : '—'} sub="kcal" />
+          <DetailValue label={t('charts.weight')} value={cur.weight != null ? `${formatKg(cur.weight)} kg` : '—'} sub={cur.smooth != null ? t('charts.smoothed', { v: formatKg(cur.smooth) }) : undefined} />
+          <DetailValue label={t('charts.steps')} value={cur.steps != null ? formatInt(cur.steps) : '—'} />
+          <DetailValue label={t('charts.calories')} value={cur.calories != null ? `${formatInt(cur.calories)}` : '—'} sub="kcal" />
         </div>
       </div>
     </div>

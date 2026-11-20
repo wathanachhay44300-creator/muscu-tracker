@@ -8,6 +8,7 @@ import { DumbbellIcon, StarIcon, TrashIcon, CopyIcon } from './Icons'
 import { PlateCalculatorSheet } from './PlateCalculatorSheet'
 import { ContextMenuSheet } from './ContextMenuSheet'
 import { DragNumberField } from './DragNumberField'
+import { t } from '../i18n'
 
 /** The plate calculator only makes sense for these — the rest have no plates to pick. */
 const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
@@ -76,7 +77,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           className={`flex h-6 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
             isPR ? 'bg-highlight-soft text-highlight' : 'text-muted'
           }`}
-          title={isPR ? 'Nouveau record personnel' : undefined}
+          title={isPR ? t('set.newPr') : undefined}
         >
           {isPR ? <StarIcon className="animate-pop-in h-3.5 w-3.5" /> : index + 1}
         </span>
@@ -86,7 +87,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           step={preferences?.weightStep ?? 2.5}
           decimal
           haptics={!!preferences?.hapticsEnabled}
-          label={`Poids en kg, série ${index + 1}`}
+          label={t('set.weightLabel', { n: index + 1 })}
           onCommit={onChangeWeight}
           className="min-w-[6.5rem] flex-1"
         />
@@ -97,8 +98,8 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
             data-no-swipe
             onClick={() => setCalculatorOpen(true)}
             className="flex shrink-0 items-center gap-0.5 rounded-md px-0.5 py-0.5 text-[10px] font-medium text-muted active:text-accent-ink"
-            aria-label="Calculateur de plaques"
-            title="Calculateur de plaques"
+            aria-label={t('set.plateCalc')}
+            title={t('set.plateCalc')}
           >
             <DumbbellIcon className="h-2.5 w-2.5" />
             kg
@@ -111,7 +112,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           value={set.reps}
           step={1}
           haptics={!!preferences?.hapticsEnabled}
-          label={`Répétitions, série ${index + 1}`}
+          label={t('set.repsLabel', { n: index + 1 })}
           onCommit={onChangeReps}
           className="min-w-[5.5rem] flex-1"
         />
@@ -123,7 +124,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           data-no-swipe
           onClick={onRemove}
           className="shrink-0 p-1 text-faint active:text-danger-ink"
-          aria-label="Supprimer la série"
+          aria-label={t('set.delete')}
         >
           <TrashIcon className="h-4 w-4" />
         </button>
@@ -139,10 +140,10 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
 
       {menuOpen && (
         <ContextMenuSheet
-          title={`Série ${index + 1}`}
+          title={t('set.title', { n: index + 1 })}
           actions={[
-            { label: 'Dupliquer la série', icon: CopyIcon, onSelect: onDuplicate },
-            { label: 'Supprimer la série', icon: TrashIcon, onSelect: onRemove, danger: true },
+            { label: t('set.duplicate'), icon: CopyIcon, onSelect: onDuplicate },
+            { label: t('set.delete'), icon: TrashIcon, onSelect: onRemove, danger: true },
           ]}
           onClose={() => setMenuOpen(false)}
         />

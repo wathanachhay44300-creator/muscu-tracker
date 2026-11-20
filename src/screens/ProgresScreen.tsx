@@ -6,6 +6,7 @@ import { addDays, relativeDateLabel, todayISO } from '../lib/date'
 import { formatWeight } from '../lib/stats'
 import { formatInt, formatKg } from '../lib/tracking'
 import { ActivityIcon, ChartIcon, ChevronRightIcon, ScaleIcon, SearchIcon, StarIcon } from '../components/Icons'
+import { t, tn } from '../i18n'
 
 interface ExerciseProgress {
   id: number
@@ -65,7 +66,7 @@ export function ProgresScreen() {
     }
     return [...byExercise.values()]
       .map(({ workouts: w, ...rest }) => ({ ...rest, sessions: w.size }))
-      .sort((a, b) => (a.lastDate === b.lastDate ? a.name.localeCompare(b.name, 'fr') : a.lastDate < b.lastDate ? 1 : -1))
+      .sort((a, b) => (a.lastDate === b.lastDate ? a.name.localeCompare(b.name) : a.lastDate < b.lastDate ? 1 : -1))
   }, [])
 
   const filtered = useMemo(() => {
@@ -79,7 +80,7 @@ export function ProgresScreen() {
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-      <h1 className="mb-5 pt-2 !text-[2rem] leading-none text-ink">Progrès</h1>
+      <h1 className="mb-5 pt-2 !text-[2rem] leading-none text-ink">{t('screens.progress')}</h1>
 
       <div className="space-y-2.5">
         <Link
@@ -88,17 +89,17 @@ export function ProgresScreen() {
         >
           <ActivityIcon className="h-6 w-6 shrink-0 text-accent-ink" />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-ink">Poids, pas &amp; calories</p>
+            <p className="font-semibold text-ink">{t('progress.trackingTitle')}</p>
             <p className="text-xs text-muted">
               {body && (body.weight != null || body.steps != null || body.calories != null)
                 ? [
                     body.weight != null && `${formatKg(body.weight)} kg`,
-                    body.steps != null && `${formatInt(body.steps)} pas/j`,
-                    body.calories != null && `${formatInt(body.calories)} kcal/j`,
+                    body.steps != null && t('progress.stepsPerDay', { n: formatInt(body.steps) }),
+                    body.calories != null && t('progress.kcalPerDay', { n: formatInt(body.calories) }),
                   ]
                     .filter(Boolean)
-                    .join(' · ') + ' (moy. 7 j)'
-                : 'Bilan côte à côte et conseils'}
+                    .join(' · ') + t('progress.avg7')
+                : t('progress.trackingHint')}
             </p>
           </div>
           <ChevronRightIcon className="h-5 w-5 shrink-0 text-faint" />
@@ -109,8 +110,8 @@ export function ProgresScreen() {
         >
           <ScaleIcon className="h-6 w-6 shrink-0 text-accent-ink" />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-ink">Poids &amp; mensurations</p>
-            <p className="text-xs text-muted">Courbe, pesées, résumé par semaine</p>
+            <p className="font-semibold text-ink">{t('screens.body')}</p>
+            <p className="text-xs text-muted">{t('progress.bodyHint')}</p>
           </div>
           <ChevronRightIcon className="h-5 w-5 shrink-0 text-faint" />
         </Link>
@@ -120,15 +121,15 @@ export function ProgresScreen() {
         >
           <ChartIcon className="h-6 w-6 shrink-0 text-accent-ink" />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-ink">Muscles travaillés</p>
-            <p className="text-xs text-muted">Séries par muscle, semaine par semaine</p>
+            <p className="font-semibold text-ink">{t('progress.musclesTitle')}</p>
+            <p className="text-xs text-muted">{t('progress.musclesHint')}</p>
           </div>
           <ChevronRightIcon className="h-5 w-5 shrink-0 text-faint" />
         </Link>
       </div>
 
-      <h2 className="mb-1 mt-7 px-1 text-ink">Records par exercice</h2>
-      <p className="mb-3 px-1 text-xs text-muted">Touchez un exercice pour son graphique et son historique.</p>
+      <h2 className="mb-1 mt-7 px-1 text-ink">{t('progress.records')}</h2>
+      <p className="mb-3 px-1 text-xs text-muted">{t('progress.recordsHint')}</p>
 
       {exercises && exercises.length > 6 && (
         <div className="mb-3 flex items-center gap-2 rounded-xl bg-surface-3 px-3 py-2.5">
@@ -136,7 +137,7 @@ export function ProgresScreen() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Chercher un exercice…"
+            placeholder={t('progress.search')}
             enterKeyHint="search"
             className="w-full bg-transparent text-base outline-none placeholder:text-muted"
           />
@@ -145,7 +146,7 @@ export function ProgresScreen() {
 
       {exercises && exercises.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center text-sm text-muted">
-          Tes records apparaîtront ici après ta première séance.
+          {t('progress.empty')}
         </p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-line bg-surface">
@@ -158,14 +159,14 @@ export function ProgresScreen() {
               <div className="min-w-0 flex-1">
                 <p className="font-exercise truncate text-[1.05rem] text-ink">{e.name}</p>
                 <p className="text-xs text-muted">
-                  {e.sessions} séance{e.sessions > 1 ? 's' : ''} · {relativeDateLabel(e.lastDate).toLowerCase()}
+                  {tn('common.sessions', e.sessions)} · {relativeDateLabel(e.lastDate).toLowerCase()}
                 </p>
               </div>
               {e.bestWeight > 0 && (
                 <span className="flex shrink-0 items-center gap-1 rounded-full bg-highlight-soft px-2.5 py-1 text-highlight-ink">
                   <StarIcon className="h-3.5 w-3.5" />
                   <span className="font-numbers text-sm font-bold">
-                    {formatWeight(e.bestWeight).replace('.', ',')} kg × {e.bestReps}
+                    {formatWeight(e.bestWeight)} kg × {e.bestReps}
                   </span>
                 </span>
               )}
@@ -180,7 +181,7 @@ export function ProgresScreen() {
           onClick={() => setShowAll(true)}
           className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
         >
-          Voir plus ({filtered.length - SHOWN})
+          {t('common.seeMoreCount', { n: filtered.length - SHOWN })}
         </button>
       )}
     </div>

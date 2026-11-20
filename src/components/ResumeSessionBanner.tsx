@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useActiveSession } from '../hooks/useActiveSession'
 import { ChevronRightIcon } from './Icons'
+import { t } from '../i18n'
 
 /**
  * "Séance en cours – Reprendre" strip at the top of every tab while today's
@@ -29,10 +30,10 @@ export function ResumeSessionBanner() {
       <span className="mx-auto flex h-[var(--session-banner-h)] max-w-md items-center gap-2">
         <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-on-accent" aria-hidden="true" />
         <span className="min-w-0 flex-1 truncate text-sm font-semibold">
-          Séance en cours · <span className="font-normal">{active.title}</span>
+          {t('common.inProgressBanner')} · <span className="font-normal">{active.title}</span>
         </span>
         <span className="flex items-center text-sm font-bold">
-          Reprendre
+          {t('common.resume')}
           <ChevronRightIcon className="h-4 w-4" />
         </span>
       </span>

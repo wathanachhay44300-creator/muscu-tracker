@@ -4,6 +4,7 @@ import { exportAllDataJSON, exportHistoryCSV, getDataSummary, importDataJSON, ty
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { TrackingImportCard } from '../components/TrackingImportCard'
 import { ChevronLeftIcon, DownloadIcon, UploadIcon } from '../components/Icons'
+import { t } from '../i18n'
 
 export function DonneesScreen() {
   const navigate = useNavigate()
@@ -54,9 +55,9 @@ export function DonneesScreen() {
     try {
       await importDataJSON(file)
       await refreshSummary()
-      setMessage({ tone: 'success', text: 'Données importées avec succès.' })
+      setMessage({ tone: 'success', text: t('data.imported') })
     } catch (err) {
-      setMessage({ tone: 'error', text: err instanceof Error ? err.message : 'Échec de l’import.' })
+      setMessage({ tone: 'error', text: err instanceof Error ? err.message : t('data.importFailed') })
     } finally {
       setBusy(false)
     }
@@ -69,19 +70,19 @@ export function DonneesScreen() {
           type="button"
           onClick={() => navigate(-1)}
           className="rounded-full p-2 -ml-2 text-muted active:bg-surface-3"
-          aria-label="Retour"
+          aria-label={t('common.back')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-bold text-ink">Export / import des données</h1>
+        <h1 className="text-lg font-bold text-ink">{t('screens.data')}</h1>
       </div>
 
       {summary && (
         <div className="mb-5 grid grid-cols-2 gap-2.5">
-          <SummaryTile label="Séances" value={summary.workouts} />
-          <SummaryTile label="Exercices" value={summary.exercises} />
-          <SummaryTile label="Programmes" value={summary.templates} />
-          <SummaryTile label="Mesures" value={summary.bodyMeasurements} />
+          <SummaryTile label={t('data.workouts')} value={summary.workouts} />
+          <SummaryTile label={t('data.exercises')} value={summary.exercises} />
+          <SummaryTile label={t('data.programs')} value={summary.templates} />
+          <SummaryTile label={t('data.measurements')} value={summary.bodyMeasurements} />
         </div>
       )}
 
@@ -97,10 +98,9 @@ export function DonneesScreen() {
 
       <div className="space-y-3">
         <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-          <p className="mb-1 text-sm font-semibold text-ink-2">Sauvegarde complète (JSON)</p>
+          <p className="mb-1 text-sm font-semibold text-ink-2">{t('data.backupTitle')}</p>
           <p className="mb-3 text-xs text-muted">
-            Toutes vos données (séances, exercices, programmes, mesures, pas, poids, calories, objectif). À conserver pour restaurer plus
-            tard, sur cet appareil ou un autre.
+            {t('data.backupHint')}
           </p>
           <button
             type="button"
@@ -109,15 +109,14 @@ export function DonneesScreen() {
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 font-semibold text-on-accent active:bg-accent-hover disabled:opacity-60"
           >
             <DownloadIcon className="h-4 w-4" />
-            Exporter en JSON
+            {t('data.exportJson')}
           </button>
         </div>
 
         <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-          <p className="mb-1 text-sm font-semibold text-ink-2">Historique (CSV)</p>
+          <p className="mb-1 text-sm font-semibold text-ink-2">{t('data.csvTitle')}</p>
           <p className="mb-3 text-xs text-muted">
-            Le détail des séries de vos séances, pour l'ouvrir dans un tableur. Ne contient pas les
-            mensurations.
+            {t('data.csvHint')}
           </p>
           <button
             type="button"
@@ -126,17 +125,16 @@ export function DonneesScreen() {
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface-3 py-3 font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-60"
           >
             <DownloadIcon className="h-4 w-4" />
-            Exporter en CSV
+            {t('data.exportCsv')}
           </button>
         </div>
 
         <TrackingImportCard />
 
         <div className="rounded-2xl border border-danger-line bg-danger-soft p-4">
-          <p className="mb-1 text-sm font-semibold text-danger-ink">Importer des données</p>
+          <p className="mb-1 text-sm font-semibold text-danger-ink">{t('data.importTitle')}</p>
           <p className="mb-3 text-xs text-danger-ink">
-            Restaure une sauvegarde JSON exportée depuis Muscu Tracker. Cela remplace définitivement toutes les
-            données actuellement sur cet appareil.
+            {t('data.importHint')}
           </p>
           <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleFileChange} />
           <button
@@ -146,16 +144,16 @@ export function DonneesScreen() {
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-danger py-3 font-semibold text-on-danger active:bg-danger disabled:opacity-60"
           >
             <UploadIcon className="h-4 w-4" />
-            Importer un fichier JSON
+            {t('data.importFile')}
           </button>
         </div>
       </div>
 
       {pendingFile && (
         <ConfirmDialog
-          title="Remplacer toutes les données ?"
-          message={`Le fichier « ${pendingFile.name} » va remplacer définitivement toutes vos données actuelles (séances, exercices, programmes, mesures). Cette action est irréversible.`}
-          confirmLabel="Remplacer"
+          title={t('data.replaceTitle')}
+          message={t('data.replaceMessage', { name: pendingFile.name })}
+          confirmLabel={t('data.replace')}
           danger
           onConfirm={handleConfirmImport}
           onCancel={() => setPendingFile(null)}

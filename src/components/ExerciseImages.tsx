@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { EXERCISE_IMAGES } from '../data/exerciseImages'
 import { XIcon } from './Icons'
+import { t } from '../i18n'
 
-const LABELS = ['Départ', 'Arrivée']
+const labels = () => [t('images.start'), t('images.end')]
 
 function imageUrl(folder: string, index: number): string {
   return `${import.meta.env.BASE_URL}exercise-images/${folder}/${index}.webp`
@@ -26,10 +27,10 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
 
   return (
     <section>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Démonstration</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('images.demo')}</h3>
       {allFailed ? (
         <p className="rounded-xl bg-surface-2 px-3 py-4 text-center text-sm text-muted">
-          Images indisponibles pour le moment.
+          {t('images.unavailable')}
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-2">
@@ -38,8 +39,8 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
               <Thumb
                 key={i}
                 src={imageUrl(entry.folder, i)}
-                alt={`${name} : position ${LABELS[i]?.toLowerCase() ?? i + 1}`}
-                label={LABELS[i] ?? String(i + 1)}
+                alt={t('images.alt', { name, pos: labels()[i]?.toLowerCase() ?? i + 1 })}
+                label={labels()[i] ?? String(i + 1)}
                 onZoom={() => setZoomed(i)}
                 onError={() => setFailed((f) => ({ ...f, [i]: true }))}
               />
@@ -47,7 +48,7 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
           )}
         </div>
       )}
-      <p className="mt-1.5 text-[11px] text-muted">Images : free-exercise-db (domaine public)</p>
+      <p className="mt-1.5 text-[11px] text-muted">{t('images.credit')}</p>
 
       {zoomed != null &&
         createPortal(
@@ -58,12 +59,12 @@ export function ExerciseImages({ seedId, name }: { seedId: string; name: string 
           >
             <img
               src={imageUrl(entry.folder, zoomed)}
-              alt={`${name} : position ${LABELS[zoomed]?.toLowerCase() ?? zoomed + 1}, agrandie`}
+              alt={t('images.altZoomed', { name, pos: labels()[zoomed]?.toLowerCase() ?? zoomed + 1 })}
               className="max-h-full max-w-full rounded-lg object-contain"
             />
             <button
               type="button"
-              aria-label="Fermer l'image"
+              aria-label={t('images.closeImage')}
               className="absolute right-3 top-3 rounded-full bg-scrim/50 p-2.5 text-on-scrim"
               onClick={() => setZoomed(null)}
               style={{ marginTop: 'env(safe-area-inset-top)' }}
@@ -95,7 +96,7 @@ function Thumb({
     <button
       type="button"
       onClick={onZoom}
-      aria-label={`Agrandir : ${alt}`}
+      aria-label={t('images.enlarge', { alt })}
       className="relative aspect-[3/2] overflow-hidden rounded-xl bg-surface-3 active:opacity-80"
     >
       {!loaded && <span className="absolute inset-0 animate-pulse bg-surface-4" aria-hidden="true" />}

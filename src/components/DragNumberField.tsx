@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { formatDecimal, parseDecimal } from '../i18n'
 import { hapticTick } from '../lib/haptics'
 import { ChevronLeftIcon, ChevronRightIcon } from './Icons'
 
@@ -11,13 +12,13 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100
 }
 
-/** "62,5", "8": French decimal comma, no trailing zeros. */
+/** "62,5" / "62.5", "8": decimal separator of the current language, no trailing zeros. */
 export function formatFieldValue(n: number): string {
-  return String(Number.isInteger(n) ? n : round2(n)).replace('.', ',')
+  return formatDecimal(round2(n))
 }
 
 function parseFieldValue(raw: string, decimal: boolean): number | null {
-  const n = decimal ? parseFloat(raw.replace(/\s/g, '').replace(',', '.')) : parseInt(raw, 10)
+  const n = decimal ? parseDecimal(raw) : parseInt(raw, 10)
   return Number.isFinite(n) ? n : null
 }
 

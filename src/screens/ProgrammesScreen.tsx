@@ -8,6 +8,7 @@ import {
   renameTemplate,
 } from '../lib/templateActions'
 import { ContextMenuSheet } from '../components/ContextMenuSheet'
+import { t, tn } from '../i18n'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { useLongPress } from '../hooks/useLongPress'
@@ -27,7 +28,7 @@ import {
   XIcon,
 } from '../components/Icons'
 
-const NAME_SUGGESTIONS = ['Push', 'Pull', 'Legs', 'Full Body', 'Haut du corps', 'Bas du corps']
+const nameSuggestions = () => ['Push', 'Pull', 'Legs', 'Full Body', t('programs.upper'), t('programs.lower')]
 
 export function ProgrammesScreen() {
   const templates = useTemplates()
@@ -58,12 +59,12 @@ export function ProgrammesScreen() {
           <button
             type="button"
             onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/'))}
-            aria-label="Retour"
+            aria-label={t('common.back')}
             className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-surface-3"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
-          <h1 className="text-ink">Programmes</h1>
+          <h1 className="text-ink">{t('screens.programs')}</h1>
         </div>
         <button
           type="button"
@@ -71,16 +72,16 @@ export function ProgrammesScreen() {
           className="flex items-center gap-1 rounded-full bg-accent py-2 pl-2.5 pr-3 text-sm font-semibold text-on-accent active:bg-accent-hover"
         >
           <PlusIcon className="h-4 w-4" />
-          Créer
+          {t('common.create')}
         </button>
       </div>
 
       {templates && templates.length === 0 ? (
         <div className="mb-6 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
           <ClipboardIcon className="h-9 w-9 text-faint" />
-          <p className="font-medium text-ink-2">Aucun programme</p>
+          <p className="font-medium text-ink-2">{t('programs.none')}</p>
           <p className="text-sm text-muted">
-            Créez un modèle de séance (Push, Full Body…) pour démarrer plus vite la prochaine fois.
+            {t('programs.noneHint')}
           </p>
         </div>
       ) : (
@@ -132,7 +133,7 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={rename.commit}
-            aria-label="Valider le renommage"
+            aria-label={t('programs.confirmRename')}
             className="shrink-0 rounded-full p-1.5 text-accent-ink active:bg-surface-3"
           >
             <CheckIcon className="h-5 w-5" />
@@ -141,7 +142,7 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={rename.cancel}
-            aria-label="Annuler le renommage"
+            aria-label={t('programs.cancelRename')}
             className="shrink-0 rounded-full p-1.5 text-muted active:bg-surface-3"
           >
             <XIcon className="h-5 w-5" />
@@ -165,7 +166,7 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
           <div className="min-w-0">
             <p className="truncate font-semibold text-ink">{template.name}</p>
             <p className="text-xs text-muted">
-              {exerciseCount} exercice{exerciseCount > 1 ? 's' : ''}
+              {tn('common.exercises', exerciseCount)}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-0.5">
@@ -177,7 +178,7 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
                 e.stopPropagation()
                 rename.start()
               }}
-              aria-label={`Renommer ${template.name}`}
+              aria-label={t('programs.renameNamed', { name: template.name })}
               className="rounded-full p-1.5 text-faint active:bg-surface-3 active:text-accent-ink"
             >
               <PencilIcon className="h-4 w-4" />
@@ -191,9 +192,9 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
         <ContextMenuSheet
           title={template.name}
           actions={[
-            { label: 'Renommer', icon: PencilIcon, onSelect: rename.start },
-            { label: 'Dupliquer', icon: CopyIcon, onSelect: () => duplicateTemplate(template.id!) },
-            { label: 'Supprimer', icon: TrashIcon, onSelect: () => setDeleting(true), danger: true },
+            { label: t('common.rename'), icon: PencilIcon, onSelect: rename.start },
+            { label: t('common.duplicate'), icon: CopyIcon, onSelect: () => duplicateTemplate(template.id!) },
+            { label: t('common.delete'), icon: TrashIcon, onSelect: () => setDeleting(true), danger: true },
           ]}
           onClose={() => setMenuOpen(false)}
         />
@@ -201,9 +202,9 @@ function TemplateListItem({ summary }: { summary: TemplateSummary }) {
 
       {deleting && (
         <ConfirmDialog
-          title={`Supprimer « ${template.name} » ?`}
-          message="Cette action est définitive. Vos séances déjà réalisées ne sont pas concernées."
-          confirmLabel="Supprimer"
+          title={t('programs.deleteTitle', { name: template.name })}
+          message={t('programs.deleteMessage')}
+          confirmLabel={t('common.delete')}
           danger
           onConfirm={() => {
             deleteTemplate(template.id!)
@@ -228,28 +229,28 @@ function CreateTemplateSheet({
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-surface">
       <div className="flex items-center justify-between border-b border-line px-4 pt-safe pt-4 pb-3">
-        <h2 className="text-lg font-bold text-ink">Nouveau programme</h2>
+        <h2 className="text-lg font-bold text-ink">{t('screens.newProgram')}</h2>
         <button
           type="button"
           onClick={onCancel}
           className="rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Fermer"
+          aria-label={t('common.close')}
         >
           <XIcon className="h-6 w-6" />
         </button>
       </div>
       <div className="flex-1 overflow-y-auto px-4 pb-8">
         <div className="mt-4">
-          <label className="mb-1 block text-sm font-medium text-ink-2">Nom du programme</label>
+          <label className="mb-1 block text-sm font-medium text-ink-2">{t('programs.name')}</label>
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ex : Push"
+            placeholder={t('programs.namePlaceholder')}
             className="w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-base outline-none focus:border-accent-line"
           />
           <div className="mt-3 flex flex-wrap gap-2">
-            {NAME_SUGGESTIONS.map((s) => (
+            {nameSuggestions().map((s) => (
               <button
                 key={s}
                 type="button"
@@ -267,7 +268,7 @@ function CreateTemplateSheet({
             onClick={onCancel}
             className="flex-1 rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
           >
-            Annuler
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -275,7 +276,7 @@ function CreateTemplateSheet({
             disabled={!name.trim()}
             className="flex-1 rounded-xl bg-accent py-3 font-medium text-on-accent disabled:opacity-40 active:bg-accent-hover"
           >
-            Créer
+            {t('common.create')}
           </button>
         </div>
       </div>

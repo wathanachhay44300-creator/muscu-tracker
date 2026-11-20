@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { t } from '../i18n'
 
 /** "Liste / Calendrier" switch at the top of the Historique tab. */
 export function HistoryTabs() {
@@ -7,12 +8,12 @@ export function HistoryTabs() {
       isActive ? 'bg-accent text-on-accent' : 'text-muted active:bg-surface-4'
     }`
   return (
-    <div className="mb-4 flex gap-1 rounded-2xl bg-surface-3 p-1" role="tablist" aria-label="Affichage de l'historique">
+    <div className="mb-4 flex gap-1 rounded-2xl bg-surface-3 p-1" role="tablist" aria-label={t('historyTabs.label')}>
       <NavLink to="/historique" end className={tab}>
-        Liste
+        {t('historyTabs.list')}
       </NavLink>
       <NavLink to="/historique/calendrier" className={tab}>
-        Calendrier
+        {t('historyTabs.calendar')}
       </NavLink>
     </div>
   )

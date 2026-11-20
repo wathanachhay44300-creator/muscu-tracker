@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { totalVolume } from '../lib/stats'
 import type { SetEntry, Workout } from '../types'
+import { t } from '../i18n'
 
 export interface WorkoutSummary {
   workout: Workout
@@ -46,7 +47,7 @@ export function useWorkoutHistory(): WorkoutSummary[] | undefined {
       const wSets = setsByWorkout.get(workout.id!) ?? []
       const template = workout.templateId ? templateName.get(workout.templateId) : undefined
       return {
-        title: workout.title ?? template ?? 'Séance libre',
+        title: workout.title ?? template ?? t('common.freeSession'),
         workout,
         exerciseIds: exercisesByWorkout.get(workout.id!) ?? [],
         exerciseCount: exercisesByWorkout.get(workout.id!)?.length ?? 0,

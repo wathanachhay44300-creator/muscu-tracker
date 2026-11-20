@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { t } from '../i18n'
 
 interface SnackbarState {
   id: number
@@ -51,7 +52,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
                 onClick={handleUndo}
                 className="shrink-0 font-semibold text-toast-action active:opacity-70"
               >
-                Annuler
+                {t('common.undo')}
               </button>
             )}
           </div>

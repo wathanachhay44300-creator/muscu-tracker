@@ -13,6 +13,7 @@ import {
 } from '../lib/trackingImport'
 import type { DayEntry } from '../lib/tracking'
 import { DownloadIcon, UploadIcon } from './Icons'
+import { t } from '../i18n'
 
 interface Pending {
   entries: DayEntry[]
@@ -32,13 +33,13 @@ export function TrackingImportCard() {
   async function stage(entries: DayEntry[], source: string, note = '') {
     const cleaned = dedupeByDate(entries)
     if (cleaned.length === 0) {
-      setMessage({ ok: false, text: `Aucune donnée exploitable dans ${source}.${note}` })
+      setMessage({ ok: false, text: t('trackImport.noData', { source, note }) })
       return
     }
     const plan = await planMerge(cleaned)
     if (plan.conflicts === 0) {
       const { written } = await applyMerge(cleaned, 'keep')
-      setMessage({ ok: true, text: `${source} : ${formatInt(cleaned.length)} jours lus, ${formatInt(written)} valeurs ajoutées.${note}` })
+      setMessage({ ok: true, text: t('trackImport.done', { source, days: formatInt(cleaned.length), written: formatInt(written), note }) })
     } else {
       setPending({ entries: cleaned, plan, source })
     }
@@ -52,9 +53,9 @@ export function TrackingImportCard() {
     setMessage(null)
     try {
       const { entries, skipped } = parseTrackingCsv(await file.text())
-      await stage(entries, file.name, skipped ? ` ${skipped} ligne(s) ignorée(s).` : '')
+      await stage(entries, file.name, skipped ? t('trackImport.skipped', { n: skipped }) : '')
     } catch {
-      setMessage({ ok: false, text: 'Impossible de lire ce fichier.' })
+      setMessage({ ok: false, text: t('trackImport.unreadable') })
     } finally {
       setBusy(false)
     }
@@ -70,12 +71,12 @@ export function TrackingImportCard() {
     try {
       const { entries, records } = await parseHealthSteps(file, setProgress)
       if (records === 0) {
-        setMessage({ ok: false, text: 'Aucun pas trouvé : choisissez le fichier export.xml extrait du zip Apple Santé.' })
+        setMessage({ ok: false, text: t('trackImport.noSteps') })
       } else {
-        await stage(entries, 'Apple Santé')
+        await stage(entries, t('trackImport.appleHealth'))
       }
     } catch {
-      setMessage({ ok: false, text: 'Impossible de lire ce fichier.' })
+      setMessage({ ok: false, text: t('trackImport.unreadable') })
     } finally {
       setBusy(false)
       setProgress(null)
@@ -91,7 +92,7 @@ export function TrackingImportCard() {
       const { written } = await applyMerge(entries, policy)
       setMessage({
         ok: true,
-        text: `${source} : ${formatInt(written)} valeurs enregistrées (${policy === 'replace' ? 'existantes remplacées' : 'existantes conservées'}).`,
+        text: t('trackImport.saved', { source, n: formatInt(written), policy: policy === 'replace' ? t('trackImport.replaced') : t('trackImport.kept') }),
       })
     } finally {
       setBusy(false)
@@ -100,14 +101,14 @@ export function TrackingImportCard() {
 
   async function handleExport() {
     const csv = await trackingToCsv()
-    downloadBlob(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), `muscu-tracker-suivi-${todayISO()}.csv`)
+    downloadBlob(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), t('trackImport.fileName', { date: todayISO() }))
   }
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-      <p className="mb-1 text-sm font-semibold text-ink-2">Pas, poids &amp; calories (CSV, Apple Santé)</p>
+      <p className="mb-1 text-sm font-semibold text-ink-2">{t('trackImport.title')}</p>
       <p className="mb-3 text-xs text-muted">
-        Récupérez un historique passé. Une valeur déjà saisie n'est jamais écrasée sans votre accord.
+        {t('trackImport.hint')}
       </p>
 
       <input ref={csvRef} type="file" accept=".csv,text/csv,text/plain" className="hidden" onChange={handleCsv} />
@@ -121,7 +122,7 @@ export function TrackingImportCard() {
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-on-accent active:bg-accent-hover disabled:opacity-60"
         >
           <UploadIcon className="h-4 w-4" />
-          Importer un CSV (date, pas, poids, calories)
+          {t('trackImport.importCsv')}
         </button>
         <button
           type="button"
@@ -130,7 +131,7 @@ export function TrackingImportCard() {
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface-3 py-3 text-sm font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-60"
         >
           <UploadIcon className="h-4 w-4" />
-          Importer les pas d'Apple Santé (export.xml)
+          {t('trackImport.importHealth')}
         </button>
         <button
           type="button"
@@ -139,7 +140,7 @@ export function TrackingImportCard() {
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface-3 py-3 text-sm font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-60"
         >
           <DownloadIcon className="h-4 w-4" />
-          Exporter le suivi en CSV
+          {t('trackImport.exportCsv')}
         </button>
       </div>
 
@@ -159,10 +160,7 @@ export function TrackingImportCard() {
       )}
 
       <p className="mt-3 text-[11px] text-muted">
-        Apple Santé : dans l'app Santé, touchez votre profil &gt; Exporter toutes les données, extrayez le zip
-        puis choisissez <span className="font-mono">export.xml</span>. Les gros fichiers sont lus par morceaux (compter
-        quelques minutes). Si l'iPhone et l'Apple Watch comptent les mêmes pas, la source la plus complète de
-        chaque jour est retenue : le total peut différer légèrement de l'app Santé.
+        {t('trackImport.healthHelp')}
       </p>
 
       {pending && (
@@ -174,11 +172,11 @@ export function TrackingImportCard() {
             className="w-full max-w-sm animate-slide-up rounded-t-2xl bg-surface p-5 pb-safe shadow-lg sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold text-ink">Valeurs déjà saisies</h2>
+            <h2 className="text-base font-semibold text-ink">{t('trackImport.conflictTitle')}</h2>
             <p className="mt-1.5 text-sm text-muted">
-              {formatInt(pending.plan.conflicts)} valeur(s) du fichier diffèrent de ce que vous avez déjà saisi
-              {pending.plan.fresh > 0 && `, et ${formatInt(pending.plan.fresh)} nouvelle(s) valeur(s) seront ajoutées dans tous les cas`}
-              . Que faire des valeurs en conflit ?
+              {t('trackImport.conflicts', { n: formatInt(pending.plan.conflicts) })}
+              {pending.plan.fresh > 0 && t('trackImport.fresh', { n: formatInt(pending.plan.fresh) })}
+              {t('trackImport.question')}
             </p>
             <div className="mt-5 space-y-2">
               <button
@@ -186,21 +184,21 @@ export function TrackingImportCard() {
                 onClick={() => resolve('keep')}
                 className="w-full rounded-xl bg-accent py-3 font-medium text-on-accent active:bg-accent-hover"
               >
-                Garder l'existant
+                {t('trackImport.keep')}
               </button>
               <button
                 type="button"
                 onClick={() => resolve('replace')}
                 className="w-full rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
               >
-                Remplacer par le fichier
+                {t('trackImport.replace')}
               </button>
               <button
                 type="button"
                 onClick={() => setPending(null)}
                 className="w-full py-2.5 text-sm font-medium text-muted"
               >
-                Annuler l'import
+                {t('trackImport.cancel')}
               </button>
             </div>
           </div>

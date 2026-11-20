@@ -1,5 +1,5 @@
-import { MUSCLES } from '../data/muscles'
 import type { MuscleId } from '../types'
+import { muscleLabel, t } from '../i18n'
 
 /**
  * Simple original body diagram (front and back views), drawn with plain SVG
@@ -82,7 +82,7 @@ function Body({ regions, label, levels }: { regions: Region[]; label: string; le
       {regions.map((r) => {
         const level = levels.get(r.id) ?? 'none'
         const { fill, opacity } = fillFor(level)
-        const title = level === 'none' ? undefined : <title>{MUSCLES[r.id].label}</title>
+        const title = level === 'none' ? undefined : <title>{muscleLabel(r.id)}</title>
         return r.center ? (
           <path key={r.id} d={r.d} fill={fill} opacity={opacity}>
             {title}
@@ -115,22 +115,22 @@ export function BodyDiagram({ primary, secondary }: BodyDiagramProps) {
     <div>
       <div className="flex items-end justify-center gap-6">
         <figure className="text-center">
-          <Body regions={FRONT} label="Schéma du corps, vue de face" levels={levels} />
-          <figcaption className="mt-1 text-[11px] font-medium text-muted">Face</figcaption>
+          <Body regions={FRONT} label={t('diagram.front')} levels={levels} />
+          <figcaption className="mt-1 text-[11px] font-medium text-muted">{t('diagram.frontShort')}</figcaption>
         </figure>
         <figure className="text-center">
-          <Body regions={BACK} label="Schéma du corps, vue de dos" levels={levels} />
-          <figcaption className="mt-1 text-[11px] font-medium text-muted">Dos</figcaption>
+          <Body regions={BACK} label={t('diagram.back')} levels={levels} />
+          <figcaption className="mt-1 text-[11px] font-medium text-muted">{t('diagram.backShort')}</figcaption>
         </figure>
       </div>
       <div className="mt-2 flex justify-center gap-4 text-[11px] text-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--accent)' }} />
-          Principal
+          {t('diagram.primary')}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full opacity-60" style={{ background: 'var(--accent-line)' }} />
-          Secondaire
+          {t('diagram.secondary')}
         </span>
       </div>
     </div>

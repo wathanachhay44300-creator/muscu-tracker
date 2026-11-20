@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 export interface BilanShareData {
   programName: string
   date: string
@@ -74,10 +75,10 @@ export async function generateBilanImage(data: BilanShareData): Promise<Blob> {
   ctx.fillText(data.date, 60, 345)
 
   const stats: [string, string][] = [
-    ['Exercices', String(data.exerciseCount)],
-    ['Séries', String(data.setCount)],
-    ['Volume', data.volumeLabel],
-    ['Durée', data.durationLabel],
+    [t('share.exercises'), String(data.exerciseCount)],
+    [t('share.sets'), String(data.setCount)],
+    [t('share.volume'), data.volumeLabel],
+    [t('share.duration'), data.durationLabel],
   ]
   const gridTop = 430
   const cellW = 460
@@ -110,18 +111,18 @@ export async function generateBilanImage(data: BilanShareData): Promise<Blob> {
     ctx.font = `700 36px ${bodyFont}`
     const prText =
       data.prNames.length === 1
-        ? `🏆 Nouveau record : ${data.prNames[0]}`
-        : `🏆 Nouveaux records : ${data.prNames.join(', ')}`
+        ? t('share.newRecord', { name: data.prNames[0] })
+        : t('share.newRecords', { names: data.prNames.join(', ') })
     wrapText(ctx, prText, 90, nextY + 55, WIDTH - 180, 44)
     nextY += bannerH + 20
   }
 
   ctx.fillStyle = T.faint
   ctx.font = `400 26px ${bodyFont}`
-  ctx.fillText('Suivi avec Muscu Tracker', 60, HEIGHT - 50)
+  ctx.fillText(t('share.footer'), 60, HEIGHT - 50)
 
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Échec de génération de l’image'))), 'image/png')
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error(t('share.failed')))), 'image/png')
   })
 }
 

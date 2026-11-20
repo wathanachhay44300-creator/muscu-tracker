@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 interface ConfirmDialogProps {
   title: string
   message: string
@@ -12,8 +13,8 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   title,
   message,
-  confirmLabel = 'Confirmer',
-  cancelLabel = 'Annuler',
+  confirmLabel = t('common.confirm'),
+  cancelLabel = t('common.cancel'),
   danger = false,
   onConfirm,
   onCancel,

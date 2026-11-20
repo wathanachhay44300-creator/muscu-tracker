@@ -7,6 +7,7 @@ import type { WorkoutExerciseWithSets } from '../../types'
 import { MuscleGroupBreakdown } from '../MuscleGroupBreakdown'
 import { SessionNotes, SessionRpe } from '../SessionExtras'
 import { CheckIcon, GripIcon, PlusIcon, XIcon } from '../Icons'
+import { t } from '../../i18n'
 
 interface SessionOverviewSheetProps {
   detail: WorkoutDetail
@@ -34,11 +35,11 @@ export function SessionOverviewSheet({ detail, currentId, onJump, onAddExercise,
   return createPortal(
     <div className="fixed inset-0 z-50 flex flex-col bg-page animate-fade-in-backdrop">
       <div className="flex items-center justify-between border-b border-line px-4 pt-safe pt-3 pb-3">
-        <h2 className="text-ink">Exercices de la séance</h2>
+        <h2 className="text-ink">{t('session.overviewTitle')}</h2>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Fermer"
+          aria-label={t('common.close')}
           className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-surface-3"
         >
           <XIcon className="h-6 w-6" />
@@ -62,7 +63,7 @@ export function SessionOverviewSheet({ detail, currentId, onJump, onAddExercise,
               >
                 <button
                   type="button"
-                  aria-label={`Glisser pour réordonner ${we.exercise.name}`}
+                  aria-label={t('session.dragToReorder', { name: we.exercise.name })}
                   className="flex h-14 w-11 shrink-0 cursor-grab touch-none items-center justify-center text-faint active:text-muted"
                   {...row.handleProps}
                 >
@@ -77,7 +78,7 @@ export function SessionOverviewSheet({ detail, currentId, onJump, onAddExercise,
                   <span className="min-w-0 flex-1">
                     <span className="font-exercise block truncate text-[1.05rem] text-ink">{we.exercise.name}</span>
                     <span className="block text-xs text-muted">
-                      {done}/{we.sets.length} série{we.sets.length > 1 ? 's' : ''} faite{done > 1 ? 's' : ''}
+                      {t('session.setsDone', { done, total: we.sets.length })}
                     </span>
                   </span>
                   {complete && (
@@ -97,7 +98,7 @@ export function SessionOverviewSheet({ detail, currentId, onJump, onAddExercise,
           className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-line-strong font-semibold text-ink-2 active:bg-surface-3"
         >
           <PlusIcon className="h-5 w-5" />
-          Ajouter un exercice
+          {t('session.addExercise')}
         </button>
 
         {exercises.length > 0 && (

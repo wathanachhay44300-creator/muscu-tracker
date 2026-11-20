@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { countByMuscleGroup } from '../lib/stats'
 import type { MuscleGroup } from '../types'
+import { groupLabel, t, tn } from '../i18n'
 
 interface MuscleGroupBreakdownProps {
   items: { muscleGroup: MuscleGroup | undefined; setCount: number }[]
@@ -8,7 +9,7 @@ interface MuscleGroupBreakdownProps {
 }
 
 /** Simple sorted list of "Groupe : N séries" — no chart needed for this. */
-export function MuscleGroupBreakdown({ items, title = 'Répartition par muscle' }: MuscleGroupBreakdownProps) {
+export function MuscleGroupBreakdown({ items, title = t('stats.muscleBreakdown') }: MuscleGroupBreakdownProps) {
   const breakdown = useMemo(() => countByMuscleGroup(items), [items])
 
   if (breakdown.length === 0) return null
@@ -19,15 +20,15 @@ export function MuscleGroupBreakdown({ items, title = 'Répartition par muscle' 
       <div className="space-y-2">
         {breakdown.map(({ group, count }) => (
           <div key={group} className="flex items-center justify-between text-sm">
-            <span className="text-ink-2">{group}</span>
+            <span className="text-ink-2">{groupLabel(group)}</span>
             <span className="font-semibold text-ink">
-              {count} série{count > 1 ? 's' : ''}
+              {tn('common.sets', count)}
             </span>
           </div>
         ))}
       </div>
       <p className="mt-2.5 text-[11px] text-muted">
-        Seul le muscle principal de chaque exercice est compté.
+        {t('stats.primaryOnly')}
       </p>
     </div>
   )

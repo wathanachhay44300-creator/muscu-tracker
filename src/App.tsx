@@ -15,6 +15,7 @@ import { DumbbellIcon } from './components/Icons'
 import { RestTimerWidget } from './components/RestTimerWidget'
 import { SnackbarProvider } from './contexts/SnackbarContext'
 import { DeepLinkImporter } from './components/DeepLinkImporter'
+import { I18nProvider } from './i18n/I18nProvider'
 
 // Rarely-opened screens are split out of the main bundle (still precached by the service worker, so they open offline).
 const ExerciseDetailScreen = lazy(() => import('./screens/ExerciseDetailScreen').then((m) => ({ default: m.ExerciseDetailScreen })))
@@ -46,6 +47,8 @@ export default function App() {
 
   return (
     <HashRouter>
+      {/* Re-mounts the screens when the language changes (no reload, route kept). */}
+      <I18nProvider>
       <SnackbarProvider>
         <div className="app-main min-h-dvh bg-page">
           <ResumeSessionBanner />
@@ -77,6 +80,7 @@ export default function App() {
           <BottomNav />
         </div>
       </SnackbarProvider>
+      </I18nProvider>
     </HashRouter>
   )
 }

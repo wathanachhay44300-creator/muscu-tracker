@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { t } from '../i18n'
 
 const SHOW_AFTER_PX = 480
 
@@ -34,7 +35,7 @@ export function BackToTopButton() {
     <button
       type="button"
       onClick={goTop}
-      aria-label="Remonter en haut"
+      aria-label={t('common.backToTop')}
       className="animate-pop-in fixed bottom-24 left-4 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-line bg-surface text-accent-ink shadow-lg active:bg-surface-3"
     >
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">

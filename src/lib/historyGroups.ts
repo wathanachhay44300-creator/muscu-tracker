@@ -1,4 +1,4 @@
-import { formatMonthFr } from './date'
+import { formatMonth } from './date'
 import type { WorkoutSummary } from '../hooks/useHistory'
 
 export interface MonthGroup {
@@ -35,7 +35,7 @@ export function groupByMonth(sessions: WorkoutSummary[]): MonthGroup[] {
     const key = s.workout.date.slice(0, 7)
     let group = groups[groups.length - 1]
     if (!group || group.key !== key) {
-      const label = formatMonthFr(`${key}-01`)
+      const label = formatMonth(`${key}-01`)
       group = { key, label: label.charAt(0).toUpperCase() + label.slice(1), sessions: [], volume: 0 }
       groups.push(group)
     }

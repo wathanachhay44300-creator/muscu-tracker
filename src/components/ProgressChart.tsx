@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { formatDateFr } from '../lib/date'
+import { formatDateShort } from '../lib/date'
+import { formatDecimal, t } from '../i18n'
 
 export interface ChartPoint {
   date: string
@@ -52,7 +53,7 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
   const labelAnchor = active.x < PAD_X + 24 ? 'start' : active.x > WIDTH - PAD_X - 24 ? 'end' : 'middle'
 
   return (
-    <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full touch-manipulation" role="img" aria-label="Graphique de progression">
+    <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full touch-manipulation" role="img" aria-label={t('charts.progress')}>
       <path d={areaPath} fill="var(--accent-soft)" />
       <path
         d={path}
@@ -68,7 +69,7 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
           onClick={() => setSelected(i)}
           className="cursor-pointer"
           role="button"
-          aria-label={`${formatDateFr(c.date, { withYear: false })} : ${formatVal(c.value)} ${unit}`}
+          aria-label={`${formatDateShort(c.date, { withYear: false })} : ${formatVal(c.value)} ${unit}`}
         >
           {/* Generous invisible hit target — the visible dot is tiny on a phone screen. */}
           <circle cx={c.x} cy={c.y} r={12} fill="transparent" />
@@ -103,17 +104,17 @@ export function ProgressChart({ points, unit }: ProgressChartProps) {
         {formatVal(active.value)} {unit}
       </text>
       <text x={PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--text-muted)">
-        {formatDateFr(points[0].date, { withYear: false })}
+        {formatDateShort(points[0].date, { withYear: false })}
       </text>
       <text x={WIDTH - PAD_X} y={HEIGHT - 6} fontSize="9" fill="var(--text-muted)" textAnchor="end">
-        {formatDateFr(points[points.length - 1].date, { withYear: false })}
+        {formatDateShort(points[points.length - 1].date, { withYear: false })}
       </text>
     </svg>
   )
 }
 
 function formatVal(n: number): string {
-  return Number.isInteger(n) ? String(n) : n.toFixed(1)
+  return formatDecimal(n, 1)
 }
 
 /** SVG path for a 5-point star centered at (cx, cy) with outer radius r. */

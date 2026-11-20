@@ -8,6 +8,7 @@ import { ChevronLeftIcon, TrashIcon } from '../components/Icons'
 import { formatDateLong } from '../lib/date'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
+import { t } from '../i18n'
 
 export function HistoriqueDetailScreen() {
   const { workoutId } = useParams()
@@ -25,7 +26,7 @@ export function HistoriqueDetailScreen() {
   if (!detail) {
     return (
       <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-        <p className="text-muted">Séance introuvable.</p>
+        <p className="text-muted">{t('screens.sessionNotFound')}</p>
       </div>
     )
   }
@@ -33,7 +34,7 @@ export function HistoriqueDetailScreen() {
   async function handleDelete() {
     const snapshot = await deleteWorkoutWithUndo(id!)
     navigate('/historique')
-    showSnackbar('Séance supprimée', () => restoreWorkoutSnapshot(snapshot))
+    showSnackbar(t('historyDetail.deleted'), () => restoreWorkoutSnapshot(snapshot))
   }
 
   return (
@@ -44,13 +45,13 @@ export function HistoriqueDetailScreen() {
           // Back to wherever the session was opened from (history list or calendar).
           onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/historique'))}
           className="rounded-full p-2 -ml-2 text-muted active:bg-surface-3"
-          aria-label="Retour à l'historique"
+          aria-label={t('historyDetail.back')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div>
           <h1 className="text-lg font-bold text-ink">
-            {detail.workout.title ?? template?.name ?? 'Séance libre'}
+            {detail.workout.title ?? template?.name ?? t('common.freeSession')}
           </h1>
           <p className="text-sm font-medium text-ink-2">{formatDateLong(detail.workout.date)}</p>
         </div>
@@ -62,7 +63,7 @@ export function HistoriqueDetailScreen() {
         {confirming ? (
           <div className="rounded-2xl border border-danger-line bg-danger-soft p-4">
             <p className="mb-3 text-sm font-medium text-danger-ink">
-              Supprimer cette séance et toutes ses séries ?
+              {t('historyDetail.confirmDelete')}
             </p>
             <div className="flex gap-2">
               <button
@@ -70,14 +71,14 @@ export function HistoriqueDetailScreen() {
                 onClick={() => setConfirming(false)}
                 className="flex-1 rounded-xl bg-surface py-2.5 font-medium text-ink-2 active:bg-surface-3"
               >
-                Annuler
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
                 className="flex-1 rounded-xl bg-danger py-2.5 font-medium text-on-danger active:bg-danger"
               >
-                Supprimer
+                {t('common.delete')}
               </button>
             </div>
           </div>
@@ -88,7 +89,7 @@ export function HistoriqueDetailScreen() {
             className="flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-danger-ink active:text-danger-ink"
           >
             <TrashIcon className="h-4 w-4" />
-            Supprimer la séance
+            {t('historyDetail.delete')}
           </button>
         )}
       </div>

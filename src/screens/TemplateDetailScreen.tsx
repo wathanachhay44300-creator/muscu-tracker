@@ -19,6 +19,7 @@ import { ChevronLeftIcon, GripIcon, PlusIcon, TrashIcon } from '../components/Ic
 import { todayISO } from '../lib/date'
 import type { Exercise } from '../types'
 import type { TemplateExerciseWithDetails } from '../hooks/useTemplates'
+import { groupLabel, t, tn } from '../i18n'
 
 export function TemplateDetailScreen() {
   const { templateId } = useParams()
@@ -45,7 +46,7 @@ export function TemplateDetailScreen() {
   if (!detail) {
     return (
       <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-        <p className="text-muted">Programme introuvable.</p>
+        <p className="text-muted">{t('screens.programNotFound')}</p>
       </div>
     )
   }
@@ -75,7 +76,7 @@ export function TemplateDetailScreen() {
           type="button"
           onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/programmes'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Retour aux programmes"
+          aria-label={t('programs.back')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
@@ -87,13 +88,13 @@ export function TemplateDetailScreen() {
             else e.target.value = template.name
           }}
           className="flex-1 rounded-lg bg-transparent text-lg font-bold text-ink outline-none focus:bg-surface-3"
-          aria-label="Nom du programme"
+          aria-label={t('programs.name')}
         />
       </div>
 
       {exercises.length === 0 ? (
         <div className="mb-4 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
-          <p className="text-muted">Aucun exercice pour l'instant.</p>
+          <p className="text-muted">{t('editor.empty')}</p>
         </div>
       ) : (
         <div className="mb-4 space-y-2">
@@ -111,7 +112,7 @@ export function TemplateDetailScreen() {
               <div className="flex min-w-0 items-center gap-1.5">
                 <button
                   type="button"
-                  aria-label="Glisser pour réordonner"
+                  aria-label={t('card.drag')}
                   className="-ml-1 shrink-0 cursor-grab touch-none rounded-lg p-1.5 text-faint active:cursor-grabbing active:text-muted"
                   {...row.handleProps}
                 >
@@ -119,7 +120,7 @@ export function TemplateDetailScreen() {
                 </button>
                 <div className="min-w-0">
                   <p className="font-exercise truncate text-ink">{te.exercise.name}</p>
-                  <p className="text-xs text-muted">{te.exercise.muscleGroup}</p>
+                  <p className="text-xs text-muted">{groupLabel(te.exercise.muscleGroup)}</p>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -128,18 +129,18 @@ export function TemplateDetailScreen() {
                     type="button"
                     onClick={() => updateTargetSets(te.id!, te.targetSets - 1)}
                     className="px-2.5 py-1.5 text-muted active:text-accent-ink"
-                    aria-label="Moins de séries"
+                    aria-label={t('programs.fewerSets')}
                   >
                     −
                   </button>
                   <span className="w-16 text-center text-xs font-medium text-ink-2">
-                    {te.targetSets} série{te.targetSets > 1 ? 's' : ''}
+                    {tn('common.sets', te.targetSets)}
                   </span>
                   <button
                     type="button"
                     onClick={() => updateTargetSets(te.id!, te.targetSets + 1)}
                     className="px-2.5 py-1.5 text-muted active:text-accent-ink"
-                    aria-label="Plus de séries"
+                    aria-label={t('programs.moreSets')}
                   >
                     +
                   </button>
@@ -148,7 +149,7 @@ export function TemplateDetailScreen() {
                   type="button"
                   onClick={() => removeExerciseFromTemplate(te.id!)}
                   className="p-1.5 text-faint active:text-danger-ink"
-                  aria-label={`Retirer ${te.exercise.name}`}
+                  aria-label={t('programs.removeNamed', { name: te.exercise.name })}
                 >
                   <TrashIcon className="h-4 w-4" />
                 </button>
@@ -165,13 +166,13 @@ export function TemplateDetailScreen() {
         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-surface-3 py-3.5 font-semibold text-accent-ink active:bg-surface-4"
       >
         <PlusIcon className="h-5 w-5" />
-        Ajouter un exercice
+        {t('session.addExercise')}
       </button>
 
       {exercises.length > 0 && (
         <div className="mt-4">
           <MuscleGroupBreakdown
-            title="Répartition par muscle (prévue)"
+            title={t('programs.plannedBreakdown')}
             items={exercises.map((te) => ({ muscleGroup: te.exercise.muscleGroup, setCount: te.targetSets }))}
           />
         </div>
@@ -185,7 +186,7 @@ export function TemplateDetailScreen() {
             disabled={starting}
             className="w-full rounded-2xl bg-accent py-4 font-semibold text-on-accent shadow-sm active:bg-accent-hover disabled:opacity-50"
           >
-            Démarrer maintenant
+            {t('programs.startNow')}
           </button>
         </div>
       )}
@@ -196,7 +197,7 @@ export function TemplateDetailScreen() {
         className="mt-6 flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-danger-ink active:text-danger-ink"
       >
         <TrashIcon className="h-4 w-4" />
-        Supprimer ce programme
+        {t('programs.delete')}
       </button>
 
       {pickerOpen && (
@@ -209,9 +210,9 @@ export function TemplateDetailScreen() {
 
       {deleting && (
         <ConfirmDialog
-          title={`Supprimer « ${template.name} » ?`}
-          message="Cette action est définitive. Vos séances déjà réalisées ne sont pas concernées."
-          confirmLabel="Supprimer"
+          title={t('programs.deleteTitle', { name: template.name })}
+          message={t('programs.deleteMessage')}
+          confirmLabel={t('common.delete')}
           danger
           onConfirm={confirmDelete}
           onCancel={() => setDeleting(false)}

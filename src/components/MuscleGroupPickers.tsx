@@ -1,12 +1,13 @@
 import { SECONDARY_CHOICES } from '../lib/muscleGroups'
 import { MUSCLE_GROUPS, type MuscleGroup } from '../types'
+import { groupLabel, t } from '../i18n'
 
 const CHIP = 'min-h-11 rounded-full px-4 text-sm font-medium'
 
 /** Main muscle group: exactly one (required). */
 export function PrincipalPicker({ value, onChange }: { value: MuscleGroup; onChange: (g: MuscleGroup) => void }) {
   return (
-    <div role="radiogroup" aria-label="Muscle principal" className="flex flex-wrap gap-2">
+    <div role="radiogroup" aria-label={t('exerciseInfo.mainMuscle')} className="flex flex-wrap gap-2">
       {MUSCLE_GROUPS.map((g) => (
         <button
           key={g}
@@ -16,7 +17,7 @@ export function PrincipalPicker({ value, onChange }: { value: MuscleGroup; onCha
           onClick={() => onChange(g)}
           className={`${CHIP} ${value === g ? 'bg-accent text-on-accent' : 'bg-surface-3 text-ink-2 active:bg-surface-4'}`}
         >
-          {g}
+          {groupLabel(g)}
         </button>
       ))}
     </div>
@@ -37,7 +38,7 @@ export function SecondaryPicker({
   onChange: (groups: MuscleGroup[]) => void
 }) {
   return (
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Muscles secondaires">
+    <div className="flex flex-wrap gap-2" role="group" aria-label={t('exerciseInfo.secondaryOptional')}>
       {SECONDARY_CHOICES.map((g) => {
         const isMain = g === principal
         const on = value.includes(g) && !isMain
@@ -56,7 +57,7 @@ export function SecondaryPicker({
                   : 'border border-line text-ink-2 active:bg-surface-3'
             }`}
           >
-            {g}
+            {groupLabel(g)}
           </button>
         )
       })}

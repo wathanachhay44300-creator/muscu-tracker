@@ -8,27 +8,26 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { WeightChart } from '../components/WeightChart'
 import { WeightEditSheet } from '../components/WeightEditSheet'
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, ScaleIcon, TrashIcon } from '../components/Icons'
-import { addDays, formatDateFr, relativeDateLabel, todayISO } from '../lib/date'
+import { addDays, formatDateShort, relativeDateLabel, todayISO } from '../lib/date'
 import { formatKg, formatSigned, mapByDate, weeklySummaries, type DayEntry, type WeekSummary } from '../lib/tracking'
 import type { BodyMeasurement, WeightGoal } from '../types'
+import { parseDecimal, t, tDynamic, tn } from '../i18n'
 
 const MEASURES = [
-  { key: 'chest', label: 'Poitrine', unit: 'cm' },
-  { key: 'waist', label: 'Taille', unit: 'cm' },
-  { key: 'hips', label: 'Hanches', unit: 'cm' },
-  { key: 'arms', label: 'Bras', unit: 'cm' },
-  { key: 'thighs', label: 'Cuisses', unit: 'cm' },
+  { key: 'chest', unit: 'cm' },
+  { key: 'waist', unit: 'cm' },
+  { key: 'hips', unit: 'cm' },
+  { key: 'arms', unit: 'cm' },
+  { key: 'thighs', unit: 'cm' },
 ] as const
+
+const measureLabel = (key: string) => tDynamic(`bodyMeasure.${key}`)
+const periodLabel = (key: string) => tDynamic(`period.${key}`)
 
 type MeasureKey = (typeof MEASURES)[number]['key']
 
 type Period = '14' | '30' | '90' | 'all'
-const PERIODS: { key: Period; label: string }[] = [
-  { key: '14', label: '2 sem.' },
-  { key: '30', label: '1 mois' },
-  { key: '90', label: '3 mois' },
-  { key: 'all', label: 'Tout' },
-]
+const PERIODS: { key: Period }[] = [{ key: '14' }, { key: '30' }, { key: '90' }, { key: 'all' }]
 
 const RECENT_WEIGHINGS = 7
 const WEEKS_SHOWN = 6
@@ -89,18 +88,18 @@ export function CorpsScreen() {
           type="button"
           onClick={() => navigate(-1)}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Retour"
+          aria-label={t('common.back')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <ScaleIcon className="h-5 w-5 text-accent-ink" />
-        <h1 className="text-lg font-bold text-ink">Poids &amp; mensurations</h1>
+        <h1 className="text-lg font-bold text-ink">{t('screens.body')}</h1>
       </div>
 
       {/* Weight: chart first */}
       <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-ink-2">Poids</p>
+          <p className="text-sm font-semibold text-ink-2">{t('body.weight')}</p>
           <div className="flex rounded-lg bg-surface-3 p-0.5 text-xs font-medium">
             {PERIODS.map((p) => (
               <button
@@ -110,7 +109,7 @@ export function CorpsScreen() {
                 aria-pressed={period === p.key}
                 className={`min-h-9 rounded-md px-2.5 ${period === p.key ? 'bg-surface text-accent-ink shadow-sm' : 'text-muted'}`}
               >
-                {p.label}
+                {periodLabel(p.key)}
               </button>
             ))}
           </div>
@@ -119,15 +118,15 @@ export function CorpsScreen() {
         {measurements === undefined ? null : weighings.length === 0 ? (
           <div className="py-6 text-center">
             <ScaleIcon className="mx-auto mb-2 h-8 w-8 text-faint" />
-            <p className="font-medium text-ink-2">Aucune pesée pour l'instant</p>
-            <p className="mt-0.5 text-sm text-muted">Ajoutez votre premier poids pour suivre son évolution.</p>
+            <p className="font-medium text-ink-2">{t('body.noWeighIn')}</p>
+            <p className="mt-0.5 text-sm text-muted">{t('body.noWeighInHint')}</p>
           </div>
         ) : weighings.length === 1 ? (
-          singleValue(weighings[0], 'Une seule pesée : ajoutez-en une autre pour voir une courbe.')
+          singleValue(weighings[0], t('body.single'))
         ) : inPeriod.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted">Aucune pesée sur cette période.</p>
+          <p className="py-8 text-center text-sm text-muted">{t('body.noneInPeriod')}</p>
         ) : inPeriod.length === 1 ? (
-          singleValue(inPeriod[0], 'Une seule pesée sur cette période.')
+          singleValue(inPeriod[0], t('body.singleInPeriod'))
         ) : (
           <>
             <WeightChart
@@ -137,7 +136,7 @@ export function CorpsScreen() {
               onPick={(date) => setEditing({ entry: { date, weight: weightByDate.get(date)! } })}
             />
             <p className="mt-1 text-center text-[11px] text-muted">
-              Courbe : moyenne sur 7 jours · points : pesées (touchez-en une pour la modifier)
+              {t('body.chartLegend')}
             </p>
           </>
         )}
@@ -148,7 +147,7 @@ export function CorpsScreen() {
           className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-on-accent active:bg-accent-hover"
         >
           <PlusIcon className="h-4 w-4" />
-          Ajouter une pesée
+          {t('weighIn.add')}
         </button>
       </div>
 
@@ -156,7 +155,7 @@ export function CorpsScreen() {
         <>
           {/* Latest weigh-ins */}
           <div className="mt-5">
-            <p className="mb-2 px-1 text-sm font-semibold text-ink-2">Dernières pesées</p>
+            <p className="mb-2 px-1 text-sm font-semibold text-ink-2">{t('body.latest')}</p>
             <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
               {(showAllWeighings ? weighings : weighings.slice(0, RECENT_WEIGHINGS)).map((w, i) => (
                 <WeighingRow key={w.date} entry={w} bordered={i > 0} onOpen={() => setEditing({ entry: w })} />
@@ -168,14 +167,14 @@ export function CorpsScreen() {
                 onClick={() => setShowAllWeighings(true)}
                 className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
               >
-                Voir plus ({weighings.length - RECENT_WEIGHINGS} pesée{weighings.length - RECENT_WEIGHINGS > 1 ? 's' : ''})
+                {tn('body.moreWeighIns', weighings.length - RECENT_WEIGHINGS)}
               </button>
             )}
           </div>
 
           {/* Weekly summary */}
           <div className="mt-5">
-            <p className="mb-2 px-1 text-sm font-semibold text-ink-2">Par semaine</p>
+            <p className="mb-2 px-1 text-sm font-semibold text-ink-2">{t('body.byWeek')}</p>
             <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
               {(showAllWeeks ? weeks : weeks.slice(0, WEEKS_SHOWN)).map((week, i) => (
                 <WeekRow
@@ -196,11 +195,11 @@ export function CorpsScreen() {
                 onClick={() => setShowAllWeeks(true)}
                 className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
               >
-                Voir plus ({weeks.length - WEEKS_SHOWN} semaine{weeks.length - WEEKS_SHOWN > 1 ? 's' : ''})
+                {tn('body.moreWeeks', weeks.length - WEEKS_SHOWN)}
               </button>
             )}
             <p className="mt-1.5 px-1 text-[11px] text-muted">
-              Poids moyen de la semaine et écart avec la semaine précédente. Touchez une semaine pour voir ses pesées.
+              {t('body.weekHint')}
             </p>
           </div>
         </>
@@ -231,8 +230,8 @@ function WeighingRow({ entry, bordered, onOpen }: { entry: Weighing; bordered: b
     >
       <span className="text-sm text-ink-2">
         <span className="font-medium text-ink">{relativeDateLabel(entry.date)}</span>
-        {relativeDateLabel(entry.date) !== formatDateFr(entry.date) && (
-          <span className="text-muted"> · {formatDateFr(entry.date, { withYear: false })}</span>
+        {relativeDateLabel(entry.date) !== formatDateShort(entry.date) && (
+          <span className="text-muted"> · {formatDateShort(entry.date, { withYear: false })}</span>
         )}
       </span>
       <span className="flex items-center gap-1.5">
@@ -282,7 +281,7 @@ function WeekRow({
             className="h-4 w-4 shrink-0 text-muted"
             style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 200ms ease' }}
           />
-          <span className="text-ink-2">Sem. du {formatDateFr(week.monday, { withYear: false })}</span>
+          <span className="text-ink-2">{t('body.weekOf', { date: formatDateShort(week.monday, { withYear: false }) })}</span>
         </span>
         <span className="flex items-center gap-2">
           <span className="font-bold tabular-nums text-ink">{formatKg(week.weight!)} kg</span>
@@ -310,7 +309,7 @@ function WeekRow({
               onClick={() => onOpen(w)}
               className="flex min-h-11 w-full items-center justify-between pl-10 pr-4 text-left text-sm active:bg-surface-3"
             >
-              <span className="text-muted">{formatDateFr(w.date, { withYear: false })}</span>
+              <span className="text-muted">{formatDateShort(w.date, { withYear: false })}</span>
               <span className="font-semibold tabular-nums text-ink">{formatKg(w.weight)} kg</span>
             </button>
           ))}
@@ -335,26 +334,26 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
 
   return (
     <div className="mt-8">
-      <h2 className="mb-3 px-1 text-base font-semibold text-ink">Mensurations</h2>
+      <h2 className="mb-3 px-1 text-base font-semibold text-ink">{t('screens.measurements')}</h2>
 
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={() => setDate((d) => addDays(d, -1))}
           className="rounded-full p-2.5 text-muted active:bg-surface-3"
-          aria-label="Jour précédent"
+          aria-label={t('common.previousDay')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div className="text-center">
           <p className="font-semibold text-ink">{relativeDateLabel(date)}</p>
-          {relativeDateLabel(date) !== formatDateFr(date) && <p className="text-xs text-muted">{formatDateFr(date)}</p>}
+          {relativeDateLabel(date) !== formatDateShort(date) && <p className="text-xs text-muted">{formatDateShort(date)}</p>}
         </div>
         <button
           type="button"
           onClick={() => setDate((d) => addDays(d, 1))}
           className="rounded-full p-2.5 text-muted active:bg-surface-3"
-          aria-label="Jour suivant"
+          aria-label={t('common.nextDay')}
         >
           <ChevronRightIcon className="h-5 w-5" />
         </button>
@@ -373,7 +372,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
                 selected === m.key ? 'bg-accent text-on-accent' : 'bg-surface-3 text-muted active:bg-surface-4'
               }`}
             >
-              {m.label}
+              {measureLabel(m.key)}
             </button>
           ))}
         </div>
@@ -381,14 +380,14 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
           <ProgressChart points={points} unit={label.unit} />
         ) : (
           <p className="py-6 text-center text-sm text-muted">
-            Ajoutez au moins 2 mesures de {label.label.toLowerCase()} pour voir un graphique.
+            {t('body.needTwo', { name: measureLabel(label.key).toLowerCase() })}
           </p>
         )}
       </div>
 
       {withMeasures.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="px-1 text-sm font-semibold text-ink-2">Historique des mensurations</p>
+          <p className="px-1 text-sm font-semibold text-ink-2">{t('body.measureHistory')}</p>
           {[...withMeasures].reverse().map((m) => (
             <div
               key={m.id}
@@ -398,7 +397,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
                 <p className="text-sm font-semibold text-ink">{relativeDateLabel(m.date)}</p>
                 <p className="text-xs text-muted">
                   {MEASURES.filter((k) => m[k.key] != null)
-                    .map((k) => `${k.label} ${m[k.key]}${k.unit}`)
+                    .map((k) => `${measureLabel(k.key)} ${m[k.key]}${k.unit}`)
                     .join(' · ')}
                 </p>
               </div>
@@ -406,7 +405,7 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
                 type="button"
                 onClick={() => setDeletingDate(m.date)}
                 className="rounded-full p-3 text-faint active:bg-surface-3 active:text-danger-ink"
-                aria-label="Supprimer ces mensurations"
+                aria-label={t('body.deleteMeasures')}
               >
                 <TrashIcon className="h-4 w-4" />
               </button>
@@ -417,9 +416,9 @@ function MeasurementsSection({ measurements }: { measurements: BodyMeasurement[]
 
       {deletingDate != null && (
         <ConfirmDialog
-          title="Supprimer ces mensurations ?"
-          message="Seules les mensurations de ce jour sont supprimées : le poids, les pas et les calories sont conservés."
-          confirmLabel="Supprimer"
+          title={t('body.deleteMeasuresTitle')}
+          message={t('body.deleteMeasuresMessage')}
+          confirmLabel={t('common.delete')}
           danger
           onConfirm={() => {
             clearMeasurementFields(deletingDate)
@@ -459,7 +458,7 @@ function MeasurementForm({ date, entry }: { date: string; entry: BodyMeasurement
     setValues((v) => ({ ...v, [key]: text }))
     clearTimeout(timeouts.current[key])
     timeouts.current[key] = setTimeout(() => {
-      const num = parseFloat(text.replace(',', '.'))
+      const num = parseDecimal(text)
       const value = Number.isFinite(num) && num > 0 ? num : undefined
       upsertBodyMeasurement(date, { [key]: value })
       lastKnownRef.current = { ...lastKnownRef.current, [key]: value != null ? String(value) : '' }
@@ -472,7 +471,7 @@ function MeasurementForm({ date, entry }: { date: string; entry: BodyMeasurement
         {MEASURES.map((m) => (
           <div key={m.key}>
             <label className="mb-1 block text-xs font-medium text-muted">
-              {m.label} ({m.unit})
+              {measureLabel(m.key)} ({m.unit})
             </label>
             <input
               value={values[m.key]}

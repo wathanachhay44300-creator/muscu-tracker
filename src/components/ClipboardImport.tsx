@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { importFromClipboardText } from '../lib/deepLink'
 import { ClipboardPasteIcon } from './Icons'
+import { t } from '../i18n'
 
 /**
  * "Importer depuis le presse-papiers": the import path that works in the
@@ -20,7 +21,7 @@ export function ClipboardImport() {
       setResult({ ok: r.ok, text: r.message })
       if (r.ok) setManual(null)
     } catch {
-      setResult({ ok: false, text: 'Enregistrement impossible.' })
+      setResult({ ok: false, text: t('clipboard.saveError') })
     } finally {
       setBusy(false)
     }
@@ -33,7 +34,7 @@ export function ClipboardImport() {
       text = await navigator.clipboard.readText()
     } catch {
       setManual('')
-      setResult({ ok: false, text: 'Presse-papiers non lisible ici : collez le texte dans le champ ci-dessous.' })
+      setResult({ ok: false, text: t('clipboard.unreadable') })
       return
     }
     await run(text)
@@ -48,7 +49,7 @@ export function ClipboardImport() {
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-sm font-semibold text-on-accent active:bg-accent-hover disabled:opacity-60"
       >
         <ClipboardPasteIcon className="h-5 w-5" />
-        Importer depuis le presse-papiers
+        {t('clipboard.importButton')}
       </button>
 
       {manual !== null && (
@@ -59,8 +60,8 @@ export function ClipboardImport() {
               setManual(e.target.value)
               setResult(null)
             }}
-            placeholder="AAAA-MM-JJ;pas;poids;kcal"
-            aria-label="Texte à importer"
+            placeholder={t('clipboard.placeholder')}
+            aria-label={t('clipboard.fieldLabel')}
             autoCapitalize="off"
             autoCorrect="off"
             className="min-w-0 flex-1 rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-accent-line"
@@ -71,7 +72,7 @@ export function ClipboardImport() {
             disabled={busy || !manual.trim()}
             className="shrink-0 rounded-xl bg-surface-3 px-4 text-sm font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-40"
           >
-            Importer
+            {t('common.import')}
           </button>
         </div>
       )}

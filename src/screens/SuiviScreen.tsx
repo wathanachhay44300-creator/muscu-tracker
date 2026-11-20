@@ -6,7 +6,8 @@ import { upsertBodyMeasurement } from '../lib/bodyActions'
 import { ClipboardImport } from '../components/ClipboardImport'
 import { TrackingChart } from '../components/TrackingChart'
 import { ActivityIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
-import { addDays, formatDateFr, relativeDateLabel, todayISO } from '../lib/date'
+import { formatNumber, t, tDynamic } from '../i18n'
+import { addDays, formatDateShort, relativeDateLabel, todayISO } from '../lib/date'
 import {
   adviceFor,
   buildColumns,
@@ -30,14 +31,9 @@ import {
 import type { BodyMeasurement, WeightGoal } from '../types'
 
 type Period = '14' | '30' | '90' | 'all'
-const PERIODS: { key: Period; label: string }[] = [
-  { key: '14', label: '2 sem.' },
-  { key: '30', label: '1 mois' },
-  { key: '90', label: '3 mois' },
-  { key: 'all', label: 'Tout' },
-]
+const PERIODS: { key: Period }[] = [{ key: '14' }, { key: '30' }, { key: '90' }, { key: 'all' }]
 
-const GOAL_LABEL: Record<WeightGoal, string> = { loss: 'Perte de poids', maintain: 'Maintien', gain: 'Prise de masse' }
+const goalLabel = (goal: WeightGoal) => tDynamic(`goal.${goal}`)
 
 export function SuiviScreen() {
   const navigate = useNavigate()
@@ -76,12 +72,12 @@ export function SuiviScreen() {
           type="button"
           onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/progres'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Retour"
+          aria-label={t('common.back')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <ActivityIcon className="h-5 w-5 text-accent-ink" />
-        <h1 className="text-lg font-bold text-ink">Pas, poids &amp; calories</h1>
+        <h1 className="text-lg font-bold text-ink">{t('screens.tracking')}</h1>
       </div>
 
       {/* Daily entry */}
@@ -90,21 +86,21 @@ export function SuiviScreen() {
           type="button"
           onClick={() => setDate((d) => addDays(d, -1))}
           className="rounded-full p-2.5 text-muted active:bg-surface-3"
-          aria-label="Jour précédent"
+          aria-label={t('common.previousDay')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <label className="relative cursor-pointer rounded-xl px-3 py-1 text-center active:bg-surface-3">
           <span className="block font-semibold text-ink">{relativeDateLabel(date)}</span>
           <span className="block text-xs text-muted">
-            {relativeDateLabel(date) !== formatDateFr(date) ? formatDateFr(date) : 'Changer de jour'}
+            {relativeDateLabel(date) !== formatDateShort(date) ? formatDateShort(date) : t('tracking.changeDay')}
           </span>
           <input
             type="date"
             value={date}
             max={today}
             onChange={(e) => e.target.value && setDate(e.target.value > today ? today : e.target.value)}
-            aria-label="Choisir la date"
+            aria-label={t('common.chooseDate')}
             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           />
         </label>
@@ -113,7 +109,7 @@ export function SuiviScreen() {
           onClick={() => setDate((d) => (d < today ? addDays(d, 1) : d))}
           disabled={date >= today}
           className="rounded-full p-2.5 text-muted active:bg-surface-3 disabled:opacity-30"
-          aria-label="Jour suivant"
+          aria-label={t('common.nextDay')}
         >
           <ChevronRightIcon className="h-5 w-5" />
         </button>
@@ -128,7 +124,7 @@ export function SuiviScreen() {
       {/* Period + chart */}
       <div className="mt-6 rounded-2xl border border-line bg-surface p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-ink-2">Évolution</p>
+          <p className="text-sm font-semibold text-ink-2">{t('tracking.evolution')}</p>
           <div className="flex rounded-lg bg-surface-3 p-0.5 text-xs font-medium">
             {PERIODS.map((p) => (
               <button
@@ -138,7 +134,7 @@ export function SuiviScreen() {
                 aria-pressed={period === p.key}
                 className={`rounded-md px-2.5 py-1.5 ${period === p.key ? 'bg-surface text-accent-ink shadow-sm' : 'text-muted'}`}
               >
-                {p.label}
+                {tDynamic(`period.${p.key}`)}
               </button>
             ))}
           </div>
@@ -148,30 +144,28 @@ export function SuiviScreen() {
         ) : (
           <p className="py-8 text-center text-sm text-muted">
             {hasData
-              ? 'Aucune donnée sur cette période.'
-              : 'Saisissez votre poids, vos pas ou vos calories ci-dessus pour voir le graphique.'}
+              ? t('tracking.noDataPeriod')
+              : t('tracking.enterData')}
           </p>
         )}
         <p className="mt-2 text-center text-[11px] text-muted">
-          Courbe rouge : poids lissé sur 7 jours · points gris : pesées du jour
+          {t('tracking.legend')}
         </p>
       </div>
 
       {/* Advice */}
       <div className="mt-4 rounded-2xl border border-line bg-surface p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-ink-2">Où j'en suis</p>
+          <p className="text-sm font-semibold text-ink-2">{t('tracking.whereIAm')}</p>
           <Link to="/reglages" className="text-xs font-semibold text-accent-ink">
-            {preferences ? GOAL_LABEL[preferences.goal] : '…'} · modifier
+            {preferences ? goalLabel(preferences.goal) : '…'} · {t('tracking.edit')}
           </Link>
         </div>
         {trend.status === 'insufficient' ? (
           <div className="rounded-xl bg-surface-2 px-3.5 py-3">
-            <p className="text-sm font-semibold text-ink-2">Pas encore assez de données</p>
+            <p className="text-sm font-semibold text-ink-2">{t('tracking.notEnough')}</p>
             <p className="mt-0.5 text-xs text-muted">
-              Il faut au moins {trend.needed} jours avec un poids saisi sur les 4 dernières semaines (
-              {trend.days}/{trend.needed} pour l'instant), et autant avec des calories (
-              {estimate.calorieDays}/{trend.needed}).
+              {t('tracking.needDays', { needed: trend.needed, days: trend.days, cal: estimate.calorieDays })}
             </p>
           </div>
         ) : (
@@ -186,28 +180,28 @@ export function SuiviScreen() {
           )
         )}
         <p className="mt-2.5 text-[11px] text-muted">
-          Repères indicatifs basés sur vos saisies, pas un avis médical.
+          {t('tracking.disclaimer')}
         </p>
       </div>
 
       {/* Weekly table */}
       {weeks.length > 0 && (
         <div className="mt-4 rounded-2xl border border-line bg-surface p-4 shadow-sm">
-          <p className="mb-2 text-sm font-semibold text-ink-2">Par semaine</p>
+          <p className="mb-2 text-sm font-semibold text-ink-2">{t('tracking.byWeek')}</p>
           <table className="w-full text-right text-xs tabular-nums">
             <thead>
               <tr className="text-[11px] font-medium text-muted">
-                <th className="pb-1.5 text-left font-medium">Semaine</th>
-                <th className="pb-1.5 font-medium">Poids moy.</th>
-                <th className="pb-1.5 font-medium">Pas/j</th>
-                <th className="pb-1.5 font-medium">kcal/j</th>
-                <th className="pb-1.5 font-medium">Δ poids</th>
+                <th className="pb-1.5 text-left font-medium">{t('tracking.week')}</th>
+                <th className="pb-1.5 font-medium">{t('tracking.avgWeight')}</th>
+                <th className="pb-1.5 font-medium">{t('tracking.stepsDay')}</th>
+                <th className="pb-1.5 font-medium">{t('tracking.kcalDay')}</th>
+                <th className="pb-1.5 font-medium">{t('tracking.deltaWeight')}</th>
               </tr>
             </thead>
             <tbody>
               {weeks.map((w) => (
                 <tr key={w.monday} className="border-t border-line text-ink">
-                  <td className="py-2 text-left text-muted">{formatDateFr(w.monday, { withYear: false })}</td>
+                  <td className="py-2 text-left text-muted">{formatDateShort(w.monday, { withYear: false })}</td>
                   <td className="py-2 font-semibold">{w.weight != null ? formatKg(w.weight) : '—'}</td>
                   <td className="py-2">{w.steps != null ? formatInt(w.steps) : '—'}</td>
                   <td className="py-2">{w.calories != null ? formatInt(w.calories) : '—'}</td>
@@ -217,7 +211,7 @@ export function SuiviScreen() {
             </tbody>
           </table>
           <p className="mt-2 text-[11px] text-muted">
-            Moyennes sur les jours renseignés uniquement. Δ = poids moyen vs semaine précédente (kg).
+            {t('tracking.tableNote')}
           </p>
         </div>
       )}
@@ -227,14 +221,14 @@ export function SuiviScreen() {
           to="/reglages"
           className="flex items-center justify-between rounded-2xl border border-line bg-surface px-4 py-3 text-sm font-medium text-ink-2 shadow-sm active:bg-surface-2"
         >
-          Importer mes pas automatiquement (Raccourci iOS)
+          {t('tracking.shortcutLink')}
           <ChevronRightIcon className="h-4 w-4 text-faint" />
         </Link>
         <Link
           to="/donnees"
           className="flex items-center justify-between rounded-2xl border border-line bg-surface px-4 py-3 text-sm font-medium text-ink-2 shadow-sm active:bg-surface-2"
         >
-          Importer un fichier (CSV, Apple Santé)
+          {t('tracking.fileLink')}
           <ChevronRightIcon className="h-4 w-4 text-faint" />
         </Link>
       </div>
@@ -257,8 +251,10 @@ function AdviceBlock({
 }) {
   const facts = (
     <p className="mt-2 text-xs text-muted">
-      Tendance : <span className="font-semibold">{formatSigned(kgPerWeek, 2)} kg/sem</span> · Objectif :{' '}
-      <span className="font-semibold">{formatSigned(targetRate(goal, rate), 2)} kg/sem</span>
+      {t('tracking.trend', {
+        trend: t('tracking.kgPerWeekShort', { v: formatSigned(kgPerWeek, 2) }),
+        goal: t('tracking.kgPerWeekShort', { v: formatSigned(targetRate(goal, rate), 2) }),
+      })}
     </p>
   )
 
@@ -266,10 +262,9 @@ function AdviceBlock({
   if (estimate.status === 'insufficient') {
     return (
       <div className="rounded-xl bg-surface-2 px-3.5 py-3">
-        <p className="text-sm font-semibold text-ink-2">Pas encore assez de données</p>
+        <p className="text-sm font-semibold text-ink-2">{t('tracking.notEnough')}</p>
         <p className="mt-0.5 text-xs text-muted">
-          Trop de jours sans calories : {estimate.calorieDays}/{estimate.needed} jours renseignés sur les 4 dernières
-          semaines. Saisissez-les pour obtenir un conseil et une estimation.
+          {t('tracking.tooFewCalories', { days: estimate.calorieDays, needed: estimate.needed })}
         </p>
         {facts}
       </div>
@@ -281,19 +276,22 @@ function AdviceBlock({
   const color = ok ? 'text-good-ink' : 'text-highlight-ink'
   const goalVerb =
     goal === 'loss'
-      ? `Pour perdre ${formatKg(Math.abs(rate))} kg/semaine`
+      ? t('tracking.toLose', { v: formatKg(Math.abs(rate)) })
       : goal === 'gain'
-        ? `Pour prendre ${formatKg(Math.abs(rate))} kg/semaine`
-        : 'Pour maintenir ton poids'
+        ? t('tracking.toGain', { v: formatKg(Math.abs(rate)) })
+        : t('tracking.toMaintain')
 
   return (
     <div className={`rounded-xl px-3.5 py-3 ${ok ? 'bg-good-soft' : 'bg-highlight-soft'}`}>
       <p className={`text-sm font-semibold ${color}`}>{advice.title}</p>
       {shift && !ok && (
         <p className="mt-1 text-sm text-highlight-ink">
-          Tes pas ont {shift.change < 0 ? 'baissé' : 'augmenté'} de {Math.round(Math.abs(shift.change) * 100)} % cette
-          semaine ({formatInt(shift.recent)} contre {formatInt(shift.previous)} par jour) : cela peut expliquer
-          l'évolution, avant de toucher aux calories.
+          {t('tracking.stepsShift', {
+            dir: shift.change < 0 ? t('tracking.down') : t('tracking.up'),
+            pct: Math.round(Math.abs(shift.change) * 100),
+            recent: formatInt(shift.recent),
+            previous: formatInt(shift.previous),
+          })}
         </p>
       )}
       <p className={`mt-1 text-sm ${color}`}>{advice.text}</p>
@@ -301,32 +299,31 @@ function AdviceBlock({
       {estimate.status === 'ok' ? (
         <>
           <p className="mt-1 text-xs text-muted">
-            Entretien estimé : environ{' '}
-            <span className="font-semibold">{formatInt(roundTo(estimate.maintenance, 10))} kcal/jour</span>{' '}
-            (estimation approximative, sur {estimate.windowDays} jours dont {estimate.calorieDays} avec calories).
+            {t('tracking.maintenance', {
+              kcal: formatInt(roundTo(estimate.maintenance, 10)),
+              window: estimate.windowDays,
+              cal: estimate.calorieDays,
+            })}
           </p>
           <p className="mt-1 text-xs font-medium text-ink-2">
-            {goalVerb}, vise environ{' '}
-            <span className="font-bold">
-              {formatInt(roundTo(calorieTarget(estimate.maintenance, goal, rate), 10))} kcal/jour
-            </span>
-            .
+            {t('tracking.aim', { goal: goalVerb, kcal: formatInt(roundTo(calorieTarget(estimate.maintenance, goal, rate), 10)) })}
           </p>
         </>
       ) : (
         <p className="mt-1 text-xs text-muted">
-          Estimation de l'entretien non affichée : les calories saisies semblent incomplètes.
+          {t('tracking.noMaintenance')}
         </p>
       )}
     </div>
   )
 }
 
-const FIELDS: { key: TrackedField; label: string; unit: string; mode: 'decimal' | 'numeric'; placeholder: string }[] = [
-  { key: 'weight', label: 'Poids', unit: 'kg', mode: 'decimal', placeholder: '78,4' },
-  { key: 'steps', label: 'Pas', unit: 'pas', mode: 'numeric', placeholder: '8 500' },
-  { key: 'calories', label: 'Calories', unit: 'kcal', mode: 'numeric', placeholder: '2 400' },
+const FIELDS: { key: TrackedField; mode: 'decimal' | 'numeric'; example: number }[] = [
+  { key: 'weight', mode: 'decimal', example: 78.4 },
+  { key: 'steps', mode: 'numeric', example: 8500 },
+  { key: 'calories', mode: 'numeric', example: 2400 },
 ]
+const fieldUnit = (key: TrackedField) => (key === 'weight' ? 'kg' : key === 'steps' ? t('trackField.stepsUnit') : 'kcal')
 
 type Texts = Record<TrackedField, string>
 
@@ -388,7 +385,7 @@ function DailyForm({ date, entry }: { date: string; entry: BodyMeasurement | und
         {FIELDS.map((f) => (
           <div key={f.key}>
             <label htmlFor={`suivi-${f.key}`} className="mb-1 block text-xs font-medium text-muted">
-              {f.label} <span className="text-muted">({f.unit})</span>
+              {tDynamic(`trackField.${f.key}`)} <span className="text-muted">({fieldUnit(f.key)})</span>
             </label>
             <input
               id={`suivi-${f.key}`}
@@ -398,7 +395,7 @@ function DailyForm({ date, entry }: { date: string; entry: BodyMeasurement | und
               inputMode={f.mode}
               enterKeyHint="done"
               autoComplete="off"
-              placeholder={f.placeholder}
+              placeholder={formatNumber(f.example, 1)}
               aria-invalid={invalid[f.key] || undefined}
               className={`w-full min-w-0 rounded-xl border bg-surface-2 px-2 py-3.5 text-center text-lg font-bold font-numbers tabular-nums outline-none placeholder:font-normal placeholder:text-faint focus:border-accent-line ${
                 invalid[f.key] ? 'border-danger' : 'border-line'
@@ -409,8 +406,8 @@ function DailyForm({ date, entry }: { date: string; entry: BodyMeasurement | und
       </div>
       <p className="mt-2.5 text-center text-[11px] text-muted">
         {Object.values(invalid).some(Boolean)
-          ? 'Valeur hors limites : elle n’est pas enregistrée.'
-          : 'Enregistré automatiquement · aucun champ obligatoire'}
+          ? t('tracking.outOfRange')
+          : t('tracking.autoSaved')}
       </p>
     </div>
   )

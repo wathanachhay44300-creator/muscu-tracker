@@ -6,11 +6,10 @@ import { useSwipeNav, getSlideClass, type SwipeDirection } from '../hooks/useSwi
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { HistoryTabs } from '../components/HistoryTabs'
 import { ConfirmDialog } from '../components/ConfirmDialog'
-import { formatDateLong } from '../lib/date'
+import { formatDateLong, weekdayShortNames } from '../lib/date'
 import { getOrCreateWorkout } from '../lib/workoutActions'
-import { addMonths, daysInMonth, formatMonthFr, isToday, monthStartOf, todayISO } from '../lib/date'
-
-const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+import { addMonths, daysInMonth, formatMonth, isToday, monthStartOf, todayISO } from '../lib/date'
+import { t, tn } from '../i18n'
 
 export function CalendrierScreen() {
   const navigate = useNavigate()
@@ -53,7 +52,7 @@ export function CalendrierScreen() {
 
   return (
     <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-      <h1 className="mb-4 pt-2 !text-[2rem] leading-none text-ink">Historique</h1>
+      <h1 className="mb-4 pt-2 !text-[2rem] leading-none text-ink">{t('screens.history')}</h1>
       <HistoryTabs />
 
       <div className="mb-4 flex items-center justify-between">
@@ -61,16 +60,16 @@ export function CalendrierScreen() {
           type="button"
           onClick={() => changeMonth(-1)}
           className="rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Mois précédent"
+          aria-label={t('calendar.prevMonth')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <p className="text-sm font-semibold capitalize text-ink">{formatMonthFr(monthStart)}</p>
+        <p className="text-sm font-semibold capitalize text-ink">{formatMonth(monthStart)}</p>
         <button
           type="button"
           onClick={() => changeMonth(1)}
           className="rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Mois suivant"
+          aria-label={t('calendar.nextMonth')}
         >
           <ChevronRightIcon className="h-5 w-5" />
         </button>
@@ -78,13 +77,13 @@ export function CalendrierScreen() {
 
       <div className="mb-4 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-2xl border border-line bg-surface px-4 py-3 text-center shadow-sm">
         <p className="text-sm font-medium text-ink-2">
-          {monthCount} séance{monthCount > 1 ? 's' : ''} ce mois-ci
+          {tn('calendar.monthCount', monthCount)}
         </p>
         {streak >= 1 && (
           <>
             <span className="hidden text-faint sm:inline">·</span>
             <p className="text-sm font-semibold text-highlight-ink">
-              🔥 {streak} semaine{streak > 1 ? 's' : ''} de suite
+              {tn('calendar.streak', streak)}
             </p>
           </>
         )}
@@ -93,7 +92,7 @@ export function CalendrierScreen() {
       <div ref={swipe.ref} {...swipe.handlers} className="touch-pan-y">
         <div key={monthStart} className={getSlideClass(enterDir, swipe.reducedMotion)}>
           <div className="mb-1.5 grid grid-cols-7 text-center text-xs font-medium text-muted">
-            {WEEKDAY_LABELS.map((d) => (
+            {weekdayShortNames().map((d) => (
               <div key={d}>{d}</div>
             ))}
           </div>
@@ -112,10 +111,10 @@ export function CalendrierScreen() {
                   className="flex aspect-square items-center justify-center disabled:opacity-40"
                   aria-label={
                     workoutId
-                      ? `${day} — séance enregistrée, voir le détail`
+                      ? t('calendar.dayLogged', { day })
                       : date > todayStr
                         ? String(day)
-                        : `${day} — ajouter une séance ce jour-là`
+                        : t('calendar.dayAdd', { day })
                   }
                 >
                   <span
@@ -135,14 +134,14 @@ export function CalendrierScreen() {
       </div>
 
       {monthCount === 0 && (
-        <p className="mt-6 text-center text-sm text-muted">Aucune séance enregistrée ce mois-ci.</p>
+        <p className="mt-6 text-center text-sm text-muted">{t('calendar.emptyMonth')}</p>
       )}
 
       {addingDate && (
         <ConfirmDialog
-          title={`Ajouter une séance le ${formatDateLong(addingDate)} ?`}
-          message="Pour rattraper une séance oubliée : elle s'ouvre en mode séance, à la date choisie."
-          confirmLabel="Ajouter"
+          title={t('calendar.addTitle', { date: formatDateLong(addingDate) })}
+          message={t('calendar.addMessage')}
+          confirmLabel={t('common.add')}
           onConfirm={async () => {
             const date = addingDate
             setAddingDate(null)

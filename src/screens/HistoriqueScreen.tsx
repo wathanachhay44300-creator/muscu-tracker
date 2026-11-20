@@ -13,10 +13,11 @@ import { useWorkoutHistory, type WorkoutSummary } from '../hooks/useHistory'
 import { hapticMenuOpen } from '../lib/haptics'
 import { updateWorkoutTitle } from '../lib/workoutActions'
 import { applyHistoryFilters, groupByMonth, layoutMonths, type MonthGroup } from '../lib/historyGroups'
-import { formatDateFr } from '../lib/date'
+import { formatDateShort } from '../lib/date'
 import { formatVolume } from '../lib/stats'
 import { CalendarIcon, ChevronRightIcon, PencilIcon, XIcon } from '../components/Icons'
 import { HistoryTabs } from '../components/HistoryTabs'
+import { getLocale, t, tn } from '../i18n'
 
 const PAGE_SIZE = 10
 
@@ -54,8 +55,8 @@ export function HistoriqueScreen() {
     const list = (templates ?? [])
       .filter((t) => used.has(t.id!))
       .map((t) => ({ value: String(t.id), label: t.name }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
-    if (all.some((s) => s.workout.templateId == null)) list.push({ value: 'free', label: 'Séance libre' })
+      .sort((a, b) => a.label.localeCompare(b.label, getLocale()))
+    if (all.some((s) => s.workout.templateId == null)) list.push({ value: 'free', label: t('common.freeSession') })
     return list
   }, [all, templates])
   const exerciseOptions = useMemo(() => {
@@ -84,20 +85,20 @@ export function HistoriqueScreen() {
       onPointerCancel={pullToRefresh.handlers.onPointerCancel}
     >
       <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
-      <h1 className="mb-4 pt-2 !text-[2rem] leading-none text-ink">Historique</h1>
+      <h1 className="mb-4 pt-2 !text-[2rem] leading-none text-ink">{t('screens.history')}</h1>
 
       <HistoryTabs />
 
       {all.length > 0 && (
         <div className="mb-2 grid grid-cols-2 gap-2">
           <FilterSelect
-            label="Programme"
+            label={t('history.program')}
             value={program}
             options={programOptions}
             onChange={(v) => changeFilter(setProgram, v)}
           />
           <FilterSelect
-            label="Exercice"
+            label={t('history.exercise')}
             value={exercise}
             options={exerciseOptions}
             onChange={(v) => changeFilter(setExercise, v)}
@@ -107,29 +108,29 @@ export function HistoriqueScreen() {
 
       {filtersActive && (
         <div className="mb-2 flex flex-wrap items-center gap-1.5">
-          {program !== '' && <FilterChip label={programLabel ?? 'Programme'} onClear={() => changeFilter(setProgram, '')} />}
-          {exercise !== '' && <FilterChip label={exerciseLabel ?? 'Exercice'} onClear={() => changeFilter(setExercise, '')} />}
+          {program !== '' && <FilterChip label={programLabel ?? t('history.program')} onClear={() => changeFilter(setProgram, '')} />}
+          {exercise !== '' && <FilterChip label={exerciseLabel ?? t('history.exercise')} onClear={() => changeFilter(setExercise, '')} />}
         </div>
       )}
 
       {all.length > 0 && (
         <p className="mb-1 px-1 text-xs font-medium text-muted" aria-live="polite">
-          {filtered.length} séance{filtered.length > 1 ? 's' : ''}
-          {filtersActive && ` sur ${all.length}`}
+          {tn('common.sessions', filtered.length)}
+          {filtersActive && t('history.outOf', { n: all.length })}
         </p>
       )}
 
       {history && all.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
           <CalendarIcon className="h-10 w-10 text-faint" />
-          <p className="font-medium text-ink-2">Pas encore de séance enregistrée</p>
-          <p className="text-sm text-muted">Vos séances passées apparaîtront ici une fois enregistrées.</p>
+          <p className="font-medium text-ink-2">{t('history.empty')}</p>
+          <p className="text-sm text-muted">{t('history.emptyHint')}</p>
         </div>
       )}
 
       {all.length > 0 && filtered.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
-          <p className="font-medium text-ink-2">Aucune séance ne correspond à ces filtres</p>
+          <p className="font-medium text-ink-2">{t('history.noMatch')}</p>
           <button
             type="button"
             onClick={() => {
@@ -138,7 +139,7 @@ export function HistoriqueScreen() {
             }}
             className="mt-3 rounded-full bg-surface-3 px-4 py-2.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
           >
-            Effacer les filtres
+            {t('history.clearFilters')}
           </button>
         </div>
       )}
@@ -159,7 +160,7 @@ export function HistoriqueScreen() {
           onClick={() => setLimit((l) => l + PAGE_SIZE)}
           className="mt-2 w-full rounded-2xl bg-surface-3 py-3.5 text-sm font-semibold text-ink-2 active:bg-surface-4"
         >
-          Voir plus ({remaining} séance{remaining > 1 ? 's' : ''} restante{remaining > 1 ? 's' : ''})
+          {tn('history.moreRemaining', remaining)}
         </button>
       )}
 
@@ -203,7 +204,7 @@ function FilterChip({ label, onClear }: { label: string; onClear: () => void }) 
     <button
       type="button"
       onClick={onClear}
-      aria-label={`Retirer le filtre ${label}`}
+      aria-label={t('history.removeFilter', { label })}
       className="flex min-h-9 items-center gap-1.5 rounded-full bg-accent-soft py-1.5 pl-3 pr-2.5 text-xs font-semibold text-accent-ink active:bg-accent-soft"
     >
       <span className="max-w-[10rem] truncate">{label}</span>
@@ -255,7 +256,7 @@ function MonthSection({
           <span className="font-display text-base text-ink">{group.label}</span>
         </span>
         <span className="text-xs font-medium tabular-nums text-muted">
-          {count} séance{count > 1 ? 's' : ''}
+          {tn('common.sessions', count)}
           {group.volume > 0 && <> · {formatVolume(group.volume)} kg</>}
         </span>
       </button>
@@ -313,7 +314,7 @@ function SessionRow({ summary, bordered }: { summary: WorkoutSummary; bordered: 
         }`}
       >
         <span className="w-[4.25rem] shrink-0 text-xs font-medium text-muted">
-          {formatDateFr(workout.date, { withYear: false })}
+          {formatDateShort(workout.date, { withYear: false })}
         </span>
         <span className="min-w-0 flex-1 truncate font-semibold text-ink">{title}</span>
         <span className="shrink-0 text-xs font-medium tabular-nums text-muted">
@@ -325,17 +326,17 @@ function SessionRow({ summary, bordered }: { summary: WorkoutSummary; bordered: 
       {menuOpen && (
         <ContextMenuSheet
           title={title}
-          actions={[{ label: 'Renommer', icon: PencilIcon, onSelect: () => setRenaming(true) }]}
+          actions={[{ label: t('common.rename'), icon: PencilIcon, onSelect: () => setRenaming(true) }]}
           onClose={() => setMenuOpen(false)}
         />
       )}
 
       {renaming && (
         <RenameSheet
-          title="Renommer la séance"
+          title={t('history.renameWorkout')}
           initialName={title}
           allowEmpty
-          placeholder="Séance libre"
+          placeholder={t('common.freeSession')}
           onRename={(name) => {
             updateWorkoutTitle(workout.id!, name)
             setRenaming(false)

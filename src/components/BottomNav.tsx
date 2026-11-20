@@ -1,12 +1,13 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { CalendarIcon, HomeIcon, ListIcon, TrendIcon } from './Icons'
+import { t } from '../i18n'
 
 /** Four tabs; each also lights up for the screens reached from it. */
 const TABS = [
-  { to: '/', label: "Aujourd'hui", icon: HomeIcon, match: ['/', '/programmes', '/reglages', '/donnees'] },
-  { to: '/historique', label: 'Historique', icon: CalendarIcon, match: ['/historique', '/bilan'] },
-  { to: '/progres', label: 'Progrès', icon: TrendIcon, match: ['/progres', '/suivi', '/corps'] },
-  { to: '/exercices', label: 'Exercices', icon: ListIcon, match: ['/exercices'] },
+  { to: '/', key: 'today', icon: HomeIcon, match: ['/', '/programmes', '/reglages', '/donnees'] },
+  { to: '/historique', key: 'history', icon: CalendarIcon, match: ['/historique', '/bilan'] },
+  { to: '/progres', key: 'progress', icon: TrendIcon, match: ['/progres', '/suivi', '/corps'] },
+  { to: '/exercices', key: 'exercises', icon: ListIcon, match: ['/exercices'] },
 ]
 
 function isActive(pathname: string, match: string[]): boolean {
@@ -33,7 +34,7 @@ export function BottomNav() {
               }`}
             >
               <tab.icon className="h-6 w-6" strokeWidth={active ? 2.4 : 1.9} />
-              {tab.label}
+              {t(`nav.${tab.key}` as 'nav.today' | 'nav.history' | 'nav.progress' | 'nav.exercises')}
             </NavLink>
           )
         })}

@@ -7,6 +7,7 @@ import { ContextMenuSheet } from '../components/ContextMenuSheet'
 import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { useExerciseLibrary } from '../hooks/useExerciseLibrary'
 import { useExerciseBrowser } from '../hooks/useExerciseBrowser'
+import { groupLabel, t, tn } from '../i18n'
 import { ExerciseFilters } from '../components/ExerciseFilters'
 import { ExerciseInfoButton } from '../components/ExerciseInfoSheet'
 import { useInlineRename } from '../hooks/useInlineRename'
@@ -58,14 +59,14 @@ export function ExercicesScreen() {
     >
       <PullToRefreshIndicator indicatorRef={pullToRefresh.indicatorRef} refreshing={pullToRefresh.refreshing} />
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-ink">Exercices</h1>
+        <h1 className="text-lg font-bold text-ink">{t('screens.exercises')}</h1>
         <button
           type="button"
           onClick={() => setCreating(true)}
           className="flex items-center gap-1 rounded-full bg-accent py-2 pl-2.5 pr-3 text-sm font-semibold text-on-accent active:bg-accent-hover"
         >
           <PlusIcon className="h-4 w-4" />
-          Ajouter
+          {t('common.add')}
         </button>
       </div>
 
@@ -74,14 +75,14 @@ export function ExercicesScreen() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Chercher (ex : shoulder press, dev incliné)…"
+          placeholder={t('exercises.search')}
           enterKeyHint="search"
           autoCapitalize="off"
           autoCorrect="off"
           className="w-full bg-transparent text-base outline-none placeholder:text-muted"
         />
         {query && (
-          <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-muted active:bg-surface-4">
+          <button type="button" onClick={() => setQuery('')} aria-label={t('picker.clearSearch')} className="shrink-0 rounded-full p-1 text-muted active:bg-surface-4">
             <XIcon className="h-4 w-4" />
           </button>
         )}
@@ -101,7 +102,7 @@ export function ExercicesScreen() {
         browser.results.length > 0 ? (
           <>
             <p className="mb-1.5 px-1 text-xs font-medium text-muted">
-              {browser.results.length} résultat{browser.results.length > 1 ? 's' : ''}
+              {tn('picker.results', browser.results.length)}
             </p>
             <ExerciseSection
               title={null}
@@ -117,17 +118,17 @@ export function ExercicesScreen() {
       ) : (
         <>
           {browser.favorites.length > 0 && (
-            <ExerciseSection title="Favoris" exercises={browser.favorites} onEdit={setEditing} onDelete={handleDeleteClick} />
+            <ExerciseSection title={t('picker.favorites')} exercises={browser.favorites} onEdit={setEditing} onDelete={handleDeleteClick} />
           )}
           {browser.recent.length > 0 && (
-            <ExerciseSection title="Utilisés récemment" exercises={browser.recent} onEdit={setEditing} onDelete={handleDeleteClick} />
+            <ExerciseSection title={t('picker.recent')} exercises={browser.recent} onEdit={setEditing} onDelete={handleDeleteClick} />
           )}
           {[...browser.grouped.entries()].map(([group, list]) => (
-            <ExerciseSection key={group} title={group} exercises={list} onEdit={setEditing} onDelete={handleDeleteClick} />
+            <ExerciseSection key={group} title={groupLabel(group)} exercises={list} onEdit={setEditing} onDelete={handleDeleteClick} />
           ))}
           {browser.secondaryList.length > 0 && (
             <ExerciseSection
-              title="Muscle secondaire"
+              title={t('picker.secondary')}
               exercises={browser.secondaryList}
               secondaryOnly={browser.secondaryOnly}
               onEdit={setEditing}
@@ -135,7 +136,7 @@ export function ExercicesScreen() {
             />
           )}
           {browser.mode === 'grouped' && browser.results.length === 0 && (
-            <p className="mt-8 text-center text-sm text-muted">Aucun exercice pour ces filtres.</p>
+            <p className="mt-8 text-center text-sm text-muted">{t('picker.noneFilters')}</p>
           )}
         </>
       )}
@@ -143,12 +144,12 @@ export function ExercicesScreen() {
       {creating && (
         <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
           <div className="flex items-center justify-between border-t border-line px-4 pt-safe pt-4 pb-3">
-            <h2 className="text-lg font-bold text-ink">Nouvel exercice</h2>
+            <h2 className="text-lg font-bold text-ink">{t('screens.newExercise')}</h2>
             <button
               type="button"
               onClick={() => setCreating(false)}
               className="rounded-full p-2 text-muted active:bg-surface-3"
-              aria-label="Fermer"
+              aria-label={t('common.close')}
             >
               <XIcon className="h-6 w-6" />
             </button>
@@ -166,12 +167,12 @@ export function ExercicesScreen() {
       {editing && (
         <div className="animate-fade-in-backdrop fixed inset-0 z-40 flex flex-col bg-surface">
           <div className="flex items-center justify-between border-t border-line px-4 pt-safe pt-4 pb-3">
-            <h2 className="text-lg font-bold text-ink">Modifier l'exercice</h2>
+            <h2 className="text-lg font-bold text-ink">{t('screens.editExercise')}</h2>
             <button
               type="button"
               onClick={() => setEditing(null)}
               className="rounded-full p-2 text-muted active:bg-surface-3"
-              aria-label="Fermer"
+              aria-label={t('common.close')}
             >
               <XIcon className="h-6 w-6" />
             </button>
@@ -188,13 +189,13 @@ export function ExercicesScreen() {
 
       {deleting && (
         <ConfirmDialog
-          title={`Supprimer « ${deleting.exercise.name} » ?`}
+          title={t('exercises.deleteTitle', { name: deleting.exercise.name })}
           message={
             deleting.usageCount > 0
-              ? `Cet exercice a été utilisé dans ${deleting.usageCount} séance${deleting.usageCount > 1 ? 's' : ''}. Son historique sera conservé, mais il ne sera plus proposé pour vos prochaines séances.`
-              : 'Cette action est définitive.'
+              ? tn('exercises.deleteUsed', deleting.usageCount)
+              : t('exercises.deleteFinal')
           }
-          confirmLabel="Supprimer"
+          confirmLabel={t('common.delete')}
           danger
           onConfirm={confirmDelete}
           onCancel={() => setDeleting(null)}
@@ -270,7 +271,7 @@ function ExerciseRow({
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={rename.commit}
-          aria-label="Valider le renommage"
+          aria-label={t('programs.confirmRename')}
           className="shrink-0 rounded-full p-2 text-accent-ink active:bg-surface-3"
         >
           <CheckIcon className="h-4 w-4" />
@@ -279,7 +280,7 @@ function ExerciseRow({
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={rename.cancel}
-          aria-label="Annuler le renommage"
+          aria-label={t('programs.cancelRename')}
           className="shrink-0 rounded-full p-2 text-muted active:bg-surface-3"
         >
           <XIcon className="h-4 w-4" />
@@ -303,7 +304,7 @@ function ExerciseRow({
         data-no-long-press
         data-no-swipe
         onClick={() => setExerciseFavorite(exercise.id!, !exercise.favoritedAt)}
-        aria-label={exercise.favoritedAt ? `Retirer ${exercise.name} des favoris` : `Ajouter ${exercise.name} aux favoris`}
+        aria-label={exercise.favoritedAt ? t('picker.unfavorite', { name: exercise.name }) : t('picker.favorite', { name: exercise.name })}
         className="shrink-0 p-2 active:opacity-70"
       >
         {exercise.favoritedAt ? (
@@ -328,7 +329,7 @@ function ExerciseRow({
         data-no-swipe
         onClick={rename.start}
         className="shrink-0 p-2 text-faint active:text-accent-ink"
-        aria-label={`Renommer ${exercise.name}`}
+        aria-label={t('programs.renameNamed', { name: exercise.name })}
       >
         <PencilIcon className="h-4 w-4" />
       </button>
@@ -339,7 +340,7 @@ function ExerciseRow({
           data-no-swipe
           onClick={onDelete}
           className="shrink-0 p-2 text-faint active:text-danger-ink"
-          aria-label={`Supprimer ${exercise.name}`}
+          aria-label={t('exercises.deleteNamed', { name: exercise.name })}
         >
           <TrashIcon className="h-4 w-4" />
         </button>
@@ -349,10 +350,10 @@ function ExerciseRow({
         <ContextMenuSheet
           title={exercise.name}
           actions={[
-            { label: 'Renommer', icon: PencilIcon, onSelect: rename.start },
-            { label: 'Modifier les détails', icon: SettingsIcon, onSelect: onEdit },
+            { label: t('common.rename'), icon: PencilIcon, onSelect: rename.start },
+            { label: t('exercises.editDetails'), icon: SettingsIcon, onSelect: onEdit },
             ...(exercise.isCustom
-              ? [{ label: 'Supprimer', icon: TrashIcon, onSelect: onDelete, danger: true }]
+              ? [{ label: t('common.delete'), icon: TrashIcon, onSelect: onDelete, danger: true }]
               : []),
           ]}
           onClose={() => setMenuOpen(false)}
@@ -366,14 +367,14 @@ function ExerciseRow({
 export function NoResults({ query, onCreate }: { query: string; onCreate: () => void }) {
   return (
     <div className="mt-6 rounded-2xl border border-dashed border-line-strong px-4 py-8 text-center">
-      <p className="text-sm text-muted">Aucun exercice trouvé pour « {query.trim()} ».</p>
+      <p className="text-sm text-muted">{t('picker.noneFor', { q: query.trim() })}</p>
       <button
         type="button"
         onClick={onCreate}
         className="mt-3 inline-flex min-h-12 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-on-accent active:bg-accent-hover"
       >
         <PlusIcon className="h-4 w-4" />
-        Créer « {query.trim()} »
+        {t('picker.createNamed', { name: query.trim() })}
       </button>
     </div>
   )

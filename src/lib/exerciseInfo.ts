@@ -1,8 +1,10 @@
 import { EQUIPMENT_NOTES, FAMILIES } from '../data/exerciseFamilies'
+import { EQUIPMENT_NOTES_EN, FAMILIES_EN } from '../data/exerciseFamiliesEn'
 import type { LibraryExercise } from '../data/exerciseLibrary'
 import type { Equipment, Exercise, MuscleId } from '../types'
 import { equipmentOf, libraryEntryOf } from './exerciseSearch'
 import { musclesOfGroup, musclesOfGroups, secondaryGroupsOf } from './muscleGroups'
+import { getLang, t } from '../i18n'
 
 export interface ExerciseInfo {
   entry: LibraryExercise | undefined
@@ -21,7 +23,8 @@ export interface ExerciseInfo {
  */
 export function getExerciseInfo(ex: Exercise): ExerciseInfo {
   const entry = libraryEntryOf(ex)
-  const family = entry ? FAMILIES[entry.family] : undefined
+  const en = getLang() === 'en'
+  const family = entry ? ((en ? FAMILIES_EN[entry.family] : undefined) ?? FAMILIES[entry.family]) : undefined
   const equipment = equipmentOf(ex)
   return {
     entry,
@@ -29,13 +32,13 @@ export function getExerciseInfo(ex: Exercise): ExerciseInfo {
     ...musclesFor(ex, entry),
     steps: family?.steps ?? [],
     tips: family?.tips ?? [],
-    equipmentNote: entry && equipment ? EQUIPMENT_NOTES[equipment] : undefined,
+    equipmentNote: entry && equipment ? (en ? EQUIPMENT_NOTES_EN : EQUIPMENT_NOTES)[equipment] : undefined,
   }
 }
 
 /** YouTube search for a demonstration of the exercise (opens in a new tab). */
 export function demoSearchUrl(name: string): string {
-  return `https://www.youtube.com/results?search_query=${encodeURIComponent(`comment faire ${name}`)}`
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(t('exerciseInfo.howToQuery', { name }))}`
 }
 
 /** A usable http(s) link, or null. */

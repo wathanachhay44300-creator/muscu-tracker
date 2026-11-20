@@ -1,6 +1,7 @@
 import { db } from '../db'
 import type { BodyMeasurement } from '../types'
 import { parseAnyDate, parseNumber, validValue, type DayEntry, type TrackedField } from './tracking'
+import { formatDecimal, t } from '../i18n'
 
 const FIELDS: TrackedField[] = ['steps', 'weight', 'calories']
 
@@ -237,10 +238,10 @@ export async function applyMerge(
 /** Tracking history as CSV (date;pas;poids;calories), re-importable as is. */
 export async function trackingToCsv(): Promise<string> {
   const rows = await db.bodyMeasurements.orderBy('date').toArray()
-  const lines = ['date;pas;poids;calories']
+  const lines = [t('trackImport.csvHeader')]
   for (const r of rows) {
     if (r.steps == null && r.weight == null && r.calories == null) continue
-    lines.push([r.date, r.steps ?? '', r.weight != null ? String(r.weight).replace('.', ',') : '', r.calories ?? ''].join(';'))
+    lines.push([r.date, r.steps ?? '', r.weight != null ? formatDecimal(r.weight) : '', r.calories ?? ''].join(';'))
   }
   return lines.join('\r\n')
 }

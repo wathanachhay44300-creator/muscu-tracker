@@ -7,6 +7,7 @@ import { hapticMenuOpen } from '../../lib/haptics'
 import { ContextMenuSheet } from '../ContextMenuSheet'
 import { DragNumberField } from '../DragNumberField'
 import { CheckIcon, CopyIcon, StarIcon, TrashIcon } from '../Icons'
+import { t } from '../../i18n'
 
 export const SET_GRID = 'grid grid-cols-[2rem_1fr_1fr_2.75rem] items-center gap-1.5'
 
@@ -84,7 +85,7 @@ export function SessionSetRow({
       >
         <span
           className={`flex justify-center text-sm font-bold font-numbers ${done ? 'text-faint' : 'text-muted'}`}
-          title={isPR ? 'Record personnel' : undefined}
+          title={isPR ? t('set.pr') : undefined}
         >
           {isPR ? <StarIcon className="h-4 w-4 text-highlight" /> : index + 1}
         </span>
@@ -95,7 +96,7 @@ export function SessionSetRow({
           decimal
           dimmed={done}
           haptics={!!preferences?.hapticsEnabled}
-          label={`Poids en kg, série ${index + 1}`}
+          label={t('set.weightLabel', { n: index + 1 })}
           onCommit={onChangeWeight}
         />
         <DragNumberField
@@ -103,7 +104,7 @@ export function SessionSetRow({
           step={1}
           dimmed={done}
           haptics={!!preferences?.hapticsEnabled}
-          label={`Répétitions, série ${index + 1}`}
+          label={t('set.repsLabel', { n: index + 1 })}
           onCommit={onChangeReps}
         />
 
@@ -113,7 +114,7 @@ export function SessionSetRow({
           data-no-swipe
           onClick={onToggleDone}
           aria-pressed={done}
-          aria-label={done ? `Série ${index + 1} faite, annuler` : `Valider la série ${index + 1}`}
+          aria-label={done ? t('set.doneUndo', { n: index + 1 }) : t('set.validate', { n: index + 1 })}
           className={`flex h-11 w-11 items-center justify-center justify-self-center rounded-full ${
             done ? 'bg-accent text-on-accent' : 'border-2 border-line-strong text-faint active:bg-surface-3'
           }`}
@@ -124,10 +125,10 @@ export function SessionSetRow({
 
       {menuOpen && (
         <ContextMenuSheet
-          title={`Série ${index + 1}`}
+          title={t('set.title', { n: index + 1 })}
           actions={[
-            { label: 'Dupliquer la série', icon: CopyIcon, onSelect: onDuplicate },
-            { label: 'Supprimer la série', icon: TrashIcon, onSelect: onRemove, danger: true },
+            { label: t('set.duplicate'), icon: CopyIcon, onSelect: onDuplicate },
+            { label: t('set.delete'), icon: TrashIcon, onSelect: onRemove, danger: true },
           ]}
           onClose={() => setMenuOpen(false)}
         />

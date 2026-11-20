@@ -5,6 +5,7 @@ import { togglePlate, updateBarWeight } from '../lib/settingsActions'
 import { formatWeight } from '../lib/stats'
 import { ChevronRightIcon, XIcon } from './Icons'
 import type { LoadType } from '../types'
+import { parseDecimal, t } from '../i18n'
 
 interface PlateCalculatorSheetProps {
   initialWeight: number
@@ -19,7 +20,7 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
   const [showSettings, setShowSettings] = useState(false)
   const isSplit = loadType === 'Barre libre'
 
-  const weight = parseFloat(weightText.replace(',', '.')) || 0
+  const weight = parseDecimal(weightText) || 0
 
   return (
     <div
@@ -31,19 +32,19 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-ink">Calculateur de plaques</h2>
+          <h2 className="text-base font-semibold text-ink">{t('plates.title')}</h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full p-1.5 text-muted active:bg-surface-3"
-            aria-label="Fermer"
+            aria-label={t('common.close')}
           >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
 
         <label className="mb-1 block text-sm font-medium text-ink-2">
-          {isSplit ? 'Poids total (kg)' : 'Poids à charger (kg)'}
+          {isSplit ? t('plates.total') : t('plates.load')}
         </label>
         <input
           autoFocus
@@ -51,7 +52,7 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
           onChange={(e) => setWeightText(e.target.value)}
           onFocus={(e) => e.target.select()}
           inputMode="decimal"
-          placeholder="Ex : 100"
+          placeholder={t('plates.placeholder')}
           className="mb-4 w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-center text-lg font-semibold outline-none focus:border-accent-line"
         />
 
@@ -64,7 +65,7 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
           onClick={() => setShowSettings((s) => !s)}
           className="mt-4 flex w-full items-center justify-between rounded-xl bg-surface-3 px-4 py-3 text-sm font-medium text-ink-2 active:bg-surface-4"
         >
-          Réglages ({isSplit ? 'barre et ' : ''}plaques disponibles)
+          {isSplit ? t('plates.settingsSplit') : t('plates.settings')}
           <ChevronRightIcon
             className={`h-4 w-4 shrink-0 transition-transform duration-200 ${showSettings ? 'rotate-90' : ''}`}
           />
@@ -75,7 +76,7 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
             {isSplit && (
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink-2">
-                  Poids de la barre (kg)
+                  {t('plates.barWeight')}
                 </label>
                 <input
                   type="number"
@@ -89,7 +90,7 @@ export function PlateCalculatorSheet({ initialWeight, loadType, onClose }: Plate
             )}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink-2">
-                Plaques disponibles
+                {t('plates.available')}
               </label>
               <div className="flex flex-wrap gap-2">
                 {settings.plates.map((p) => (
@@ -125,13 +126,13 @@ function PlateBreakdown({
   plates: { weight: number; enabled: boolean }[]
 }) {
   if (weight <= 0) {
-    return <p className="rounded-xl bg-surface-2 p-4 text-center text-sm text-muted">Saisissez un poids.</p>
+    return <p className="rounded-xl bg-surface-2 p-4 text-center text-sm text-muted">{t('plates.enter')}</p>
   }
 
   if (isSplit && weight < barWeight) {
     return (
       <p className="rounded-xl bg-surface-2 p-4 text-center text-sm text-muted">
-        Ce poids est inférieur à celui de la barre seule ({formatWeight(barWeight)} kg).
+        {t('plates.belowBar', { v: formatWeight(barWeight) })}
       </p>
     )
   }
@@ -144,16 +145,16 @@ function PlateBreakdown({
     return (
       <>
         <div className="rounded-xl bg-surface-2 p-4 text-center">
-          <p className="text-xs font-medium text-muted">Par côté de la barre</p>
+          <p className="text-xs font-medium text-muted">{t('plates.perSide')}</p>
           {result.perSide.length === 0 ? (
-            <p className="mt-1.5 text-lg font-bold text-ink">Barre seule</p>
+            <p className="mt-1.5 text-lg font-bold text-ink">{t('plates.barOnly')}</p>
           ) : (
             <p className="mt-1.5 text-lg font-bold text-ink">
               {result.perSide.map((p) => `${p.count} × ${formatWeight(p.weight)} kg`).join('  +  ')}
             </p>
           )}
           <p className="mt-1 text-xs text-muted">
-            + barre de {formatWeight(barWeight)} kg de chaque côté
+            {t('plates.plusBar', { v: formatWeight(barWeight) })}
           </p>
         </div>
         <GapMessage gap={gap} achieved={result.achievedTotal} requested={weight} />
@@ -166,9 +167,9 @@ function PlateBreakdown({
   return (
     <>
       <div className="rounded-xl bg-surface-2 p-4 text-center">
-        <p className="text-xs font-medium text-muted">Plaques à charger</p>
+        <p className="text-xs font-medium text-muted">{t('plates.toLoad')}</p>
         {result.plates.length === 0 ? (
-          <p className="mt-1.5 text-lg font-bold text-ink">Aucune plaque</p>
+          <p className="mt-1.5 text-lg font-bold text-ink">{t('plates.none')}</p>
         ) : (
           <p className="mt-1.5 text-lg font-bold text-ink">
             {result.plates.map((p) => `${p.count} × ${formatWeight(p.weight)} kg`).join('  +  ')}
@@ -184,11 +185,11 @@ function GapMessage({ gap, achieved, requested }: { gap: number; achieved: numbe
   if (gap > 0.01) {
     return (
       <p className="mt-3 rounded-lg bg-highlight-soft px-3 py-2 text-center text-xs font-medium text-highlight-ink">
-        Poids réel : {formatWeight(achieved)} kg au lieu de {formatWeight(requested)} kg demandé
+        {t('plates.gap', { a: formatWeight(achieved), r: formatWeight(requested) })}
       </p>
     )
   }
-  return <p className="mt-3 text-center text-xs font-medium text-good-ink">Poids exact atteint ✓</p>
+  return <p className="mt-3 text-center text-xs font-medium text-good-ink">{t('plates.exact')}</p>
 }
 
 function round2(n: number): number {

@@ -1,4 +1,5 @@
 import { db } from '../db'
+import { t } from '../i18n'
 
 const DEFAULT_TARGET_SETS = 3
 
@@ -13,9 +14,9 @@ export async function renameTemplate(id: number, name: string): Promise<void> {
 /** Duplicates a template and its exercise list, as a new independent program. */
 export async function duplicateTemplate(id: number): Promise<number> {
   const source = await db.workoutTemplates.get(id)
-  if (!source) throw new Error('Programme introuvable')
+  if (!source) throw new Error(t('common.programNotFound'))
   const exercises = await db.templateExercises.where('templateId').equals(id).sortBy('order')
-  const newId = await db.workoutTemplates.add({ name: `${source.name} (copie)`, createdAt: Date.now() })
+  const newId = await db.workoutTemplates.add({ name: t('common.copySuffix', { name: source.name }), createdAt: Date.now() })
   await Promise.all(
     exercises.map((te) =>
       db.templateExercises.add({

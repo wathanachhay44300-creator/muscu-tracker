@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { updateWorkoutNotes, updateWorkoutRpe } from '../lib/workoutActions'
 import type { Workout } from '../types'
+import { t } from '../i18n'
 
 const RPE_VALUES = Array.from({ length: 10 }, (_, i) => i + 1)
 
@@ -9,14 +10,14 @@ export function SessionRpe({ workout }: { workout: Workout }) {
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-sm font-semibold text-ink-2">Ressenti de la séance (RPE)</p>
+        <p className="text-sm font-semibold text-ink-2">{t('session.rpe')}</p>
         {workout.rpe != null && (
           <button
             type="button"
             onClick={() => updateWorkoutRpe(workout.id!, null)}
             className="min-h-9 px-1 text-xs font-medium text-muted active:text-ink-2"
           >
-            Effacer
+            {t('common.clear')}
           </button>
         )}
       </div>
@@ -53,11 +54,11 @@ export function SessionNotes({ workout }: { workout: Workout }) {
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-      <p className="mb-2 text-sm font-semibold text-ink-2">Notes de séance</p>
+      <p className="mb-2 text-sm font-semibold text-ink-2">{t('session.notes')}</p>
       <textarea
         value={notes}
         onChange={(e) => change(e.target.value)}
-        placeholder="Fatigue, sommeil, douleurs, contexte…"
+        placeholder={t('session.notesPlaceholder')}
         rows={3}
         className="w-full resize-none rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-sm outline-none focus:border-accent-line"
       />

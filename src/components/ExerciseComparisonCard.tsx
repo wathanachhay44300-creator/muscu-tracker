@@ -3,6 +3,7 @@ import type { WorkoutExerciseWithSets } from '../types'
 import type { ExerciseComparison, SetComparison } from '../hooks/useWorkoutComparison'
 import { formatWeight } from '../lib/stats'
 import { StarIcon } from './Icons'
+import { groupLabel, t } from '../i18n'
 
 interface ExerciseComparisonCardProps {
   we: WorkoutExerciseWithSets
@@ -17,11 +18,11 @@ export function ExerciseComparisonCard({ we, comparison, style }: ExerciseCompar
   return (
     <div className="animate-fade-in rounded-2xl border border-line bg-surface p-4 shadow-sm" style={style}>
       <p className="font-exercise text-[0.95rem] text-ink">{we.exercise.name}</p>
-      <p className="mb-2.5 text-xs font-medium text-muted">{we.exercise.muscleGroup}</p>
+      <p className="mb-2.5 text-xs font-medium text-muted">{groupLabel(we.exercise.muscleGroup)}</p>
 
       {!hasHistory && (
         <p className="mb-2 rounded-lg bg-surface-2 px-2.5 py-2 text-xs text-muted">
-          Première fois sur cet exercice — rien à comparer.
+          {t('compare.firstTime')}
         </p>
       )}
 
@@ -79,7 +80,7 @@ function SetComparisonRow({
     >
       <div className="flex min-w-0 items-center gap-1.5">
         {set.isPR && <StarIcon className="pr-star-glow h-3.5 w-3.5 shrink-0 text-highlight" />}
-        <span className="shrink-0 text-muted">Série {index + 1}</span>
+        <span className="shrink-0 text-muted">{t('set.title', { n: index + 1 })}</span>
         <span className="truncate font-semibold text-ink">
           {formatWeight(set.weight)}kg × {set.reps}
         </span>
@@ -92,7 +93,7 @@ function SetComparisonRow({
           {toneArrow} {formatDelta(weightDelta, repsDelta)}
         </span>
       ) : hasHistory ? (
-        <span className="shrink-0 text-xs font-medium text-muted">Nouvelle série</span>
+        <span className="shrink-0 text-xs font-medium text-muted">{t('compare.newSet')}</span>
       ) : null}
     </div>
   )
@@ -101,8 +102,8 @@ function SetComparisonRow({
 function formatDelta(weightDelta: number, repsDelta: number): string {
   const parts: string[] = []
   if (weightDelta !== 0) parts.push(`${weightDelta > 0 ? '+' : ''}${formatWeight(weightDelta)}kg`)
-  if (repsDelta !== 0) parts.push(`${repsDelta > 0 ? '+' : ''}${repsDelta} reps`)
-  return parts.length > 0 ? parts.join(', ') : 'identique'
+  if (repsDelta !== 0) parts.push(t('compare.reps', { n: `${repsDelta > 0 ? '+' : ''}${repsDelta}` }))
+  return parts.length > 0 ? parts.join(', ') : t('compare.same')
 }
 
 function round2(n: number): number {

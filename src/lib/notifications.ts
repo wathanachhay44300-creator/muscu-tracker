@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 /**
  * Native "rest is over" notification via the Notifications API.
  *
@@ -30,7 +31,7 @@ export async function requestNotificationPermission(): Promise<NotificationSuppo
 export async function showRestOverNotification(vibrate: boolean): Promise<void> {
   if (getNotificationSupport() !== 'granted') return
   const options: NotificationOptions & { vibrate?: number[] } = {
-    body: 'Reprenez votre prochaine série.',
+    body: t('rest.notifBody'),
     tag: 'rest-timer',
     icon: `${import.meta.env.BASE_URL}icons/icon-192.png`,
     ...(vibrate ? { vibrate: [200, 100, 200] } : {}),
@@ -38,10 +39,10 @@ export async function showRestOverNotification(vibrate: boolean): Promise<void> 
   try {
     const reg = await navigator.serviceWorker?.getRegistration()
     if (reg) {
-      await reg.showNotification('Repos terminé 💪', options)
+      await reg.showNotification(t('rest.notifTitle'), options)
       return
     }
-    new Notification('Repos terminé 💪', options)
+    new Notification(t('rest.notifTitle'), options)
   } catch {
     // Unsupported constructor (e.g. Android requires the SW path) — nothing else to try.
   }

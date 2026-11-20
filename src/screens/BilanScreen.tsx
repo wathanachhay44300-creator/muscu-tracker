@@ -5,6 +5,7 @@ import { db } from '../db'
 import { useWorkoutDetail } from '../hooks/useWorkout'
 import { useWorkoutComparison } from '../hooks/useWorkoutComparison'
 import { usePreferences } from '../hooks/usePreferences'
+import { t } from '../i18n'
 import { useCountUp } from '../hooks/useCountUp'
 import { ExerciseComparisonCard } from '../components/ExerciseComparisonCard'
 import { AngkorSilhouette } from '../components/AngkorSilhouette'
@@ -18,7 +19,7 @@ import {
   VibrationIcon,
 } from '../components/Icons'
 import { formatVolume, totalVolume } from '../lib/stats'
-import { formatDateFr, formatDuration } from '../lib/date'
+import { formatDateShort, formatDuration } from '../lib/date'
 import { setHapticsEnabled, setSoundEnabled } from '../lib/settingsActions'
 import { playRecordChime } from '../lib/sound'
 import { hapticSuccess } from '../lib/haptics'
@@ -51,7 +52,7 @@ export function BilanScreen() {
   if (!detail || !comparison) {
     return (
       <div className="mx-auto max-w-md px-4 pt-safe pb-28 pt-4 animate-fade-in">
-        <p className="text-muted">Bilan introuvable.</p>
+        <p className="text-muted">{t('summary.notFound')}</p>
       </div>
     )
   }
@@ -67,15 +68,15 @@ export function BilanScreen() {
     setSharing(true)
     try {
       const blob = await generateBilanImage({
-        programName: workout.title ?? template?.name ?? 'Séance libre',
-        date: formatDateFr(workout.date),
+        programName: workout.title ?? template?.name ?? t('common.freeSession'),
+        date: formatDateShort(workout.date),
         exerciseCount: exercises.length,
         setCount,
         volumeLabel: volume > 0 ? `${formatVolume(volume)} kg` : '—',
         durationLabel: durationMs != null ? formatDuration(durationMs) : '—',
         prNames: comparison?.prExerciseNames ?? [],
       })
-      await shareOrDownloadImage(blob, `bilan-${workout.date}.png`, 'Mon bilan de séance')
+      await shareOrDownloadImage(blob, t('summary.fileName', { date: workout.date }), t('summary.shareTitle'))
     } catch {
       // Share can be cancelled by the user (AbortError) or unsupported — either way, nothing to recover from here.
     } finally {
@@ -95,8 +96,8 @@ export function BilanScreen() {
             onClick={handleShare}
             disabled={sharing}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-3 text-muted active:bg-surface-4 disabled:opacity-50"
-            aria-label="Partager le bilan"
-            title="Partager"
+            aria-label={t('summary.share')}
+            title={t('summary.shareShort')}
           >
             <ShareIcon className="h-4 w-4" />
           </button>
@@ -106,8 +107,8 @@ export function BilanScreen() {
             className={`flex h-9 w-9 items-center justify-center rounded-full ${
               preferences?.hapticsEnabled ? 'bg-accent-soft text-accent-ink' : 'bg-surface-3 text-muted'
             } active:bg-surface-4`}
-            aria-label={preferences?.hapticsEnabled ? 'Désactiver les vibrations' : 'Activer les vibrations'}
-            title={preferences?.hapticsEnabled ? 'Vibrations activées' : 'Vibrations désactivées'}
+            aria-label={preferences?.hapticsEnabled ? t('summary.hapticsOff') : t('summary.hapticsOn')}
+            title={preferences?.hapticsEnabled ? t('summary.hapticsEnabled') : t('summary.hapticsDisabled')}
           >
             <VibrationIcon className="h-4 w-4" />
           </button>
@@ -115,8 +116,8 @@ export function BilanScreen() {
             type="button"
             onClick={() => setSoundEnabled(!preferences?.soundEnabled)}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-3 text-muted active:bg-surface-4"
-            aria-label={preferences?.soundEnabled ? 'Désactiver le son' : 'Activer le son'}
-            title={preferences?.soundEnabled ? 'Son activé' : 'Son désactivé'}
+            aria-label={preferences?.soundEnabled ? t('summary.soundOff') : t('summary.soundOn')}
+            title={preferences?.soundEnabled ? t('summary.soundEnabled') : t('summary.soundDisabled')}
           >
             {preferences?.soundEnabled ? (
               <SpeakerOnIcon className="h-4 w-4" />
@@ -126,8 +127,8 @@ export function BilanScreen() {
           </button>
         </div>
         <ClipboardIcon className="mx-auto mb-2 h-9 w-9 text-accent-ink" />
-        <h1 className="text-lg font-bold text-ink">Bilan de la séance</h1>
-        <p className="text-sm text-muted">{formatDateFr(workout.date)}</p>
+        <h1 className="text-lg font-bold text-ink">{t('screens.sessionSummary')}</h1>
+        <p className="text-sm text-muted">{formatDateShort(workout.date)}</p>
       </div>
 
       {hasPR && (
@@ -135,22 +136,22 @@ export function BilanScreen() {
           <StarIcon className="pr-star-glow mt-0.5 h-5 w-5 shrink-0 text-highlight" />
           <p className="text-sm font-semibold text-highlight-ink">
             {comparison.prExerciseNames.length === 1
-              ? `Nouveau record sur ${comparison.prExerciseNames[0]} !`
-              : `Nouveaux records sur ${comparison.prExerciseNames.join(', ')} !`}
+              ? t('summary.newRecord', { name: comparison.prExerciseNames[0] })
+              : t('summary.newRecords', { names: comparison.prExerciseNames.join(', ') })}
           </p>
         </div>
       )}
 
       <div className="mb-5 grid grid-cols-2 gap-2.5">
-        <SummaryTile label="Exercices" target={exercises.length} formatValue={(n) => String(Math.round(n))} />
-        <SummaryTile label="Séries" target={setCount} formatValue={(n) => String(Math.round(n))} />
+        <SummaryTile label={t('share.exercises')} target={exercises.length} formatValue={(n) => String(Math.round(n))} />
+        <SummaryTile label={t('share.sets')} target={setCount} formatValue={(n) => String(Math.round(n))} />
         <SummaryTile
-          label="Volume"
+          label={t('share.volume')}
           target={volume}
           formatValue={(n) => (volume > 0 ? `${formatVolume(n)} kg` : '—')}
         />
         <SummaryTile
-          label="Durée"
+          label={t('share.duration')}
           target={durationMs ?? 0}
           formatValue={(n) => (durationMs != null ? formatDuration(n) : '—')}
         />
@@ -158,7 +159,7 @@ export function BilanScreen() {
 
       {exercises.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line-strong px-4 py-8 text-center text-sm text-muted">
-          Aucun exercice dans cette séance.
+          {t('summary.noExercise')}
         </p>
       ) : (
         <div className="space-y-3">
@@ -178,7 +179,7 @@ export function BilanScreen() {
         onClick={() => navigate('/')}
         className="mt-6 w-full rounded-2xl bg-accent py-3.5 font-semibold text-on-accent shadow-sm active:bg-accent-hover"
       >
-        Retour à l'accueil
+        {t('summary.backHome')}
       </button>
     </div>
   )

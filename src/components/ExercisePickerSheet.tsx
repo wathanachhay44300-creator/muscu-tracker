@@ -10,6 +10,7 @@ import { secondaryGroupsOf } from '../lib/muscleGroups'
 import { PrincipalPicker, SecondaryPicker } from './MuscleGroupPickers'
 import { LOAD_TYPES, type Exercise, type LoadType, type MuscleGroup } from '../types'
 import { SearchIcon, XIcon, PlusIcon, StarIcon, StarOutlineIcon } from './Icons'
+import { groupLabel, loadTypeLabel, t, tn } from '../i18n'
 
 interface ExercisePickerSheetProps {
   onSelect: (exercise: Exercise) => void
@@ -34,14 +35,14 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Chercher (ex : shoulder press)…"
+              placeholder={t('picker.search')}
               enterKeyHint="search"
               autoCapitalize="off"
               autoCorrect="off"
               className="w-full bg-transparent text-base outline-none placeholder:text-muted"
             />
             {query && (
-              <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="shrink-0 rounded-full p-1 text-muted active:bg-surface-4">
+              <button type="button" onClick={() => setQuery('')} aria-label={t('picker.clearSearch')} className="shrink-0 rounded-full p-1 text-muted active:bg-surface-4">
                 <XIcon className="h-4 w-4" />
               </button>
             )}
@@ -50,7 +51,7 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
             type="button"
             onClick={onClose}
             className="shrink-0 rounded-full p-2 text-muted active:bg-surface-3"
-            aria-label="Fermer"
+            aria-label={t('common.close')}
           >
             <XIcon className="h-6 w-6" />
           </button>
@@ -87,38 +88,38 @@ export function ExercisePickerSheet({ onSelect, onClose, excludeIds = [] }: Exer
             >
               <PlusIcon className="h-5 w-5" />
               <span className="font-medium">
-                {query.trim() ? `Créer « ${query.trim()} »` : 'Créer un exercice personnalisé'}
+                {query.trim() ? t('picker.createNamed', { name: query.trim() }) : t('picker.createCustom')}
               </span>
             </button>
 
             {browser.mode === 'search' ? (
               browser.results.length > 0 ? (
                 <PickerSection
-                  title={`${browser.results.length} résultat${browser.results.length > 1 ? 's' : ''}`}
+                  title={tn('picker.results', browser.results.length)}
                   list={browser.results}
                   onSelect={onSelect}
                   secondaryOnly={browser.secondaryOnly}
                 />
               ) : (
-                <p className="mt-8 text-center text-sm text-muted">Aucun exercice trouvé pour « {query.trim()} ».</p>
+                <p className="mt-8 text-center text-sm text-muted">{t('picker.noneFor', { q: query.trim() })}</p>
               )
             ) : (
               <>
-                {browser.favorites.length > 0 && <PickerSection title="Favoris" list={browser.favorites} onSelect={onSelect} />}
-                {browser.recent.length > 0 && <PickerSection title="Utilisés récemment" list={browser.recent} onSelect={onSelect} />}
+                {browser.favorites.length > 0 && <PickerSection title={t('picker.favorites')} list={browser.favorites} onSelect={onSelect} />}
+                {browser.recent.length > 0 && <PickerSection title={t('picker.recent')} list={browser.recent} onSelect={onSelect} />}
                 {[...browser.grouped.entries()].map(([group, list]) => (
-                  <PickerSection key={group} title={group} list={list} onSelect={onSelect} />
+                  <PickerSection key={group} title={groupLabel(group)} list={list} onSelect={onSelect} />
                 ))}
                 {browser.secondaryList.length > 0 && (
                   <PickerSection
-                    title="Muscle secondaire"
+                    title={t('picker.secondary')}
                     list={browser.secondaryList}
                     onSelect={onSelect}
                     secondaryOnly={browser.secondaryOnly}
                   />
                 )}
                 {browser.mode === 'grouped' && browser.results.length === 0 && (
-                  <p className="mt-8 text-center text-sm text-muted">Aucun exercice pour ces filtres.</p>
+                  <p className="mt-8 text-center text-sm text-muted">{t('picker.noneFilters')}</p>
                 )}
               </>
             )}
@@ -163,7 +164,7 @@ function PickerSection({
             <button
               type="button"
               onClick={() => setExerciseFavorite(ex.id!, !ex.favoritedAt)}
-              aria-label={ex.favoritedAt ? `Retirer ${ex.name} des favoris` : `Ajouter ${ex.name} aux favoris`}
+              aria-label={ex.favoritedAt ? t('picker.unfavorite', { name: ex.name }) : t('picker.favorite', { name: ex.name })}
               className="shrink-0 p-2 pr-3 active:opacity-70"
             >
               {ex.favoritedAt ? (
@@ -232,17 +233,17 @@ function ExerciseForm({
   return (
     <div className="mt-4 space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-ink-2">Nom de l'exercice</label>
+        <label className="mb-1 block text-sm font-medium text-ink-2">{t('picker.name')}</label>
         <input
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Ex : Développé Smith machine"
+          placeholder={t('picker.namePlaceholder')}
           className="w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-base outline-none focus:border-accent-line"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-ink-2">Muscle principal</label>
+        <label className="mb-1 block text-sm font-medium text-ink-2">{t('exerciseInfo.mainMuscle')}</label>
         <PrincipalPicker
           value={group}
           onChange={(g) => {
@@ -254,12 +255,12 @@ function ExerciseForm({
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-ink-2">
-          Muscles secondaires <span className="font-normal text-muted">(optionnel)</span>
+          {t('picker.secondaryMuscles')} <span className="font-normal text-muted">{t('common.optional')}</span>
         </label>
         <SecondaryPicker principal={group} value={secondary} onChange={setSecondary} />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-ink-2">Type de chargement</label>
+        <label className="mb-1 block text-sm font-medium text-ink-2">{t('picker.loadType')}</label>
         <div className="flex flex-wrap gap-2">
           {LOAD_TYPES.map((lt) => (
             <button
@@ -275,7 +276,7 @@ function ExerciseForm({
                   : 'bg-surface-3 text-ink-2 active:bg-surface-4'
               }`}
             >
-              {lt}
+              {loadTypeLabel(lt)}
             </button>
           ))}
         </div>
@@ -286,7 +287,7 @@ function ExerciseForm({
           onClick={onCancel}
           className="flex-1 rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
         >
-          Annuler
+          {t('common.cancel')}
         </button>
         <button
           type="button"
@@ -316,7 +317,7 @@ export function CreateExerciseForm({
       initialGroup="Autre"
       initialLoadType={guessLoadType(initialName)}
       autoSuggestLoadType
-      submitLabel="Ajouter"
+      submitLabel={t('common.add')}
       onCancel={onCancel}
       onSubmit={async ({ name, muscleGroup, secondaryGroups, loadType }) => {
         const createdAt = Date.now()
@@ -350,7 +351,7 @@ export function EditExerciseForm({
       initialGroup={exercise.muscleGroup}
       initialSecondary={secondaryGroupsOf(exercise)}
       initialLoadType={exercise.loadType}
-      submitLabel="Enregistrer"
+      submitLabel={t('common.save')}
       onCancel={onCancel}
       onSubmit={async ({ name, muscleGroup, secondaryGroups, loadType }) => {
         await renameExercise(exercise.id!, { name, muscleGroup, secondaryGroups, loadType })

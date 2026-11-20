@@ -1,6 +1,7 @@
 import { applyMerge } from './trackingImport'
 import { todayISO } from './date'
 import { describeImport, describeImports, hasDeepLinkParams, parseClipboardText, parseDeepLink } from './tracking'
+import { t } from '../i18n'
 
 const LINK_KEYS = ['steps', 'date', 'weight', 'kcal', 'calories']
 
@@ -24,7 +25,7 @@ export function takeDeepLinkParams(): URLSearchParams | null {
 export async function importFromParams(params: URLSearchParams): Promise<{ ok: boolean; message: string }> {
   const result = parseDeepLink(params, todayISO())
   if (result.kind === 'ignored') {
-    return { ok: false, message: `Lien d'import ignoré : ${result.reason}` }
+    return { ok: false, message: t('common.importLinkIgnored', { reason: result.reason }) }
   }
   // The link is the automatic source for these values: it updates the day's
   // existing row (never a duplicate), including re-runs of the same Shortcut.

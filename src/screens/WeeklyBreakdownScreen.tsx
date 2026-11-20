@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useWeeklyMuscleBreakdown } from '../hooks/useWeeklyBreakdown'
 import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
-import { addDays, addWeeks, formatDateFr, mondayOf, todayISO } from '../lib/date'
+import { addDays, addWeeks, formatDateShort, mondayOf, todayISO } from '../lib/date'
+import { t, tn } from '../i18n'
 
 export function WeeklyBreakdownScreen() {
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayISO()))
@@ -22,11 +23,11 @@ export function WeeklyBreakdownScreen() {
           type="button"
           onClick={() => (location.key !== 'default' ? navigate(-1) : navigate('/progres'))}
           className="-ml-2 rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Retour à l'historique"
+          aria-label={t('common.back')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-bold text-ink">Répartition hebdomadaire</h1>
+        <h1 className="text-lg font-bold text-ink">{t('screens.weekly')}</h1>
       </div>
 
       <div className="mb-5 flex items-center justify-between">
@@ -34,23 +35,23 @@ export function WeeklyBreakdownScreen() {
           type="button"
           onClick={() => setWeekStart((w) => addWeeks(w, -1))}
           className="rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Semaine précédente"
+          aria-label={t('weekly.prevWeek')}
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
         <div className="text-center">
           <p className="text-sm font-semibold text-ink-2">
-            {isCurrentWeek ? 'Cette semaine' : formatDateFr(weekStart, { withYear: false })}
+            {isCurrentWeek ? t('weekly.thisWeek') : formatDateShort(weekStart, { withYear: false })}
           </p>
           <p className="text-xs text-muted">
-            {formatDateFr(weekStart, { withYear: false })} – {formatDateFr(weekEnd, { withYear: false })}
+            {formatDateShort(weekStart, { withYear: false })} – {formatDateShort(weekEnd, { withYear: false })}
           </p>
         </div>
         <button
           type="button"
           onClick={() => setWeekStart((w) => addWeeks(w, 1))}
           className="rounded-full p-2 text-muted active:bg-surface-3"
-          aria-label="Semaine suivante"
+          aria-label={t('weekly.nextWeek')}
         >
           <ChevronRightIcon className="h-5 w-5" />
         </button>
@@ -58,14 +59,14 @@ export function WeeklyBreakdownScreen() {
 
       {items && totalSets === 0 ? (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
-          <p className="text-muted">Aucune série enregistrée cette semaine-là.</p>
+          <p className="text-muted">{t('weekly.empty')}</p>
         </div>
       ) : (
         <>
           <p className="mb-3 text-center text-xs font-medium text-muted">
-            {totalSets} série{totalSets > 1 ? 's' : ''} au total
+            {tn('weekly.total', totalSets)}
           </p>
-          <MuscleGroupBreakdown items={items ?? []} title="Séries par muscle" />
+          <MuscleGroupBreakdown items={items ?? []} title={t('weekly.perMuscle')} />
         </>
       )}
     </div>

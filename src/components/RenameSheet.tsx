@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { t } from '../i18n'
 
 interface RenameSheetProps {
   title: string
@@ -15,7 +16,7 @@ interface RenameSheetProps {
 export function RenameSheet({
   title,
   initialName,
-  confirmLabel = 'Renommer',
+  confirmLabel = t('common.rename'),
   allowEmpty = false,
   placeholder,
   onRename,
@@ -49,7 +50,7 @@ export function RenameSheet({
             onClick={onCancel}
             className="flex-1 rounded-xl bg-surface-3 py-3 font-medium text-ink-2 active:bg-surface-4"
           >
-            Annuler
+            {t('common.cancel')}
           </button>
           <button
             type="button"

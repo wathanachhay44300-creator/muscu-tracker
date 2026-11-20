@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useRestTimer } from '../hooks/useRestTimer'
 import { PauseIcon, PlayIcon, RefreshIcon, TimerIcon, XIcon } from './Icons'
+import { t } from '../i18n'
 
 const PRESETS = [
   { sec: 30, label: '30s' },
@@ -48,12 +49,12 @@ export function RestTimerWidget() {
       {expanded && (
         <div className="animate-slide-up pointer-events-auto w-64 rounded-2xl border border-line bg-surface p-3 shadow-lg">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Minuteur de repos</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t('rest.timer')}</p>
             <button
               type="button"
               onClick={() => setExpanded(false)}
               className="rounded-full p-1 text-muted active:bg-surface-3"
-              aria-label="Réduire"
+              aria-label={t('rest.collapse')}
             >
               <XIcon className="h-4 w-4" />
             </button>
@@ -65,8 +66,8 @@ export function RestTimerWidget() {
           >
             {formatCountdown(timer.remainingMs)}
           </p>
-          {timer.isDone && <p className="mb-2 text-center text-sm font-semibold text-good-ink">Repos terminé !</p>}
-          {timer.isPaused && <p className="mb-2 text-center text-sm font-medium text-highlight-ink">En pause</p>}
+          {timer.isDone && <p className="mb-2 text-center text-sm font-semibold text-good-ink">{t('rest.done')}</p>}
+          {timer.isPaused && <p className="mb-2 text-center text-sm font-medium text-highlight-ink">{t('rest.paused')}</p>}
 
           {showPresets ? (
             <div className="grid grid-cols-3 gap-1.5">
@@ -94,7 +95,7 @@ export function RestTimerWidget() {
                 type="button"
                 onClick={() => (timer.isRunning ? timer.pause() : timer.resume())}
                 className="flex flex-1 items-center justify-center rounded-xl bg-accent py-2.5 text-on-accent active:bg-accent-hover"
-                aria-label={timer.isRunning ? 'Pause' : 'Reprendre'}
+                aria-label={timer.isRunning ? t('rest.pause') : t('rest.resume')}
               >
                 {timer.isRunning ? <PauseIcon className="h-4 w-4" /> : <PlayIcon className="h-4 w-4" />}
               </button>
@@ -112,7 +113,7 @@ export function RestTimerWidget() {
                   setExpanded(false)
                 }}
                 className="rounded-xl bg-surface-3 px-3 py-2.5 text-ink-2 active:bg-surface-4"
-                aria-label="Arrêter le minuteur"
+                aria-label={t('rest.stop')}
               >
                 <RefreshIcon className="h-4 w-4" />
               </button>
@@ -124,7 +125,7 @@ export function RestTimerWidget() {
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        aria-label="Minuteur de repos"
+        aria-label={t('rest.timer')}
         aria-expanded={expanded}
         className={`pointer-events-auto flex h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-lg active:scale-95 ${tone}`}
       >

@@ -1,5 +1,6 @@
 import { EQUIPMENT, EQUIPMENT_LABEL, MUSCLE_GROUPS, type Equipment, type MuscleGroup } from '../types'
 import { XIcon } from './Icons'
+import { equipmentLabel, groupLabel, t } from '../i18n'
 
 interface ExerciseFiltersProps {
   groups: MuscleGroup[]
@@ -16,14 +17,14 @@ export function ExerciseFilters({ groups, equipment, onToggleGroup, onToggleEqui
   const active = groups.length + equipment.length > 0
   return (
     <div className="space-y-1.5">
-      <div className={SCROLL_ROW} role="group" aria-label="Filtrer par muscle">
+      <div className={SCROLL_ROW} role="group" aria-label={t('exerciseFilters.byMuscle')}>
         {MUSCLE_GROUPS.filter((g) => g !== 'Autre').map((g) => (
-          <Chip key={g} label={g} on={groups.includes(g)} onClick={() => onToggleGroup(g)} />
+          <Chip key={g} label={groupLabel(g)} on={groups.includes(g)} onClick={() => onToggleGroup(g)} />
         ))}
       </div>
-      <div className={SCROLL_ROW} role="group" aria-label="Filtrer par matériel">
+      <div className={SCROLL_ROW} role="group" aria-label={t('exerciseFilters.byEquipment')}>
         {EQUIPMENT.map((e) => (
-          <Chip key={e} label={EQUIPMENT_LABEL[e]} on={equipment.includes(e)} onClick={() => onToggleEquipment(e)} />
+          <Chip key={e} label={equipmentLabel(EQUIPMENT_LABEL[e])} on={equipment.includes(e)} onClick={() => onToggleEquipment(e)} />
         ))}
         {active && (
           <button
@@ -32,7 +33,7 @@ export function ExerciseFilters({ groups, equipment, onToggleGroup, onToggleEqui
             className="flex min-h-9 shrink-0 items-center gap-1 rounded-full px-3 text-xs font-semibold text-muted active:bg-surface-3"
           >
             <XIcon className="h-3.5 w-3.5" />
-            Effacer
+            {t('common.clear')}
           </button>
         )}
       </div>
