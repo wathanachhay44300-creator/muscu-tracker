@@ -60,7 +60,7 @@ export async function setWeightGoal(goal: WeightGoal, goalRateKg?: number): Prom
   await db.settings.put({ ...current, goal, goalRateKg: goalRateKg ?? current.goalRateKg })
 }
 
-export const WEIGHT_STEPS = [1, 1.25, 2.5, 5] as const
+export const WEIGHT_STEPS = [1, 1.25, 2, 2.5, 5] as const
 
 export async function setWeightStep(weightStep: number): Promise<void> {
   const current = await getPreferences()

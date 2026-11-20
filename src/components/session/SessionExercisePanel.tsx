@@ -26,14 +26,29 @@ import {
 import { ContextMenuSheet } from '../ContextMenuSheet'
 import { ExerciseInfoSheet } from '../ExerciseInfoSheet'
 import { PlateCalculatorSheet } from '../PlateCalculatorSheet'
-import { CopyIcon, DumbbellIcon, InfoIcon, ListIcon, MoreIcon, NoteIcon, PlusIcon, StarIcon, TrashIcon, XIcon } from '../Icons'
-import { SET_GRID, SessionSetRow } from './SessionSetRow'
-import { equipmentLabel, groupLabel, t } from '../../i18n'
+import { CheckIcon, CopyIcon, DumbbellIcon, InfoIcon, ListIcon, MoreIcon, NoteIcon, SettingsIcon, StarIcon, TrashIcon, XIcon } from '../Icons'
+import { SessionSetRow } from './SessionSetRow'
+import { SetEditor } from './SetEditor'
+import { setExerciseWeightStep } from '../../lib/exerciseActions'
+import { equipmentLabel, formatDecimal, groupLabel, t } from '../../i18n'
+
+const WEIGHT_STEP_CHOICES = [1, 1.25, 2, 2.5, 5]
+
+/** Draws nothing: keeps menu labels aligned with the ticked one. */
+function NoIcon(props: React.SVGProps<SVGSVGElement>) {
+  return <svg {...props} aria-hidden="true" />
+}
 
 const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
 
 function kg(n: number): string {
   return formatWeight(n)
+}
+
+/** "60 kg", or "PDC" / "PDC +10 kg" for a bodyweight exercise. */
+function formatLoad(weight: number, bodyweight: boolean): string {
+  if (!bodyweight) return `${kg(weight)} kg`
+  return weight > 0 ? `${t('editor.bw')} +${kg(weight)} kg` : t('editor.bw')
 }
 
 /** "60 kg × 8 · 8 · 7" when every set used the same weight, else "60×8 · 62,5×6". */
@@ -81,15 +96,71 @@ export function SessionExercisePanel({
   const [plateOpen, setPlateOpen] = useState(false)
   const [noteOpen, setNoteOpen] = useState(false)
   const [noteText, setNoteText] = useState(we.note ?? '')
+  const [stepOpen, setStepOpen] = useState(false)
+  /** Set loaded in the editor: a set id, the next (unsaved) set, or null = automatic. */
+  const [selected, setSelected] = useState<number | 'draft' | null>(null)
+  /** Values being edited, tied to what's in the editor (`key`). */
+  const [edit, setEdit] = useState<{ key: string; weight: number; reps: number } | null>(null)
   const noteTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   useEffect(() => () => clearTimeout(noteTimeout.current), [])
 
   const equipment = equipmentOf(we.exercise)
   const secondary = secondaryGroupsOf(we.exercise)
-  const currentIndex = we.sets.findIndex((s) => !s.done)
-  const suggestion = we.sets.length === 0 ? getSuggestedProgression(lastTime) : null
+  const sets = we.sets
+  const currentIndex = sets.findIndex((s) => !s.done)
+  const suggestion = sets.length === 0 ? getSuggestedProgression(lastTime) : null
   const canPlate = PLATE_CALC_LOAD_TYPES.includes(we.exercise.loadType)
-  const plateWeight = (we.sets[currentIndex] ?? we.sets[we.sets.length - 1])?.weight ?? 0
+  const bodyweight = we.exercise.loadType === 'Poids du corps' || equipment === 'poids_du_corps'
+  const generalStep = preferences?.weightStep ?? 2.5
+  const weightStep = we.exercise.weightStep ?? generalStep
+  const haptics = !!preferences?.hapticsEnabled
+
+  // What the editor shows: the chosen set, else the first one not done, else the next new set.
+  const target: number | 'draft' =
+    selected === 'draft' || (typeof selected === 'number' && sets.some((s) => s.id === selected))
+      ? selected
+      : currentIndex >= 0
+        ? sets[currentIndex].id!
+        : 'draft'
+  const targetIndex = target === 'draft' ? sets.length : sets.findIndex((s) => s.id === target)
+  const targetSet = target === 'draft' ? undefined : sets[targetIndex]
+  const editKey = target === 'draft' ? `draft-${sets.length}` : `set-${target}`
+  // A new set starts from last session's same set, else repeats the previous one.
+  const lastSameSet = lastTime?.sets[sets.length]
+  const previous = sets[sets.length - 1]
+  const draftDefault = lastSameSet ?? previous ?? { weight: 0, reps: 0 }
+  const base = targetSet ?? draftDefault
+  const values = edit?.key === editKey ? edit : { key: editKey, weight: base.weight, reps: base.reps }
+  const plateWeight = values.weight
+  const lastHint = lastTime?.sets[targetIndex]
+
+  function setValue(patch: { weight?: number; reps?: number }) {
+    setEdit({ ...values, ...patch })
+  }
+
+  /** Saves a correction straight away when editing an existing set. */
+  function persist(patch: { weight?: number; reps?: number }) {
+    if (targetSet) updateSet(targetSet.id!, patch)
+  }
+
+  async function submit() {
+    const { weight, reps } = values
+    if (targetSet) {
+      await updateSet(targetSet.id!, { weight, reps })
+      if (!targetSet.done) {
+        await setSetDone(targetSet.id!, true)
+        hapticLight(haptics)
+        onSetDone()
+      }
+    } else {
+      const id = await addSet(we.id!, { weight, reps })
+      await setSetDone(id, true)
+      hapticLight(haptics)
+      onSetDone()
+    }
+    setSelected(null)
+    setEdit(null)
+  }
 
   /** A ticked set that beats the previous best (heavier, or same weight for more reps). */
   function isPR(set: { weight: number; reps: number; done?: boolean }): boolean {
@@ -103,23 +174,10 @@ export function SessionExercisePanel({
     noteTimeout.current = setTimeout(() => updateExerciseNote(we.id!, value), 400)
   }
 
-  async function handleAddSet(override?: { weight: number; reps: number }) {
-    await addSet(we.id!, override)
-    hapticLight(!!preferences?.hapticsEnabled)
-  }
-
   async function handleRemoveSet(setId: number) {
     const removed = we.sets.find((s) => s.id === setId)
     await removeSet(setId)
     if (removed) showSnackbar(t('card.setRemoved'), () => restoreSet(removed))
-  }
-
-  async function handleToggle(setId: number, done: boolean) {
-    await setSetDone(setId, !done)
-    if (!done) {
-      hapticLight(!!preferences?.hapticsEnabled)
-      onSetDone()
-    }
   }
 
   async function handleRemoveExercise() {
@@ -195,7 +253,10 @@ export function SessionExercisePanel({
       {suggestion && (
         <button
           type="button"
-          onClick={() => handleAddSet({ weight: suggestion.weight, reps: suggestion.reps })}
+          onClick={() => {
+            setSelected('draft')
+            setEdit({ key: `draft-${sets.length}`, weight: suggestion.weight, reps: suggestion.reps })
+          }}
           className="mt-3 flex w-full items-center justify-between gap-2 rounded-xl bg-good-soft px-3 py-2.5 text-left text-xs text-good-ink active:opacity-80"
         >
           <span>
@@ -205,42 +266,69 @@ export function SessionExercisePanel({
         </button>
       )}
 
-      <div className="mt-4">
-        <div className={`${SET_GRID} px-1 pb-1.5 text-center text-[11px] font-bold uppercase tracking-wide text-muted`}>
-          <span>{t('panel.colSet')}</span>
-          <span>{t('panel.colKg')}</span>
-          <span>{t('panel.colReps')}</span>
-          <span>{t('panel.colOk')}</span>
-        </div>
-        <div className="space-y-1.5">
-          {we.sets.map((set, i) => (
+      <div className="mt-4 space-y-1.5">
+        {sets.map((set, i) => {
+          const isTarget = set.id === target
+          const shown = isTarget ? values : set
+          return (
             <SessionSetRow
               key={set.id}
-              set={set}
               index={i}
-              current={i === currentIndex}
+              text={`${formatLoad(shown.weight, bodyweight)} × ${shown.reps}`}
+              done={!!set.done}
+              selected={isTarget}
               isPR={isPR(set)}
-              onChangeWeight={(weight) => updateSet(set.id!, { weight })}
-              onChangeReps={(reps) => updateSet(set.id!, { reps })}
-              onToggleDone={() => handleToggle(set.id!, !!set.done)}
+              onSelect={() => {
+                setSelected(set.id!)
+                setEdit(null)
+              }}
               onRemove={() => handleRemoveSet(set.id!)}
               onDuplicate={() => duplicateSet(set.id!)}
+              onUndo={() => setSetDone(set.id!, false)}
             />
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => handleAddSet()}
-          className="mt-2 flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-line-strong text-sm font-semibold text-ink-2 active:bg-surface-3"
-        >
-          <PlusIcon className="h-4 w-4" />
-          {t('card.addSet')}
-        </button>
-        {showHint && we.sets.length > 0 && (
-          <div className="mt-2 flex items-center gap-1">
-            <p className="flex-1 text-center text-xs text-muted">
-              {t('panel.hint')}
-            </p>
+          )
+        })}
+        <SessionSetRow
+          index={sets.length}
+          text={`${formatLoad(target === 'draft' ? values.weight : draftDefault.weight, bodyweight)} × ${
+            target === 'draft' ? values.reps : draftDefault.reps
+          }`}
+          done={false}
+          selected={target === 'draft'}
+          isPR={false}
+          draft
+          onSelect={() => {
+            setSelected('draft')
+            setEdit(null)
+          }}
+        />
+      </div>
+
+      {/* The editor stays visible at the bottom, above the rest timer and navigation. */}
+      <div className="sticky z-10 -mx-4 mt-3 bg-page px-4 pb-3 pt-2" style={{ bottom: 'var(--session-bar-h, 0px)' }}>
+        <SetEditor
+          key={editKey}
+          title={
+            targetSet?.done
+              ? t('editor.fixSet', { n: targetIndex + 1 })
+              : t('set.title', { n: targetIndex + 1 })
+          }
+          hint={lastHint ? t('editor.lastTimeHint', { v: `${formatLoad(lastHint.weight, bodyweight)} × ${lastHint.reps}` }) : undefined}
+          weight={values.weight}
+          reps={values.reps}
+          weightStep={weightStep}
+          bodyweight={bodyweight}
+          haptics={haptics}
+          buttonLabel={targetSet?.done ? t('editor.saveFix') : t('editor.validate')}
+          canSubmit={values.reps > 0}
+          onWeight={(weight) => setValue({ weight })}
+          onReps={(reps) => setValue({ reps })}
+          onSettle={persist}
+          onSubmit={submit}
+        />
+        {showHint && (
+          <div className="mt-1 flex items-center gap-1">
+            <p className="flex-1 text-center text-xs text-muted">{t('panel.hint')}</p>
             <button
               type="button"
               onClick={onDismissHint}
@@ -260,11 +348,30 @@ export function SessionExercisePanel({
             { label: t('panel.details'), icon: InfoIcon, onSelect: () => setInfoOpen(true) },
             { label: noteText.trim() ? t('panel.editNote') : t('panel.addNote'), icon: NoteIcon, onSelect: () => setNoteOpen(true) },
             ...(canPlate ? [{ label: t('set.plateCalc'), icon: DumbbellIcon, onSelect: () => setPlateOpen(true) }] : []),
+            { label: t('editor.stepMenu', { v: formatDecimal(weightStep) }), icon: SettingsIcon, onSelect: () => setStepOpen(true) },
             { label: t('panel.allExercises'), icon: ListIcon, onSelect: onOpenOverview },
             { label: t('panel.duplicate'), icon: CopyIcon, onSelect: () => duplicateExerciseInWorkout(we.id!) },
             { label: t('card.removeFromWorkout'), icon: TrashIcon, onSelect: handleRemoveExercise, danger: true },
           ]}
           onClose={() => setMenuOpen(false)}
+        />
+      )}
+      {stepOpen && (
+        <ContextMenuSheet
+          title={t('editor.stepTitle', { name: we.exercise.name })}
+          actions={[
+            {
+              label: t('editor.stepGeneral', { v: formatDecimal(generalStep) }),
+              icon: we.exercise.weightStep == null ? CheckIcon : NoIcon,
+              onSelect: () => setExerciseWeightStep(we.exerciseId, undefined),
+            },
+            ...WEIGHT_STEP_CHOICES.map((v) => ({
+              label: `${formatDecimal(v)} kg`,
+              icon: we.exercise.weightStep === v ? CheckIcon : NoIcon,
+              onSelect: () => setExerciseWeightStep(we.exerciseId, v),
+            })),
+          ]}
+          onClose={() => setStepOpen(false)}
         />
       )}
       {infoOpen && <ExerciseInfoSheet exerciseId={we.exerciseId} fallback={we.exercise} onClose={() => setInfoOpen(false)} />}

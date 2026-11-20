@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
@@ -94,12 +94,27 @@ function SessionView({ workoutId }: { workoutId: number }) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [showHint, setShowHint] = useState(takeDragHint)
+  // Height of the fixed bottom bar: the set editor sticks right above it.
+  const barRef = useRef<HTMLDivElement>(null)
+  const [barHeight, setBarHeight] = useState(180)
+  const observed = useRef<{ el: HTMLDivElement; ro: ResizeObserver } | null>(null)
+  useEffect(() => {
+    const el = barRef.current
+    if (!el || observed.current?.el === el) return
+    observed.current?.ro.disconnect()
+    const ro = new ResizeObserver(() => setBarHeight(Math.round(el.getBoundingClientRect().height)))
+    ro.observe(el)
+    observed.current = { el, ro }
+  })
+  useEffect(() => () => observed.current?.ro.disconnect(), [])
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const exercises = detail?.exercises ?? []
   const startedAt = (() => {
+    // Sets are only saved once validated: the session starts when it was opened, or at its first set if earlier.
     const times = exercises.flatMap((we) => we.sets.map((s) => s.createdAt))
-    return times.length ? Math.min(...times) : (detail?.workout.createdAt ?? null)
+    if (detail?.workout.createdAt) times.push(detail.workout.createdAt)
+    return times.length ? Math.min(...times) : null
   })()
   const elapsed = useElapsedTime(startedAt, 1000)
 
@@ -184,7 +199,10 @@ function SessionView({ workoutId }: { workoutId: number }) {
   const isLast = index >= exercises.length - 1
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-64 animate-fade-in">
+    <div
+      className="mx-auto max-w-md px-4 animate-fade-in"
+      style={{ ['--session-bar-h' as string]: `${barHeight}px`, paddingBottom: barHeight + 16 }}
+    >
       {/* Top bar */}
       <div className="sticky top-0 z-20 -mx-4 bg-page/95 px-4 pt-safe backdrop-blur">
         <div className="flex items-center gap-2 py-2">
@@ -268,7 +286,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
       </div>
 
       {/* Bottom: rest timer + previous / next */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-nav/95 pb-safe backdrop-blur">
+      <div ref={barRef} className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-nav/95 pb-safe backdrop-blur">
         <div className="mx-auto max-w-md px-4">
           <SessionRestTimer timer={timer} restSec={restSec} onChangeRest={changeRest} />
           <div className="flex gap-2 pb-1 pt-1">

@@ -44,3 +44,8 @@ export type ExerciseDetailsPatch = Partial<
 export async function updateExerciseDetails(exerciseId: number, patch: ExerciseDetailsPatch): Promise<void> {
   await db.exercises.update(exerciseId, patch)
 }
+
+/** Weight ruler step for one exercise (a machine moving by 5 kg…); `undefined` = the general setting. */
+export async function setExerciseWeightStep(exerciseId: number, weightStep: number | undefined): Promise<void> {
+  await db.exercises.update(exerciseId, { weightStep })
+}

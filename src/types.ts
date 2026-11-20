@@ -91,6 +91,8 @@ export interface Exercise {
    * theirs from the bundled library). */
   primaryMuscles?: MuscleId[]
   secondaryMuscles?: MuscleId[]
+  /** Weight ruler step for this exercise (kg); absent = the general setting. */
+  weightStep?: number
   /** Personal notes shown on the exercise sheet. */
   notes?: string
   /** Optional link to a demonstration video the user likes. */

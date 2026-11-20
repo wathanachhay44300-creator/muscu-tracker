@@ -1,4 +1,4 @@
-const KEY = 'muscu-tracker:drag-hint'
+const KEY = 'muscu-tracker:ruler-hint'
 /** The hint shows during the first sessions, until hidden by the user. */
 const MAX_SESSIONS = 5
 

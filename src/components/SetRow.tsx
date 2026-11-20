@@ -7,7 +7,7 @@ import { hapticMenuOpen } from '../lib/haptics'
 import { DumbbellIcon, StarIcon, TrashIcon, CopyIcon } from './Icons'
 import { PlateCalculatorSheet } from './PlateCalculatorSheet'
 import { ContextMenuSheet } from './ContextMenuSheet'
-import { DragNumberField } from './DragNumberField'
+import { NumberField } from './NumberField'
 import { t } from '../i18n'
 
 /** The plate calculator only makes sense for these — the rest have no plates to pick. */
@@ -82,11 +82,10 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           {isPR ? <StarIcon className="animate-pop-in h-3.5 w-3.5" /> : index + 1}
         </span>
 
-        <DragNumberField
+        <NumberField
           value={set.weight}
           step={preferences?.weightStep ?? 2.5}
           decimal
-          haptics={!!preferences?.hapticsEnabled}
           label={t('set.weightLabel', { n: index + 1 })}
           onCommit={onChangeWeight}
           className="min-w-[6.5rem] flex-1"
@@ -108,10 +107,9 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <span className="shrink-0 text-[10px] font-medium text-muted">kg</span>
         )}
 
-        <DragNumberField
+        <NumberField
           value={set.reps}
           step={1}
-          haptics={!!preferences?.hapticsEnabled}
           label={t('set.repsLabel', { n: index + 1 })}
           onCommit={onChangeReps}
           className="min-w-[5.5rem] flex-1"
