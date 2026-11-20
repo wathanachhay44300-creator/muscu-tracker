@@ -25,8 +25,16 @@ import { relativeDateLabel } from '../lib/date'
 import { SetRow } from './SetRow'
 import { ContextMenuSheet } from './ContextMenuSheet'
 import { ExerciseInfoButton } from './ExerciseInfoSheet'
-import { CopyIcon, GripIcon, NoteIcon, PlusIcon, TrashIcon } from './Icons'
-import { groupLabel, t } from '../i18n'
+import { CheckIcon, CopyIcon, GripIcon, NoteIcon, PlusIcon, SettingsIcon, TrashIcon } from './Icons'
+import { setExerciseWeightStep } from '../lib/exerciseActions'
+import { formatDecimal, groupLabel, t } from '../i18n'
+
+const WEIGHT_STEP_CHOICES = [1, 1.25, 2, 2.5, 5]
+
+/** Draws nothing: keeps menu labels aligned with the ticked one. */
+function NoIcon(props: React.SVGProps<SVGSVGElement>) {
+  return <svg {...props} aria-hidden="true" />
+}
 
 interface WorkoutExerciseCardProps {
   we: WorkoutExerciseWithSets
@@ -54,6 +62,9 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
   const records = usePersonalRecords(we.exerciseId)
   const lastTime = useLastPerformance(we.exerciseId, workoutId)
   const preferences = usePreferences()
+  const [stepOpen, setStepOpen] = useState(false)
+  const generalStep = preferences?.weightStep ?? 2.5
+  const weightStep = we.exercise.weightStep ?? generalStep
   const { showSnackbar } = useSnackbar()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -234,6 +245,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             set={set}
             index={i}
             loadType={we.exercise.loadType}
+            weightStep={weightStep}
             isPR={isPR(set)}
             onChangeWeight={(weight) => updateSet(set.id!, { weight })}
             onChangeReps={(reps) => updateSet(set.id!, { reps })}
@@ -272,6 +284,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
               icon: CopyIcon,
               onSelect: () => duplicateExerciseInWorkout(we.id!),
             },
+            { label: t('editor.stepMenu', { v: formatDecimal(weightStep) }), icon: SettingsIcon, onSelect: () => setStepOpen(true) },
             {
               label: t('card.removeFromWorkout'),
               icon: TrashIcon,
@@ -280,6 +293,24 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
             },
           ]}
           onClose={() => setMenuOpen(false)}
+        />
+      )}
+      {stepOpen && (
+        <ContextMenuSheet
+          title={t('editor.stepTitle', { name: we.exercise.name })}
+          actions={[
+            {
+              label: t('editor.stepGeneral', { v: formatDecimal(generalStep) }),
+              icon: we.exercise.weightStep == null ? CheckIcon : NoIcon,
+              onSelect: () => setExerciseWeightStep(we.exerciseId, undefined),
+            },
+            ...WEIGHT_STEP_CHOICES.map((v) => ({
+              label: `${formatDecimal(v)} kg`,
+              icon: we.exercise.weightStep === v ? CheckIcon : NoIcon,
+              onSelect: () => setExerciseWeightStep(we.exerciseId, v),
+            })),
+          ]}
+          onClose={() => setStepOpen(false)}
         />
       )}
     </div>

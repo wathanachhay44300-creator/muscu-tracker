@@ -17,7 +17,6 @@ function isActive(pathname: string, match: string[]): boolean {
 export function BottomNav() {
   const { pathname } = useLocation()
   // Session mode replaces the tab bar with its own previous/next buttons.
-  if (pathname.startsWith('/seance')) return null
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-nav/95 pb-safe backdrop-blur">

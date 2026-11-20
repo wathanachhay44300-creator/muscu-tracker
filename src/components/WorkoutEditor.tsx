@@ -14,6 +14,7 @@ import { totalVolume, formatVolume } from '../lib/stats'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
 import { MuscleGroupBreakdown } from './MuscleGroupBreakdown'
 import { SessionTimer } from './SessionTimer'
+import { todayISO } from '../lib/date'
 import { SessionNotes, SessionRpe } from './SessionExtras'
 import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
@@ -47,7 +48,9 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
   const setCount = exercises.reduce((sum, we) => sum + we.sets.length, 0)
   const sessionVolume = totalVolume(exercises.flatMap((we) => we.sets))
   const setTimestamps = exercises.flatMap((we) => we.sets.map((s) => s.createdAt))
-  const firstSetAt = setTimestamps.length ? Math.min(...setTimestamps) : null
+  // The chrono runs for today's unfinished session, from when it was started (or its first set if earlier).
+  const startedAt = Math.min(workout.createdAt, ...setTimestamps)
+  const showChrono = !workout.finishedAt && workout.date === todayISO()
 
   async function handleSelectExercise(exercise: Exercise) {
     await addExerciseToWorkout(workoutId, exercise.id!)
@@ -62,7 +65,18 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
 
   return (
     <div className="space-y-4">
-      {firstSetAt != null && !workout.finishedAt && <SessionTimer startedAt={firstSetAt} />}
+      {/* Chrono pill + summary */}
+      {(showChrono || exercises.length > 0) && (
+        <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
+          {showChrono && <SessionTimer startedAt={startedAt} label={t('editor.chrono')} />}
+          {exercises.length > 0 && (
+            <p className="text-xs font-medium text-muted">
+              {tn('common.exercises', exercises.length)} · {tn('common.sets', setCount)}
+              {sessionVolume > 0 && <> · {formatVolume(sessionVolume)} kg</>}
+            </p>
+          )}
+        </div>
+      )}
 
       {exercises.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
@@ -71,13 +85,6 @@ export function WorkoutEditor({ workoutId }: WorkoutEditorProps) {
             {t('editor.emptyHint')}
           </p>
         </div>
-      )}
-
-      {exercises.length > 0 && (
-        <p className="text-center text-xs font-medium text-muted">
-          {tn('common.exercises', exercises.length)} · {tn('common.sets', setCount)}
-          {sessionVolume > 0 && <> · {t('editor.totalVolume', { v: formatVolume(sessionVolume) })}</>}
-        </p>
       )}
 
       {exercises.length > 0 && (

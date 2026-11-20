@@ -4,7 +4,7 @@ import { migrateLegacyExerciseData } from './lib/migrations'
 import { syncExerciseLibrary } from './lib/exerciseLibrarySync'
 import { BottomNav } from './components/BottomNav'
 import { AujourdhuiScreen } from './screens/AujourdhuiScreen'
-import { SessionScreen } from './screens/SessionScreen'
+import { SeanceScreen } from './screens/SeanceScreen'
 import { ProgresScreen } from './screens/ProgresScreen'
 import { ResumeSessionBanner } from './components/ResumeSessionBanner'
 import { HistoriqueScreen } from './screens/HistoriqueScreen'
@@ -55,8 +55,8 @@ export default function App() {
           <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<AujourdhuiScreen />} />
-            <Route path="/seance" element={<SessionScreen />} />
-            <Route path="/seance/:workoutId" element={<SessionScreen />} />
+            <Route path="/seance" element={<SeanceScreen />} />
+            <Route path="/seance/:workoutId" element={<SeanceScreen />} />
             <Route path="/progres" element={<ProgresScreen />} />
             <Route path="/progres/muscles" element={<WeeklyBreakdownScreen />} />
             <Route path="/historique" element={<HistoriqueScreen />} />
