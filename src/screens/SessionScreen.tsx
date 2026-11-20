@@ -12,6 +12,7 @@ import { getSlideClass, type SwipeDirection } from '../hooks/useSwipeNav'
 import { hapticSuccess } from '../lib/haptics'
 import { addExerciseToWorkout, deleteWorkoutWithUndo, finishWorkout, restoreWorkoutSnapshot } from '../lib/workoutActions'
 import { relativeDateLabel, todayISO } from '../lib/date'
+import { dismissDragHint, takeDragHint } from '../lib/dragHint'
 import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { SessionExercisePanel } from '../components/session/SessionExercisePanel'
@@ -91,6 +92,7 @@ function SessionView({ workoutId }: { workoutId: number }) {
   const [overviewOpen, setOverviewOpen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
+  const [showHint, setShowHint] = useState(takeDragHint)
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const exercises = detail?.exercises ?? []
@@ -241,6 +243,11 @@ function SessionView({ workoutId }: { workoutId: number }) {
                 setCurrentId(neighbor?.id ?? null)
               }}
               onSetDone={startRest}
+              showHint={showHint}
+              onDismissHint={() => {
+                dismissDragHint()
+                setShowHint(false)
+              }}
             />
           </div>
         ) : (

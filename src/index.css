@@ -220,3 +220,15 @@ a:active {
 .pr-star-glow {
   filter: drop-shadow(0 0 3px var(--star-glow));
 }
+
+/* ---- Drag-to-adjust number bounce (one per notch, see DragNumberField) ---- */
+@keyframes num-bump-a {
+  0% { transform: translateX(0) scale(1); }
+  40% { transform: translateX(calc(var(--bump-dir, 1) * 3px)) scale(1.16); }
+  100% { transform: translateX(0) scale(1); }
+}
+@keyframes num-bump-b {
+  0% { transform: translateX(0) scale(1); }
+  40% { transform: translateX(calc(var(--bump-dir, 1) * 3px)) scale(1.16); }
+  100% { transform: translateX(0) scale(1); }
+}

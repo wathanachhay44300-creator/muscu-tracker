@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { usePreferences } from '../hooks/usePreferences'
-import { setHapticsEnabled, setSoundEnabled, setWeightGoal } from '../lib/settingsActions'
+import { setHapticsEnabled, setSoundEnabled, setWeightGoal, setWeightStep, WEIGHT_STEPS } from '../lib/settingsActions'
 import { ClipboardImport } from '../components/ClipboardImport'
 import { todayISO } from '../lib/date'
 import { shortDate } from '../lib/tracking'
@@ -285,6 +285,30 @@ export function ReglagesScreen() {
           </span>
           <ChevronRightIcon className="h-5 w-5 text-faint" />
         </Link>
+
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+          <p className="font-semibold text-ink">Pas du poids au glissement</p>
+          <p className="mb-3 text-xs text-muted">Combien de kg ajoute ou retire chaque cran quand tu glisses un poids.</p>
+          <div className="grid grid-cols-4 gap-1.5" role="radiogroup" aria-label="Pas du poids">
+            {WEIGHT_STEPS.map((st) => {
+              const on = (preferences?.weightStep ?? 2.5) === st
+              return (
+                <button
+                  key={st}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setWeightStep(st)}
+                  className={`min-h-11 rounded-xl text-sm font-bold ${
+                    on ? 'bg-accent text-on-accent' : 'bg-surface-3 text-ink-2 active:bg-surface-4'
+                  }`}
+                >
+                  {String(st).replace('.', ',')} kg
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-sm">
           <div>

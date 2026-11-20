@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import type { LoadType, SetEntry } from '../types'
 import { useLongPress } from '../hooks/useLongPress'
 import { useSwipeToDelete } from '../hooks/useSwipeToDelete'
@@ -7,6 +7,7 @@ import { hapticMenuOpen } from '../lib/haptics'
 import { DumbbellIcon, StarIcon, TrashIcon, CopyIcon } from './Icons'
 import { PlateCalculatorSheet } from './PlateCalculatorSheet'
 import { ContextMenuSheet } from './ContextMenuSheet'
+import { DragNumberField } from './DragNumberField'
 
 /** The plate calculator only makes sense for these — the rest have no plates to pick. */
 const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
@@ -24,91 +25,15 @@ interface SetRowProps {
 }
 
 export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeReps, onRemove, onDuplicate }: SetRowProps) {
-  // Local state is the source of truth while this row is being edited. It's
-  // only re-synced from props when a *different* set is mounted into this row
-  // (new set.id) — not on every set.weight/reps change — otherwise rapid
-  // taps on the steppers would race against the async DB write + live-query
-  // round trip and silently drop increments.
-  const [weight, setWeight] = useState(set.weight)
-  const [reps, setReps] = useState(set.reps)
-  const [weightText, setWeightText] = useState(trimZero(set.weight))
-  const [repsText, setRepsText] = useState(String(set.reps))
   const [calculatorOpen, setCalculatorOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const preferences = usePreferences()
-
-  // Brief scale "pop" on the number when a stepper button changes it —
-  // transform-only, so it stays cheap and GPU-composited.
-  const [weightPulse, setWeightPulse] = useState(false)
-  const [repsPulse, setRepsPulse] = useState(false)
-  const weightPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const repsPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const longPress = useLongPress(() => {
     hapticMenuOpen(!!preferences?.hapticsEnabled)
     setMenuOpen(true)
   })
   const swipe = useSwipeToDelete(onRemove)
-
-  useEffect(() => {
-    setWeight(set.weight)
-    setReps(set.reps)
-    setWeightText(trimZero(set.weight))
-    setRepsText(String(set.reps))
-    // Only re-sync when a new set is mounted into this row, not on every edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [set.id])
-
-  useEffect(() => {
-    return () => {
-      if (weightPulseTimeout.current) clearTimeout(weightPulseTimeout.current)
-      if (repsPulseTimeout.current) clearTimeout(repsPulseTimeout.current)
-    }
-  }, [])
-
-  function pulseWeight() {
-    setWeightPulse(true)
-    if (weightPulseTimeout.current) clearTimeout(weightPulseTimeout.current)
-    weightPulseTimeout.current = setTimeout(() => setWeightPulse(false), 150)
-  }
-
-  function pulseReps() {
-    setRepsPulse(true)
-    if (repsPulseTimeout.current) clearTimeout(repsPulseTimeout.current)
-    repsPulseTimeout.current = setTimeout(() => setRepsPulse(false), 150)
-  }
-
-  function commitWeight(raw: string) {
-    const n = parseFloat(raw.replace(',', '.'))
-    const value = Number.isFinite(n) && n >= 0 ? n : 0
-    setWeight(value)
-    setWeightText(trimZero(value))
-    onChangeWeight(value)
-  }
-
-  function commitReps(raw: string) {
-    const n = parseInt(raw, 10)
-    const value = Number.isFinite(n) && n >= 0 ? n : 0
-    setReps(value)
-    setRepsText(String(value))
-    onChangeReps(value)
-  }
-
-  function stepWeight(delta: number) {
-    const n = Math.max(0, round2(weight + delta))
-    setWeight(n)
-    setWeightText(trimZero(n))
-    onChangeWeight(n)
-    pulseWeight()
-  }
-
-  function stepReps(delta: number) {
-    const n = Math.max(0, reps + delta)
-    setReps(n)
-    setRepsText(String(n))
-    onChangeReps(n)
-    pulseReps()
-  }
 
   return (
     <div className="relative overflow-hidden rounded-xl">
@@ -156,39 +81,15 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           {isPR ? <StarIcon className="animate-pop-in h-3.5 w-3.5" /> : index + 1}
         </span>
 
-        <div
-          data-no-long-press
-          data-no-swipe
-          className="flex min-w-[6.5rem] flex-1 items-center overflow-hidden rounded-xl border border-line bg-surface-2"
-        >
-          <button
-            type="button"
-            onClick={() => stepWeight(-2.5)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
-            aria-label="Moins 2.5 kg"
-          >
-            −
-          </button>
-          <input
-            value={weightText}
-            onChange={(e) => setWeightText(e.target.value)}
-            onFocus={(e) => e.target.select()}
-            onBlur={(e) => commitWeight(e.target.value)}
-            inputMode="decimal"
-            className={`w-0 min-w-[3.4rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold font-numbers tabular-nums text-ink outline-none transition-transform duration-150 ${
-              weightPulse ? 'scale-110' : 'scale-100'
-            }`}
-            aria-label="Poids en kg"
-          />
-          <button
-            type="button"
-            onClick={() => stepWeight(2.5)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
-            aria-label="Plus 2.5 kg"
-          >
-            +
-          </button>
-        </div>
+        <DragNumberField
+          value={set.weight}
+          step={preferences?.weightStep ?? 2.5}
+          decimal
+          haptics={!!preferences?.hapticsEnabled}
+          label={`Poids en kg, série ${index + 1}`}
+          onCommit={onChangeWeight}
+          className="min-w-[6.5rem] flex-1"
+        />
         {PLATE_CALC_LOAD_TYPES.includes(loadType) ? (
           <button
             type="button"
@@ -206,39 +107,14 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
           <span className="shrink-0 text-[10px] font-medium text-muted">kg</span>
         )}
 
-        <div
-          data-no-long-press
-          data-no-swipe
-          className="flex min-w-[5.5rem] flex-1 items-center overflow-hidden rounded-xl border border-line bg-surface-2"
-        >
-          <button
-            type="button"
-            onClick={() => stepReps(-1)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
-            aria-label="Moins une répétition"
-          >
-            −
-          </button>
-          <input
-            value={repsText}
-            onChange={(e) => setRepsText(e.target.value)}
-            onFocus={(e) => e.target.select()}
-            onBlur={(e) => commitReps(e.target.value)}
-            inputMode="numeric"
-            className={`w-0 min-w-[2.6rem] flex-1 bg-transparent py-3 text-center text-lg font-semibold font-numbers tabular-nums text-ink outline-none transition-transform duration-150 ${
-              repsPulse ? 'scale-110' : 'scale-100'
-            }`}
-            aria-label="Répétitions"
-          />
-          <button
-            type="button"
-            onClick={() => stepReps(1)}
-            className="shrink-0 px-1.5 py-3 text-lg font-semibold text-muted active:text-accent-ink"
-            aria-label="Plus une répétition"
-          >
-            +
-          </button>
-        </div>
+        <DragNumberField
+          value={set.reps}
+          step={1}
+          haptics={!!preferences?.hapticsEnabled}
+          label={`Répétitions, série ${index + 1}`}
+          onCommit={onChangeReps}
+          className="min-w-[5.5rem] flex-1"
+        />
         <span className="shrink-0 text-[10px] font-medium text-muted">reps</span>
 
         <button
@@ -255,7 +131,7 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
 
       {calculatorOpen && PLATE_CALC_LOAD_TYPES.includes(loadType) && (
         <PlateCalculatorSheet
-          initialWeight={weight}
+          initialWeight={set.weight}
           loadType={loadType}
           onClose={() => setCalculatorOpen(false)}
         />
@@ -273,12 +149,4 @@ export function SetRow({ set, index, loadType, isPR, onChangeWeight, onChangeRep
       )}
     </div>
   )
-}
-
-function round2(n: number): number {
-  return Math.round(n * 100) / 100
-}
-
-function trimZero(n: number): string {
-  return Number.isInteger(n) ? String(n) : String(round2(n))
 }

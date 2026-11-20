@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import type { SetEntry } from '../../types'
 import { useLongPress } from '../../hooks/useLongPress'
 import { useSwipeToDelete } from '../../hooks/useSwipeToDelete'
 import { usePreferences } from '../../hooks/usePreferences'
 import { hapticMenuOpen } from '../../lib/haptics'
 import { ContextMenuSheet } from '../ContextMenuSheet'
+import { DragNumberField } from '../DragNumberField'
 import { CheckIcon, CopyIcon, StarIcon, TrashIcon } from '../Icons'
 
 export const SET_GRID = 'grid grid-cols-[2rem_1fr_1fr_2.75rem] items-center gap-1.5'
@@ -88,18 +89,20 @@ export function SessionSetRow({
           {isPR ? <StarIcon className="h-4 w-4 text-highlight" /> : index + 1}
         </span>
 
-        <Stepper
+        <DragNumberField
           value={set.weight}
-          step={2.5}
+          step={preferences?.weightStep ?? 2.5}
           decimal
           dimmed={done}
+          haptics={!!preferences?.hapticsEnabled}
           label={`Poids en kg, série ${index + 1}`}
           onCommit={onChangeWeight}
         />
-        <Stepper
+        <DragNumberField
           value={set.reps}
           step={1}
           dimmed={done}
+          haptics={!!preferences?.hapticsEnabled}
           label={`Répétitions, série ${index + 1}`}
           onCommit={onChangeReps}
         />
@@ -129,105 +132,6 @@ export function SessionSetRow({
           onClose={() => setMenuOpen(false)}
         />
       )}
-    </div>
-  )
-}
-
-function round2(n: number): number {
-  return Math.round(n * 100) / 100
-}
-
-function display(n: number): string {
-  return String(Number.isInteger(n) ? n : round2(n)).replace('.', ',')
-}
-
-/** Number field with − / + buttons (phase 3 replaces the buttons with dragging). */
-function Stepper({
-  value,
-  step,
-  decimal = false,
-  dimmed,
-  label,
-  onCommit,
-}: {
-  value: number
-  step: number
-  decimal?: boolean
-  dimmed: boolean
-  label: string
-  onCommit: (v: number) => void
-}) {
-  // Local value is the source of truth while editing, so fast taps don't race
-  // the database round trip; it re-syncs when the stored value changes elsewhere.
-  const [current, setCurrent] = useState(value)
-  const [text, setText] = useState(display(value))
-  const [pulse, setPulse] = useState(false)
-  const focused = useRef(false)
-  const pulseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  useEffect(() => () => clearTimeout(pulseTimer.current), [])
-
-  useEffect(() => {
-    if (focused.current) return
-    setCurrent(value)
-    setText(display(value))
-  }, [value])
-
-  function apply(n: number) {
-    const v = Math.max(0, decimal ? round2(n) : Math.round(n))
-    setCurrent(v)
-    setText(display(v))
-    onCommit(v)
-  }
-
-  function bump(delta: number) {
-    apply(current + delta)
-    setPulse(true)
-    clearTimeout(pulseTimer.current)
-    pulseTimer.current = setTimeout(() => setPulse(false), 150)
-  }
-
-  return (
-    <div
-      data-no-long-press
-      data-no-swipe
-      className={`flex h-12 items-center overflow-hidden rounded-xl bg-surface-2 ${dimmed ? 'opacity-55' : ''}`}
-    >
-      <button
-        type="button"
-        onClick={() => bump(-step)}
-        aria-label={`Moins ${display(step)}`}
-        className="h-full w-9 shrink-0 text-lg font-semibold text-muted active:text-accent-ink"
-      >
-        −
-      </button>
-      <input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onFocus={(e) => {
-          focused.current = true
-          e.target.select()
-        }}
-        onBlur={(e) => {
-          focused.current = false
-          const n = decimal ? parseFloat(e.target.value.replace(',', '.')) : parseInt(e.target.value, 10)
-          apply(Number.isFinite(n) ? n : 0)
-        }}
-        onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
-        inputMode={decimal ? 'decimal' : 'numeric'}
-        enterKeyHint="done"
-        aria-label={label}
-        className={`w-0 min-w-0 flex-1 bg-transparent text-center text-xl font-bold font-numbers text-ink outline-none transition-transform duration-150 ${
-          pulse ? 'scale-110' : 'scale-100'
-        }`}
-      />
-      <button
-        type="button"
-        onClick={() => bump(step)}
-        aria-label={`Plus ${display(step)}`}
-        className="h-full w-9 shrink-0 text-lg font-semibold text-muted active:text-accent-ink"
-      >
-        +
-      </button>
     </div>
   )
 }

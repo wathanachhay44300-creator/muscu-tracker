@@ -26,7 +26,7 @@ import {
 import { ContextMenuSheet } from '../ContextMenuSheet'
 import { ExerciseInfoSheet } from '../ExerciseInfoSheet'
 import { PlateCalculatorSheet } from '../PlateCalculatorSheet'
-import { CopyIcon, DumbbellIcon, InfoIcon, ListIcon, MoreIcon, NoteIcon, PlusIcon, StarIcon, TrashIcon } from '../Icons'
+import { CopyIcon, DumbbellIcon, InfoIcon, ListIcon, MoreIcon, NoteIcon, PlusIcon, StarIcon, TrashIcon, XIcon } from '../Icons'
 import { SET_GRID, SessionSetRow } from './SessionSetRow'
 
 const PLATE_CALC_LOAD_TYPES: LoadType[] = ['Barre libre', 'Machine à plaques']
@@ -54,6 +54,8 @@ interface SessionExercisePanelProps {
   onRemoved: () => void
   /** A set was just ticked: the screen starts the rest timer. */
   onSetDone: () => void
+  showHint: boolean
+  onDismissHint: () => void
 }
 
 /** The focused one-exercise view of session mode. */
@@ -65,6 +67,8 @@ export function SessionExercisePanel({
   onOpenOverview,
   onRemoved,
   onSetDone,
+  showHint,
+  onDismissHint,
 }: SessionExercisePanelProps) {
   const preferences = usePreferences()
   const { showSnackbar } = useSnackbar()
@@ -232,6 +236,21 @@ export function SessionExercisePanel({
           <PlusIcon className="h-4 w-4" />
           Ajouter une série
         </button>
+        {showHint && we.sets.length > 0 && (
+          <div className="mt-2 flex items-center gap-1">
+            <p className="flex-1 text-center text-xs text-muted">
+              Glisse un chiffre vers la gauche ou la droite · touche-le pour taper
+            </p>
+            <button
+              type="button"
+              onClick={onDismissHint}
+              aria-label="Masquer l'aide"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-faint active:bg-surface-3"
+            >
+              <XIcon className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {menuOpen && (

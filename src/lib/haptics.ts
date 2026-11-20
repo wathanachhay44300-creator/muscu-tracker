@@ -22,3 +22,8 @@ export function hapticMenuOpen(enabled: boolean): void {
 export function hapticSuccess(enabled: boolean): void {
   if (enabled) vibrate([20, 40, 20])
 }
+
+/** One notch while dragging a value — the faintest tick. (No-op on iPhone: Safari has no Vibration API.) */
+export function hapticTick(enabled: boolean): void {
+  if (enabled) vibrate(6)
+}

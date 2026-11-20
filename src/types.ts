@@ -188,6 +188,8 @@ export interface AppPreferences {
   goal: WeightGoal
   /** Target pace in kg/week (magnitude; the sign comes from `goal`). */
   goalRateKg: number
+  /** Weight change per notch when dragging a weight value in a set (kg). */
+  weightStep: number
 }
 
 export type WeightGoal = 'loss' | 'maintain' | 'gain'

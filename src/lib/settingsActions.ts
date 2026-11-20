@@ -35,7 +35,7 @@ const PREFERENCES_ID = 'appPreferences' as const
 function defaultPreferences(): AppPreferences {
   // Off by default: the app is often used in a gym, where an unexpected
   // chime (or buzz) is more awkward than welcome — both are opt-in.
-  return { id: PREFERENCES_ID, soundEnabled: false, hapticsEnabled: false, goal: 'maintain', goalRateKg: 0.3 }
+  return { id: PREFERENCES_ID, soundEnabled: false, hapticsEnabled: false, goal: 'maintain', goalRateKg: 0.3, weightStep: 2.5 }
 }
 
 export async function getPreferences(): Promise<AppPreferences> {
@@ -58,4 +58,11 @@ export async function setHapticsEnabled(hapticsEnabled: boolean): Promise<void> 
 export async function setWeightGoal(goal: WeightGoal, goalRateKg?: number): Promise<void> {
   const current = await getPreferences()
   await db.settings.put({ ...current, goal, goalRateKg: goalRateKg ?? current.goalRateKg })
+}
+
+export const WEIGHT_STEPS = [1, 1.25, 2.5, 5] as const
+
+export async function setWeightStep(weightStep: number): Promise<void> {
+  const current = await getPreferences()
+  await db.settings.put({ ...current, weightStep })
 }
