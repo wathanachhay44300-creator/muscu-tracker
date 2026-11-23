@@ -306,6 +306,8 @@ export const en: Dictionary = {
     newPr: 'New personal record',
     weightLabel: 'Weight in kg, set {n}',
     repsLabel: 'Reps, set {n}',
+    less: 'Minus {v}',
+    more: 'Plus {v}',
     title: 'Set {n}',
     duplicate: 'Duplicate set',
     delete: 'Delete set',

@@ -1,5 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
-import { formatDecimal, parseDecimal } from '../i18n'
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { formatDecimal, parseDecimal, t } from '../i18n'
 import { hapticTick } from '../lib/haptics'
 
 /** Distance between two graduations, in px. */
@@ -65,6 +65,8 @@ export function MiniRulerField({
   const fingerDown = useRef(false)
   const gestureEndTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const offGrid = useRef(false)
+  /** − or + is held down and repeating. */
+  const holding = useRef(false)
   /** Off-grid value being left: its fractional index and the scroll offset it sits at. */
   const leaving = useRef<{ index: number; left: number } | null>(null)
   const offGridAt = useRef<{ index: number; left: number } | null>(null)
@@ -86,7 +88,8 @@ export function MiniRulerField({
   // Only reacts to a new stored value: closing the keyboard must not bring back the old one
   // before the typed value has been saved.
   useEffect(() => {
-    if (!interacting.current && !editing) setCurrent(value)
+    // While − / + is held, each step is saved as it goes: an older saved value coming back must not undo it.
+    if (!interacting.current && !editing && !holding.current) setCurrent(value)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
@@ -226,15 +229,64 @@ export function MiniRulerField({
     if (v !== value) onCommit(v)
   }
 
+  // Latest shown value, for the − / + buttons held down (their repeat timer outlives a render).
+  const currentRef = useRef(current)
+  useLayoutEffect(() => {
+    currentRef.current = current
+  }, [current])
+  const repeatTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  /** The − or + being pressed (no step yet: a press that turns into a page scroll changes nothing). */
+  const pressed = useRef<1 | -1 | null>(null)
+  useEffect(() => () => clearTimeout(repeatTimer.current), [])
+
   function stepBy(delta: 1 | -1) {
     // From an off-grid value, the neighbouring graduation on that side.
-    const exact = current / step
+    const { step, count, onCommit, haptics } = latest.current
+    const from = currentRef.current
+    const exact = from / step
     const next = delta > 0 ? Math.floor(exact + 1e-6) + 1 : Math.ceil(exact - 1e-6) - 1
     const v = round2(Math.min(Math.max(next, 0), count) * step)
-    if (v === current) return
+    if (v === from) return
+    currentRef.current = v
     setCurrent(v)
     setBump((b) => ({ n: (b?.n ?? 0) + 1, dir: delta }))
+    hapticTick(haptics)
     onCommit(v)
+  }
+
+  /**
+   * − / + : one step on release of a tap; held down, it starts after a moment and keeps going,
+   * faster and faster. Nothing happens on press itself, so a page scroll that starts on the
+   * edge of a box (pointercancel) never changes a value.
+   */
+  function startRepeat(delta: 1 | -1, e: ReactPointerEvent<HTMLButtonElement>) {
+    if (e.button !== 0) return
+    e.preventDefault()
+    stopRepeat()
+    pressed.current = delta
+    const loop = (delay: number) => {
+      repeatTimer.current = setTimeout(() => {
+        holding.current = true
+        stepBy(delta)
+        loop(Math.max(60, delay * 0.8))
+      }, delay)
+    }
+    loop(400)
+  }
+
+  /** Finger lifted on the button: a tap (not held long enough to repeat) makes its one step. */
+  function endPress() {
+    const delta = pressed.current
+    const wasHolding = holding.current
+    stopRepeat()
+    if (delta && !wasHolding) stepBy(delta)
+  }
+
+  function stopRepeat() {
+    clearTimeout(repeatTimer.current)
+    repeatTimer.current = undefined
+    pressed.current = null
+    holding.current = false
   }
 
   function onSliderKey(e: KeyboardEvent<HTMLDivElement>) {
@@ -330,6 +382,49 @@ export function MiniRulerField({
           active ? 'bg-accent' : 'bg-muted'
         }`}
       />
+
+      {/* − / + on the edges of the box: tap for one step, hold to keep going. The middle stays the ruler.
+          The signs sit in the bottom corners, by the faded ends of the ruler, so they never touch the number. */}
+      {!editing && (
+        <>
+          <button
+            type="button"
+            data-no-swipe
+            data-no-long-press
+            aria-label={t('set.less', { v: `${formatDecimal(step)} ${unit}` })}
+            onPointerDown={(e) => startRepeat(-1, e)}
+            onPointerUp={endPress}
+            onPointerLeave={stopRepeat}
+            onPointerCancel={stopRepeat}
+            onClick={(e) => {
+              if (e.detail === 0) stepBy(-1)
+            }}
+            onContextMenu={(e) => e.preventDefault()}
+            className="absolute inset-y-0 left-0 z-10 flex w-7 items-end pb-1 justify-center text-lg font-bold leading-none text-muted active:bg-accent-soft active:text-accent-ink"
+            style={{ touchAction: 'manipulation', WebkitTouchCallout: 'none' }}
+          >
+            −
+          </button>
+          <button
+            type="button"
+            data-no-swipe
+            data-no-long-press
+            aria-label={t('set.more', { v: `${formatDecimal(step)} ${unit}` })}
+            onPointerDown={(e) => startRepeat(1, e)}
+            onPointerUp={endPress}
+            onPointerLeave={stopRepeat}
+            onPointerCancel={stopRepeat}
+            onClick={(e) => {
+              if (e.detail === 0) stepBy(1)
+            }}
+            onContextMenu={(e) => e.preventDefault()}
+            className="absolute inset-y-0 right-0 z-10 flex w-7 items-end pb-1 justify-center text-lg font-bold leading-none text-muted active:bg-accent-soft active:text-accent-ink"
+            style={{ touchAction: 'manipulation', WebkitTouchCallout: 'none' }}
+          >
+            +
+          </button>
+        </>
+      )}
 
       {/* Keyboard entry, on top only while typing */}
       <input

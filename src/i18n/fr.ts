@@ -307,6 +307,8 @@ export const fr = {
     newPr: 'Nouveau record personnel',
     weightLabel: 'Poids en kg, série {n}',
     repsLabel: 'Répétitions, série {n}',
+    less: 'Moins {v}',
+    more: 'Plus {v}',
     title: 'Série {n}',
     duplicate: 'Dupliquer la série',
     delete: 'Supprimer la série',
