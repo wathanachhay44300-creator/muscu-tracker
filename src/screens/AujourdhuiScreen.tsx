@@ -10,7 +10,9 @@ import { formatReps, formatWeight } from '../lib/stats'
 import { formatKg } from '../lib/tracking'
 import { DuplicateSessionSheet } from '../components/DuplicateSessionSheet'
 import { CheckIcon, ChevronRightIcon, CopyIcon, PlayIcon, PlusIcon, SettingsIcon, StarIcon } from '../components/Icons'
-import { getLocale, t, tn } from '../i18n'
+import { getLocale, t, tn, tnThemed, tThemed } from '../i18n'
+import { useThemeId } from '../hooks/useTheme'
+import { BeltIcon, GloveIcon, NoRing, RingOnly, RopeBand, Spotlight } from '../components/ring/Ring'
 import { HeartIcon, KawaiiOnly, PlainOnly, Sprinkles } from '../components/kawaii/Kawaii'
 import { Mochi } from '../components/kawaii/Mochi'
 
@@ -28,6 +30,7 @@ export function AujourdhuiScreen() {
   const [starting, setStarting] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
   const today = todayISO()
+  const theme = useThemeId()
 
   async function start(run: () => Promise<unknown>) {
     if (starting) return
@@ -62,7 +65,13 @@ export function AujourdhuiScreen() {
       </header>
 
       {/* Hero: resume the session in progress, or start a new one. */}
-      <section className="relative mb-6 overflow-hidden rounded-3xl bg-accent p-5 text-on-accent">
+      <section className="relative isolate mb-6 overflow-hidden rounded-3xl bg-hero p-5 text-on-hero">
+        <RingOnly>
+          <span className="pointer-events-none absolute inset-0 -z-10 block">
+            <Spotlight />
+          </span>
+          <RopeBand className="absolute inset-x-0 top-0" />
+        </RingOnly>
         <KawaiiOnly>
           <Sprinkles className="pointer-events-none absolute right-2 top-2 h-16 w-[88px]" />
         </KawaiiOnly>
@@ -71,7 +80,7 @@ export function AujourdhuiScreen() {
             <div className="flex items-end gap-2">
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.inProgress')}</p>
-                <p className="font-display mt-1 text-[1.6rem] leading-tight">{active.title}</p>
+                <p className="font-display mt-1 leading-tight" style={{ fontSize: 'var(--hero-title-size)' }}>{active.title}</p>
                 <p className="mt-1 text-sm font-medium opacity-80">
                   {tn('common.exercises', active.exerciseCount)} · {tn('common.sets', active.setCount)}
                 </p>
@@ -83,7 +92,7 @@ export function AujourdhuiScreen() {
             <button
               type="button"
               onClick={() => navigate('/seance')}
-              className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-on-accent text-base font-bold text-accent active:opacity-90"
+              className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-hero-button text-base font-bold text-on-hero-button active:opacity-90"
             >
               <PlayIcon className="h-4 w-4" />
               {t('home.resume')}
@@ -93,8 +102,15 @@ export function AujourdhuiScreen() {
           <>
             <div className="flex items-end gap-2">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.newWorkout')}</p>
-                <p className="font-display mt-1 text-[1.6rem] leading-tight">{t('home.ready')}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-bold uppercase tracking-wide opacity-75">{tThemed(theme, 'home.newWorkout')}</p>
+                  <RingOnly>
+                    <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-on-accent">
+                      {t('ring.tonight')}
+                    </span>
+                  </RingOnly>
+                </div>
+                <p className="font-display mt-1 leading-tight" style={{ fontSize: 'var(--hero-title-size)' }}>{t('home.ready')}</p>
                 <p className="mt-1 text-sm font-medium opacity-80">
                   {t('home.freeOrProgram')}
                 </p>
@@ -107,16 +123,16 @@ export function AujourdhuiScreen() {
               type="button"
               disabled={starting}
               onClick={() => start(() => getOrCreateWorkout(today))}
-              className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-on-accent text-base font-bold text-accent active:opacity-90 disabled:opacity-60"
+              className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-hero-button text-base font-bold text-on-hero-button active:opacity-90 disabled:opacity-60"
             >
               <PlayIcon className="h-4 w-4" />
-              {t('home.free')}
+              {tThemed(theme, 'home.free')}
             </button>
             <button
               type="button"
               disabled={starting}
               onClick={() => setDuplicating(true)}
-              className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-on-accent/40 text-sm font-semibold active:bg-on-accent/10 disabled:opacity-60"
+              className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-on-hero/40 text-sm font-semibold active:bg-on-hero/10 disabled:opacity-60"
             >
               <CopyIcon className="h-4 w-4" />
               {t('home.duplicateWorkout')}
@@ -129,7 +145,7 @@ export function AujourdhuiScreen() {
       <section className="mb-6">
         <div className="mb-2 flex items-center justify-between px-1">
           <h2 className="text-ink">{t('home.programs')}</h2>
-          <Link to="/programmes" className="flex min-h-11 items-center px-1 text-sm font-semibold text-accent-ink">
+          <Link to="/programmes" className="flex min-h-11 items-center px-1 text-sm font-semibold text-link">
             {t('common.seeAll')}
           </Link>
         </div>
@@ -150,7 +166,7 @@ export function AujourdhuiScreen() {
                   className="mt-2.5 flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-accent text-sm font-bold text-on-accent active:bg-accent-hover disabled:opacity-60"
                 >
                   <PlayIcon className="h-3.5 w-3.5" />
-                  {t('home.start')}
+                  {tThemed(theme, 'home.start')}
                 </button>
               )}
             </div>
@@ -171,7 +187,7 @@ export function AujourdhuiScreen() {
           <div className="mb-2 flex items-center justify-between px-1">
             <h2 className="text-ink">{t('home.thisWeek')}</h2>
             <p className="text-sm font-semibold text-muted">
-              {tn('common.sessions', stats.sessionsThisWeek)}
+              {tnThemed(theme, 'common.sessions', stats.sessionsThisWeek)}
             </p>
           </div>
           <Link
@@ -189,14 +205,19 @@ export function AujourdhuiScreen() {
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full ${
                       d.trained ? 'bg-week-done text-on-week-done' : 'bg-surface-3 text-faint'
-                    } ${isToday ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface' : ''}`}
+                    } ${isToday ? 'ring-2 ring-week-today ring-offset-2 ring-offset-surface' : ''}`}
                     aria-label={`${new Date(`${d.date}T12:00:00`).toLocaleDateString(getLocale(), { weekday: 'long' })}${d.trained ? t('home.trained') : ''}`}
                   >
                     {d.trained ? (
                       <>
                         <PlainOnly>
-                          <CheckIcon className="h-4 w-4" strokeWidth={3} />
+                          <NoRing>
+                            <CheckIcon className="h-4 w-4" strokeWidth={3} />
+                          </NoRing>
                         </PlainOnly>
+                        <RingOnly>
+                          <GloveIcon className="h-5 w-5" />
+                        </RingOnly>
                         <KawaiiOnly>
                           <HeartIcon className="h-4 w-4" />
                         </KawaiiOnly>
@@ -227,12 +248,17 @@ export function AujourdhuiScreen() {
       {/* Latest record */}
       {stats?.latestRecord && (
         <section>
-          <h2 className="mb-2 px-1 text-ink">{t('home.latestRecord')}</h2>
+          <h2 className="mb-2 px-1 text-ink">{tThemed(theme, 'home.latestRecord')}</h2>
           <Link
             to={`/exercices/${stats.latestRecord.exerciseId}`}
             className="flex items-center gap-3 rounded-2xl border border-highlight-line bg-highlight-soft px-4 py-3.5 active:opacity-80"
           >
-            <StarIcon className="pr-star-glow h-6 w-6 shrink-0 text-highlight" />
+            <NoRing>
+              <StarIcon className="pr-star-glow h-6 w-6 shrink-0 text-highlight" />
+            </NoRing>
+            <RingOnly>
+              <BeltIcon className="h-[34px] w-[54px] shrink-0" />
+            </RingOnly>
             <div className="min-w-0 flex-1">
               <p className="font-exercise truncate text-[1.05rem] text-ink">{stats.latestRecord.exerciseName}</p>
               <p className="text-sm text-ink-2">

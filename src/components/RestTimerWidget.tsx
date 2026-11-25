@@ -61,7 +61,7 @@ export function RestTimerWidget() {
           </div>
           <p
             className={`mb-3 text-center text-4xl font-bold font-numbers tabular-nums ${
-              timer.isDone ? 'text-good-ink' : 'text-ink'
+              timer.isDone ? 'text-good-ink' : 'text-timer-ink'
             }`}
           >
             {formatCountdown(timer.remainingMs)}

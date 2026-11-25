@@ -221,6 +221,8 @@ export const en: Dictionary = {
     'khmer-dark_desc': 'Warm brown, red and gold',
     'fraise-chantilly': 'Fraise Chantilly',
     'fraise-chantilly_desc': 'Pink, cream and sweets',
+    'title-fight': 'Title Fight',
+    'title-fight_desc': 'Fight night: navy, red and gold',
   },
   clipboard: {
     saveError: 'Could not save.',
@@ -660,5 +662,16 @@ export const en: Dictionary = {
   },
   kawaii: {
     mochi: 'Mochi, the mascot',
+  },
+  /** Wording that only a theme uses instead of the usual one (tThemed). */
+  themeWords: {
+    'title-fight': {
+      home: { newWorkout: 'Next fight', start: 'Step into the ring', free: 'Free', latestRecord: 'New belt' },
+      common: { freeSession: 'Free', sessions_one: '{n} fight', sessions_other: '{n} fights' },
+      session: { rest: 'Between rounds' },
+    },
+  },
+  ring: {
+    tonight: 'Tonight',
   },
 }

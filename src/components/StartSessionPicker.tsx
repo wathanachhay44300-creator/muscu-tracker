@@ -1,6 +1,7 @@
 import { CopyIcon, DumbbellIcon, PlayIcon } from './Icons'
 import type { TemplateSummary } from '../hooks/useTemplates'
-import { t, tn } from '../i18n'
+import { t, tn, tThemed } from '../i18n'
+import { useThemeId } from '../hooks/useTheme'
 import { PlainOnly } from './kawaii/Kawaii'
 import { EmptyMochi } from './kawaii/Mochi'
 
@@ -25,6 +26,7 @@ export function StartSessionPicker({
   onDuplicatePrevious,
 }: StartSessionPickerProps) {
   const hasTemplates = !!templates && templates.length > 0
+  const theme = useThemeId()
 
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
@@ -67,7 +69,7 @@ export function StartSessionPicker({
             : 'mt-2 w-full rounded-2xl bg-accent px-6 py-3.5 font-bold text-on-accent active:bg-accent-hover disabled:opacity-50'
         }
       >
-        {t('common.freeSession')}
+        {tThemed(theme, 'common.freeSession')}
       </button>
 
       <button

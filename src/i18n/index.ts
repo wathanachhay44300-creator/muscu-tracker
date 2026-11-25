@@ -109,6 +109,21 @@ export function tn(key: TPluralKey, n: number, params?: Record<string, string | 
   return t(`${key}_${one ? 'one' : 'other'}` as TKey, { n: formatNumber(n), ...params })
 }
 
+/**
+ * Wording specific to a theme (e.g. boxing words in Title Fight), from
+ * `themeWords.<theme>.<key>`; any other theme gets the usual text for `key`.
+ */
+export function tThemed(theme: string, key: TKey, params?: Record<string, string | number>): string {
+  const themed = lookup(DICTIONARIES[current], `themeWords.${theme}.${key}`)
+  return themed != null ? interpolate(themed, params) : t(key, params)
+}
+
+/** `tn` with the theme's own wording when it has one. */
+export function tnThemed(theme: string, key: TPluralKey, n: number, params?: Record<string, string | number>): string {
+  const one = current === 'fr' ? Math.abs(n) < 2 : n === 1
+  return tThemed(theme, `${key}_${one ? 'one' : 'other'}` as TKey, { n: formatNumber(n), ...params })
+}
+
 /** Like `t`, for keys built at runtime from data (e.g. a muscle group stored in the database). */
 export function tDynamic(key: string, params?: Record<string, string | number>): string {
   const text = lookup(DICTIONARIES[current], key) ?? lookup(fr, key)

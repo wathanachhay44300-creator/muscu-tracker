@@ -40,6 +40,14 @@
  *    decorations, or the plain elements they replace); --tab-pill (behind
  *    the active tab's icon); --week-done-bg / --week-done-ink (trained days
  *    in "Cette semaine"); --status-bar (iPhone home-screen app: black or default).
+ *  - Ring decorations (Title Fight): --decor-ring / --decor-noring, same
+ *    principle as --decor-kawaii / --decor-plain.
+ *  - Per-element roles that default to the accent (so a theme can move them
+ *    to another color without touching components): --nav-active, --link,
+ *    --hero-bg / --on-hero / --hero-button / --on-hero-button /
+ *    --hero-title-size (home card), --chrono-bg / -line / -ink / -dot,
+ *    --timer-ink / --timer-bar (rest timer), --week-today, --ruler-mark
+ *    (centre mark of a box being set), --font-synthesis.
  */
 
 /* ---------------------------------------------------------------- Iron Night
@@ -133,6 +141,24 @@
   --decor-kawaii: none;
   --decor-plain: contents;
   --status-bar: black;
+  --decor-ring: none;
+  --decor-noring: contents;
+  --nav-active: var(--accent-ink);
+  --link: var(--accent-ink);
+  --hero-bg: var(--accent);
+  --on-hero: var(--on-accent);
+  --hero-button: var(--on-accent);
+  --on-hero-button: var(--accent);
+  --hero-title-size: 1.6rem;
+  --chrono-bg: var(--surface);
+  --chrono-line: var(--border);
+  --chrono-ink: var(--text);
+  --chrono-dot: var(--accent);
+  --timer-ink: var(--text);
+  --timer-bar: var(--accent);
+  --week-today: var(--accent);
+  --ruler-mark: var(--accent);
+  --font-synthesis: weight style small-caps;
   --tab-pill: transparent;
   --week-done-bg: var(--accent);
   --week-done-ink: var(--on-accent);
@@ -227,6 +253,24 @@
   --decor-kawaii: none;
   --decor-plain: contents;
   --status-bar: black;
+  --decor-ring: none;
+  --decor-noring: contents;
+  --nav-active: var(--accent-ink);
+  --link: var(--accent-ink);
+  --hero-bg: var(--accent);
+  --on-hero: var(--on-accent);
+  --hero-button: var(--on-accent);
+  --on-hero-button: var(--accent);
+  --hero-title-size: 1.6rem;
+  --chrono-bg: var(--surface);
+  --chrono-line: var(--border);
+  --chrono-ink: var(--text);
+  --chrono-dot: var(--accent);
+  --timer-ink: var(--text);
+  --timer-bar: var(--accent);
+  --week-today: var(--accent);
+  --ruler-mark: var(--accent);
+  --font-synthesis: weight style small-caps;
   --tab-pill: transparent;
   --week-done-bg: var(--accent);
   --week-done-ink: var(--on-accent);
@@ -321,6 +365,24 @@
   --decor-kawaii: none;
   --decor-plain: contents;
   --status-bar: black;
+  --decor-ring: none;
+  --decor-noring: contents;
+  --nav-active: var(--accent-ink);
+  --link: var(--accent-ink);
+  --hero-bg: var(--accent);
+  --on-hero: var(--on-accent);
+  --hero-button: var(--on-accent);
+  --on-hero-button: var(--accent);
+  --hero-title-size: 1.6rem;
+  --chrono-bg: var(--surface);
+  --chrono-line: var(--border);
+  --chrono-ink: var(--text);
+  --chrono-dot: var(--accent);
+  --timer-ink: var(--text);
+  --timer-bar: var(--accent);
+  --week-today: var(--accent);
+  --ruler-mark: var(--accent);
+  --font-synthesis: weight style small-caps;
   --tab-pill: transparent;
   --week-done-bg: var(--accent);
   --week-done-ink: var(--on-accent);
@@ -421,6 +483,24 @@
   --decor-plain: none;
   /* iPhone installed app: light status bar (dark text). */
   --status-bar: default;
+  --decor-ring: none;
+  --decor-noring: contents;
+  --nav-active: var(--accent-ink);
+  --link: var(--accent-ink);
+  --hero-bg: var(--accent);
+  --on-hero: var(--on-accent);
+  --hero-button: var(--on-accent);
+  --on-hero-button: var(--accent);
+  --hero-title-size: 1.6rem;
+  --chrono-bg: var(--surface);
+  --chrono-line: var(--border);
+  --chrono-ink: var(--text);
+  --chrono-dot: var(--accent);
+  --timer-ink: var(--text);
+  --timer-bar: var(--accent);
+  --week-today: var(--accent);
+  --ruler-mark: var(--accent);
+  --font-synthesis: weight style small-caps;
   --tab-pill: var(--accent-soft);
   --week-done-bg: var(--surface-2);
   --week-done-ink: var(--kawaii-heart);
@@ -445,6 +525,140 @@
   --mochi-line-on-accent: #ffffff;
   --mochi-shadow-on-accent: rgb(217 85 127 / 0.5);
   --mochi-plate-on-accent: #e04460;
+}
+
+/* --------------------------------------------------------------- Title Fight
+ * Fight night: arena navy, spotlight, ring ropes, champion's gold. Red is for
+ * actions (main button, box being set, trained days), gold for results and
+ * landmarks (records, chrono, rest timer, active tab, links). Its decorations
+ * (ropes, glove, belt, bell) show only here, through --decor-ring; the
+ * --rope-* / --glove / --belt-* colors are only read by them. */
+[data-theme='title-fight'] {
+  --scheme: dark;
+
+  --bg: #0d1220;
+  --surface: #161d2e;
+  --surface-2: #1f2840;
+  --surface-3: #2a3550;
+  --surface-4: #34405f;
+  --nav-bg: #0a0e19;
+
+  --border: #1f2840;
+  --border-strong: #2a3550;
+
+  --text: #f4f4f6;
+  --text-2: #d9dde6;
+  /* #a3abbe in the brief: a touch lighter so it reads at 4.5:1 on pressed chips too. */
+  --text-muted: #a8b0c2;
+  --text-faint: #4a5675;
+
+  --accent: #d7263d;
+  /* Pressed state: darker than the brief's #e33b51 so white text stays at 4.5:1. */
+  --accent-hover: #c21e34;
+  --on-accent: #ffffff;
+  --accent-ink: #ff7381;
+  --accent-soft: #2a1a24;
+  --accent-line: #d7263d;
+
+  --highlight: #f2c14e;
+  --highlight-ink: #f2c14e;
+  --highlight-soft: #3a2e10;
+  --highlight-line: #f2c14e;
+  --on-highlight: #1a1300;
+
+  --good: #3dd68c;
+  --good-ink: #5be3a0;
+  --good-soft: #12301f;
+  --on-good: #04140b;
+
+  --danger: #c62f3b;
+  --danger-ink: #ff8589;
+  --danger-soft: #3a1518;
+  --danger-line: #7a2a30;
+  --on-danger: #ffffff;
+
+  --progress: #5be3a0;
+  --stable: #a8b0c2;
+  --decline: #ff9f5a;
+
+  --knob: #f4f4f6;
+  /* Opaque: overlays apply their own opacity (bg-scrim/40). */
+  --scrim: #05070d;
+  --on-scrim: #ffffff;
+  --toast-bg: #f4f4f6;
+  --toast-text: #0d1220;
+  --toast-action: #d7263d;
+  --chart-1: #d7263d;
+  --chart-2: #f2c14e;
+  --star-glow: rgb(242 193 78 / 0.45);
+  --muscle-primary: #e5484d;
+  --on-muscle-primary: #0d1220;
+  --muscle-secondary: #8c3a45;
+  --muscle-idle: #2a3550;
+  /* #1f2840 in the brief: that's the diagram frame's color, the silhouette vanished into it. */
+  --body: #121827;
+
+  --font-body: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-title: 'Anton', 'Archivo', Impact, system-ui, sans-serif;
+  --font-exercise: 'Anton', 'Archivo', Impact, system-ui, sans-serif;
+  --font-numbers: 'Anton', 'Archivo', Impact, system-ui, sans-serif;
+  /* Anton has a single weight: never fake a bold version of it. */
+  --title-weight: 400;
+  --title-case: uppercase;
+  --title-tracking: 0.01em;
+  --h1-size: 1.9rem;
+  --h2-size: 1.25rem;
+  --exercise-weight: 400;
+  --exercise-case: uppercase;
+  --exercise-tracking: 0.01em;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-field: 12px;
+  --radius-card: 18px;
+  --radius-hero: 18px;
+  --shadow-card: 0 0 #0000;
+  --shadow-raised: 0 4px 12px rgb(0 0 0 / 0.35);
+  --shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.5);
+  --space-unit: 0.25rem;
+
+  --decor-angkor: none;
+  --decor-kawaii: none;
+  --decor-plain: contents;
+  --tab-pill: transparent;
+  --week-done-bg: var(--accent);
+  --week-done-ink: var(--on-accent);
+  --status-bar: black;
+  --decor-ring: contents;
+  --decor-noring: none;
+  --nav-active: var(--highlight-ink);
+  --link: var(--highlight-ink);
+  --hero-bg: var(--surface);
+  --on-hero: var(--text);
+  --hero-button: var(--accent);
+  --on-hero-button: var(--on-accent);
+  --hero-title-size: 2.75rem;
+  --chrono-bg: #05070d;
+  --chrono-line: var(--border-strong);
+  --chrono-ink: var(--highlight-ink);
+  --chrono-dot: var(--accent);
+  --timer-ink: var(--highlight-ink);
+  --timer-bar: var(--highlight);
+  --week-today: var(--highlight);
+  --ruler-mark: var(--highlight);
+  --font-synthesis: style small-caps;
+
+  --rope-red: #d7263d;
+  --rope-white: #f4f4f6;
+  --rope-blue: #2f5bd3;
+  --rope-band: linear-gradient(to bottom, var(--rope-red) 0 3px, var(--rope-white) 3px 6px, var(--rope-blue) 6px 9px);
+  --rope-band-thin: linear-gradient(to bottom, var(--rope-red) 0 2px, var(--rope-white) 2px 4px, var(--rope-blue) 4px 6px);
+  --spotlight: radial-gradient(ellipse at center top, rgb(255 255 255 / 0.16), transparent 65%);
+  --glove: #ffffff;
+  --glove-cuff: #f4f4f6;
+  --belt-strap: #2a3550;
+  --belt-gold: #f2c14e;
+  --belt-engrave: #8a6514;
 }
 
 /* =========================================================================
@@ -491,6 +705,20 @@
   --color-danger: var(--danger);
   --color-muscle-primary: var(--muscle-primary);
   --color-week-done: var(--week-done-bg);
+  --color-nav-active: var(--nav-active);
+  --color-link: var(--link);
+  --color-hero: var(--hero-bg);
+  --color-on-hero: var(--on-hero);
+  --color-hero-button: var(--hero-button);
+  --color-on-hero-button: var(--on-hero-button);
+  --color-chrono: var(--chrono-bg);
+  --color-chrono-line: var(--chrono-line);
+  --color-chrono-ink: var(--chrono-ink);
+  --color-chrono-dot: var(--chrono-dot);
+  --color-timer-ink: var(--timer-ink);
+  --color-timer-bar: var(--timer-bar);
+  --color-week-today: var(--week-today);
+  --color-ruler-mark: var(--ruler-mark);
   --color-on-week-done: var(--week-done-ink);
   --color-on-muscle-primary: var(--on-muscle-primary);
   --color-muscle-secondary: var(--muscle-secondary);
@@ -533,6 +761,7 @@
 /* ------------------------------------------------------------ Global usage */
 [data-theme] {
   color-scheme: var(--scheme);
+  font-synthesis: var(--font-synthesis);
 }
 
 body {
@@ -580,4 +809,10 @@ h2 {
 }
 .decor-plain {
   display: var(--decor-plain);
+}
+.decor-ring {
+  display: var(--decor-ring);
+}
+.decor-noring {
+  display: var(--decor-noring);
 }

@@ -28,7 +28,7 @@ export function BottomNav() {
               to={tab.to}
               aria-current={active ? 'page' : undefined}
               className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 text-[11px] font-semibold transition-colors ${
-                active ? 'text-accent-ink' : 'text-muted'
+                active ? 'text-nav-active' : 'text-muted'
               }`}
             >
               <span className="relative flex">

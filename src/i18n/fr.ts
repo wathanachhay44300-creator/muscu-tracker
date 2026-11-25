@@ -222,6 +222,8 @@ export const fr = {
     'khmer-dark_desc': 'Brun chaud, rouge et or',
     'fraise-chantilly': 'Fraise Chantilly',
     'fraise-chantilly_desc': 'Rose, crème et gourmandises',
+    'title-fight': 'Title Fight',
+    'title-fight_desc': 'Soirée de boxe : nuit, rouge et or',
   },
   clipboard: {
     saveError: 'Enregistrement impossible.',
@@ -661,5 +663,16 @@ export const fr = {
   },
   kawaii: {
     mochi: 'Mochi, la mascotte',
+  },
+  /** Wording that only a theme uses instead of the usual one (tThemed). */
+  themeWords: {
+    'title-fight': {
+      home: { newWorkout: 'Prochain combat', start: 'Monter sur le ring', free: 'Libre', latestRecord: 'Nouvelle ceinture' },
+      common: { freeSession: 'Libre', sessions_one: '{n} combat', sessions_other: '{n} combats' },
+      session: { rest: 'Entre les rounds' },
+    },
+  },
+  ring: {
+    tonight: 'Ce soir',
   },
 } as const

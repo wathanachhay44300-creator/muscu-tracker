@@ -15,17 +15,17 @@ export function SessionTimer({ startedAt, label }: { startedAt: number; label: s
   const elapsed = useElapsedTime(startedAt, 1000)
   return (
     <span
-      className="flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3"
+      className="flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-chrono-line bg-chrono px-3"
       role="timer"
       aria-label={label}
     >
       <PlainOnly>
-        <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+        <span className="h-2 w-2 rounded-full bg-chrono-dot" aria-hidden="true" />
       </PlainOnly>
       <KawaiiOnly>
         <HeartIcon className="h-3 w-3 text-accent" />
       </KawaiiOnly>
-      <span className="font-numbers text-base font-bold tabular-nums text-ink">{formatChrono(elapsed)}</span>
+      <span className="font-numbers text-base font-bold tabular-nums text-chrono-ink">{formatChrono(elapsed)}</span>
     </span>
   )
 }

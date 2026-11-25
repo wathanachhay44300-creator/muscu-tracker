@@ -9,6 +9,7 @@ export const THEMES = [
   { id: 'khmer-light', label: 'Khmer clair', description: 'Sable, rouge et or' },
   { id: 'khmer-dark', label: 'Khmer sombre', description: 'Brun chaud, rouge et or' },
   { id: 'fraise-chantilly', label: 'Fraise Chantilly', description: 'Rose, crème et gourmandises' },
+  { id: 'title-fight', label: 'Title Fight', description: 'Soirée de boxe : nuit, rouge et or' },
 ] as const
 
 export type ThemeId = (typeof THEMES)[number]['id']

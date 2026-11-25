@@ -8,6 +8,7 @@ import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { StartSessionPicker } from '../components/StartSessionPicker'
 import { SessionTimer } from '../components/SessionTimer'
 import { SessionRestTimer } from '../components/session/SessionRestTimer'
+import { RingOnly, RopeBand } from '../components/ring/Ring'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { useWorkoutDetail, useWorkoutIdForDate } from '../hooks/useWorkout'
 import { useRestTimer } from '../hooks/useRestTimer'
@@ -219,6 +220,9 @@ export function SeanceScreen() {
         className="fixed inset-x-0 z-30 border-t border-line bg-nav/95 backdrop-blur"
         style={{ bottom: navHeight }}
       >
+        <RingOnly>
+          <RopeBand thin className="opacity-85" />
+        </RingOnly>
         <div className="mx-auto max-w-md px-4">
           <SessionRestTimer timer={timer} restSec={restSec} onChangeRest={changeRest} />
         </div>

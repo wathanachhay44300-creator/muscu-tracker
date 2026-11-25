@@ -1,6 +1,8 @@
 import type { useRestTimer } from '../../hooks/useRestTimer'
 import { PauseIcon, PlayIcon, XIcon } from '../Icons'
-import { t } from '../../i18n'
+import { t, tThemed } from '../../i18n'
+import { useThemeId } from '../../hooks/useTheme'
+import { BellIcon, RingOnly } from '../ring/Ring'
 
 type RestTimer = ReturnType<typeof useRestTimer>
 
@@ -30,14 +32,21 @@ export function SessionRestTimer({
   restSec: number
   onChangeRest: (sec: number) => void
 }) {
+  const theme = useThemeId()
   const active = timer.hasTimer && !timer.isDone
   const progress = timer.totalMs > 0 ? 1 - timer.remainingMs / timer.totalMs : 0
 
   if (!active) {
     return (
       <div className="flex items-center gap-1.5 py-2">
-        <span className={`mr-1 text-xs font-semibold uppercase tracking-wide ${timer.isDone ? 'text-good-ink' : 'text-muted'}`}>
-          {timer.isDone ? t('session.restDone') : t('session.rest')}
+        <span className={`mr-1 flex items-center gap-1 text-xs font-semibold uppercase tracking-wide ${timer.isDone ? 'text-good-ink' : 'text-muted'}`}>
+          <RingOnly>
+            <BellIcon className="h-4 w-4 shrink-0 text-highlight" />
+          </RingOnly>
+          {/* The boxing wording ("Entre les rounds") goes on two short lines. */}
+          <span className={theme === 'title-fight' ? 'max-w-[4.5rem] leading-tight' : undefined}>
+            {timer.isDone ? t('session.restDone') : tThemed(theme, 'session.rest')}
+          </span>
         </span>
         {PRESETS.map((sec) => (
           <button
@@ -63,7 +72,7 @@ export function SessionRestTimer({
     <div className="py-2">
       <div className="flex items-center gap-2">
         <p
-          className={`font-numbers min-w-[5.5rem] text-[2.4rem] font-bold leading-none ${timer.isPaused ? 'text-muted' : 'text-ink'}`}
+          className={`font-numbers min-w-[5.5rem] text-[2.4rem] font-bold leading-none ${timer.isPaused ? 'text-muted' : 'text-timer-ink'}`}
           aria-live="off"
         >
           {formatCountdown(timer.remainingMs)}
@@ -95,7 +104,7 @@ export function SessionRestTimer({
         </div>
       </div>
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label={t('session.rest')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-        <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(100, progress * 100)}%`, transition: 'width 250ms linear' }} />
+        <div className="h-full rounded-full bg-timer-bar" style={{ width: `${Math.min(100, progress * 100)}%`, transition: 'width 250ms linear' }} />
       </div>
     </div>
   )

@@ -379,7 +379,7 @@ export function MiniRulerField({
       <span
         aria-hidden="true"
         className={`pointer-events-none absolute bottom-1 left-1/2 h-3 w-0.5 -translate-x-1/2 rounded-full ${
-          active ? 'bg-accent' : 'bg-muted'
+          active ? 'bg-ruler-mark' : 'bg-muted'
         }`}
       />
 

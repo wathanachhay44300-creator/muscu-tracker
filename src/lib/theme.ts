@@ -17,6 +17,22 @@ export function setStoredTheme(theme: ThemeId): void {
   }
 }
 
+/* The applied theme, shared with the screens that read it while rendering
+ * (theme-specific wording, see useThemeId). */
+let currentTheme: ThemeId | null = null
+const listeners = new Set<() => void>()
+
+export function getCurrentTheme(): ThemeId {
+  return currentTheme ?? getStoredTheme()
+}
+
+export function subscribeTheme(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
+
 /**
  * Applies a theme: the `data-theme` attribute (every color comes from it,
  * see src/theme/theme.css) and the browser/PWA chrome tint, read back from
@@ -25,6 +41,10 @@ export function setStoredTheme(theme: ThemeId): void {
 export function applyTheme(theme: ThemeId): void {
   const root = document.documentElement
   root.setAttribute('data-theme', theme)
+  if (currentTheme !== theme) {
+    currentTheme = theme
+    listeners.forEach((l) => l())
+  }
   const chrome = getComputedStyle(root).getPropertyValue('--bg').trim()
   if (chrome) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', chrome)
   // Home-screen app on iPhone: status bar style, read again when the app is reopened.
