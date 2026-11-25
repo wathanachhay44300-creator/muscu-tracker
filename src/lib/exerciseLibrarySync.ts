@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { EXERCISE_LIBRARY, LIBRARY_BY_SEED_ID, LIBRARY_VERSION } from '../data/exerciseLibrary'
-import type { Exercise, ExerciseLibraryState } from '../types'
+import type { AppPreferences, Exercise, ExerciseLibraryState, ExerciseNameLang } from '../types'
 
 const STATE_ID = 'exerciseLibrary' as const
 
@@ -32,6 +32,37 @@ export function nameKey(name: string): string {
  *   A name the user changed themselves is left untouched.
  */
 export async function syncExerciseLibrary(): Promise<void> {
+  await syncLibraryRows()
+  // The v2 step above renames to English: put back the language chosen in the settings.
+  await applyExerciseNameLanguage()
+}
+
+/**
+ * Shows the predefined exercises in the chosen language (Réglages > Noms des
+ * exercices). Only a row whose name is still its library name, in French or
+ * in English, is renamed: a name the user changed and the user's own
+ * exercises are never touched. Everything points to exercises by id, so
+ * history, programs and records follow.
+ */
+export async function applyExerciseNameLanguage(lang?: ExerciseNameLang): Promise<void> {
+  await db.transaction('rw', db.exercises, db.settings, async () => {
+    const prefs = (await db.settings.get('appPreferences')) as AppPreferences | undefined
+    const target: ExerciseNameLang = lang ?? prefs?.exerciseNameLang ?? 'en'
+    const rows = await db.exercises.toArray()
+    for (const row of rows) {
+      const entry = row.seedId ? LIBRARY_BY_SEED_ID.get(row.seedId) : undefined
+      if (!entry) continue
+      const wanted = target === 'fr' ? entry.frenchName : entry.name
+      if (row.name === wanted) continue
+      const key = nameKey(row.name)
+      if (key === nameKey(entry.name) || key === nameKey(entry.frenchName)) {
+        await db.exercises.update(row.id!, { name: wanted })
+      }
+    }
+  })
+}
+
+async function syncLibraryRows(): Promise<void> {
   await db.transaction('rw', db.exercises, db.settings, async () => {
     const state = (await db.settings.get(STATE_ID)) as ExerciseLibraryState | undefined
     if (state && state.version >= LIBRARY_VERSION) return

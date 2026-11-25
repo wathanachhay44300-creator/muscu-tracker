@@ -76,12 +76,14 @@ function indexOf(ex: Exercise): Indexed {
   idx = {
     name: tokenize(ex.name),
     extra: [
+      // Both names of a library exercise stay searchable, whichever language is shown.
+      ...(entry ? tokenize(entry.name) : []),
       ...(entry?.synonyms ?? []).flatMap(tokenize),
       ...(eq ? tokenize(EQUIPMENT_LABEL[eq]) : []),
       ...tokenize(ex.muscleGroup),
       ...muscles.flatMap(tokenize),
     ],
-    phrases: [nameKey(ex.name), ...(entry?.synonyms ?? []).map(nameKey)],
+    phrases: [nameKey(ex.name), ...(entry ? [nameKey(entry.name)] : []), ...(entry?.synonyms ?? []).map(nameKey)],
   }
   cache.set(ex, idx)
   return idx

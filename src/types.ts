@@ -192,7 +192,11 @@ export interface AppPreferences {
   goalRateKg: number
   /** Weight change per notch when dragging a weight value in a set (kg). */
   weightStep: number
+  /** Language of the predefined exercises' names, independent of the interface language (absent = English). */
+  exerciseNameLang?: ExerciseNameLang
 }
+
+export type ExerciseNameLang = 'fr' | 'en'
 
 export type WeightGoal = 'loss' | 'maintain' | 'gain'
 

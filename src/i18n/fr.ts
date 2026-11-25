@@ -64,6 +64,7 @@ export const fr = {
     language: 'Langue', languageHint: 'Choix enregistré sur cet appareil.',
     theme: 'Thème', themeHint: 'Couleurs et polices de toute l’app.',
     data: 'Données', dataHint: 'Export / import (JSON, CSV, Apple Santé)',
+    exerciseNames: 'Noms des exercices', exerciseNamesHint: 'Langue des noms des exercices de la bibliothèque, indépendante de la langue de l’app. Les noms que tu as modifiés et tes propres exercices ne changent pas. La recherche trouve les deux langues.',
     weightStep: 'Pas du poids', weightStepHint: 'Écart en kg entre deux graduations des cases de poids. Se règle aussi par exercice : appui long sur sa carte en séance.',
     haptics: 'Vibrations', hapticsHint: 'Série ajoutée, menu contextuel, fin du repos, fin de séance, record. Désactive tout d’un coup.',
     sound: 'Sons', soundHint: 'Jingle de record et bip de fin de repos.',

@@ -63,6 +63,7 @@ export const en: Dictionary = {
     language: 'Language', languageHint: 'Your choice is saved on this device.',
     theme: 'Theme', themeHint: 'App-wide colors and fonts.',
     data: 'Data', dataHint: 'Export / import (JSON, CSV, Apple Health)',
+    exerciseNames: 'Exercise names', exerciseNamesHint: 'Language of the library exercise names, separate from the app language. Names you changed and your own exercises stay as they are. Search finds both languages.',
     weightStep: 'Weight step', weightStepHint: 'Kg between two marks in the weight boxes. Can also be set per exercise: long-press its card during a workout.',
     haptics: 'Haptics', hapticsHint: 'Set added, context menu, rest timer, workout finished, personal record. Turn all vibrations off here.',
     sound: 'Sounds', soundHint: 'Record chime and rest timer alert.',

@@ -1,5 +1,6 @@
 import { db } from '../db'
-import type { AppPreferences, PlateCalculatorSettings, WeightGoal } from '../types'
+import type { AppPreferences, ExerciseNameLang, PlateCalculatorSettings, WeightGoal } from '../types'
+import { applyExerciseNameLanguage } from './exerciseLibrarySync'
 
 export const DEFAULT_BAR_WEIGHT = 20
 export const DEFAULT_PLATE_WEIGHTS = [20, 10, 5, 2.5, 1.25]
@@ -58,6 +59,12 @@ export async function setHapticsEnabled(hapticsEnabled: boolean): Promise<void> 
 export async function setWeightGoal(goal: WeightGoal, goalRateKg?: number): Promise<void> {
   const current = await getPreferences()
   await db.settings.put({ ...current, goal, goalRateKg: goalRateKg ?? current.goalRateKg })
+}
+
+export async function setExerciseNameLang(exerciseNameLang: ExerciseNameLang): Promise<void> {
+  const current = await getPreferences()
+  await db.settings.put({ ...current, exerciseNameLang })
+  await applyExerciseNameLanguage(exerciseNameLang)
 }
 
 export const WEIGHT_STEPS = [0.25, 0.5, 1, 1.25, 2, 2.5, 5] as const

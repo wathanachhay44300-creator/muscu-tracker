@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { usePreferences } from '../hooks/usePreferences'
-import { setHapticsEnabled, setSoundEnabled, setWeightGoal, setWeightStep, WEIGHT_STEPS } from '../lib/settingsActions'
+import { setExerciseNameLang, setHapticsEnabled, setSoundEnabled, setWeightGoal, setWeightStep, WEIGHT_STEPS } from '../lib/settingsActions'
 import { ClipboardImport } from '../components/ClipboardImport'
 import { todayISO } from '../lib/date'
 import { shortDate } from '../lib/tracking'
@@ -289,6 +289,35 @@ export function ReglagesScreen() {
           </span>
           <ChevronRightIcon className="h-5 w-5 text-faint" />
         </Link>
+
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+          <p className="font-semibold text-ink">{t('settings.exerciseNames')}</p>
+          <p className="mb-3 text-xs text-muted">{t('settings.exerciseNamesHint')}</p>
+          <div className="grid grid-cols-2 gap-1.5" role="radiogroup" aria-label={t('settings.exerciseNames')}>
+            {(
+              [
+                ['fr', 'Français'],
+                ['en', 'English'],
+              ] as const
+            ).map(([lang, label]) => {
+              const on = (preferences?.exerciseNameLang ?? 'en') === lang
+              return (
+                <button
+                  key={lang}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setExerciseNameLang(lang)}
+                  className={`min-h-11 rounded-xl text-sm font-bold ${
+                    on ? 'bg-accent text-on-accent' : 'bg-surface-3 text-ink-2 active:bg-surface-4'
+                  }`}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
           <p className="font-semibold text-ink">{t('settings.weightStep')}</p>
