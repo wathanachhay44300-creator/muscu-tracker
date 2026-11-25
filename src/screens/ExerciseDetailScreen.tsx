@@ -7,6 +7,7 @@ import { ProgressChart } from '../components/ProgressChart'
 import { formatDateShort, relativeDateLabel } from '../lib/date'
 import { formatReps, formatVolume, formatWeight, setVolume, totalVolume } from '../lib/stats'
 import { groupLabel, t } from '../i18n'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 type Metric = 'weight' | 'volume'
 
@@ -75,6 +76,7 @@ export function ExerciseDetailScreen() {
 
       {entries.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
+          <EmptyMochi className="mb-2" />
           <p className="text-muted">{t('exerciseDetail.noSets')}</p>
           <p className="mt-1 text-sm text-muted">
             {t('exerciseDetail.noSetsHint')}

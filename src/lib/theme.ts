@@ -27,4 +27,7 @@ export function applyTheme(theme: ThemeId): void {
   root.setAttribute('data-theme', theme)
   const chrome = getComputedStyle(root).getPropertyValue('--bg').trim()
   if (chrome) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', chrome)
+  // Home-screen app on iPhone: status bar style, read again when the app is reopened.
+  const statusBar = getComputedStyle(root).getPropertyValue('--status-bar').trim()
+  if (statusBar) document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content', statusBar)
 }

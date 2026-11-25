@@ -1,4 +1,5 @@
 import { useElapsedTime } from '../hooks/useElapsedTime'
+import { HeartIcon, KawaiiOnly, PlainOnly } from './kawaii/Kawaii'
 
 /** "12:05" or "1:02:05" */
 function formatChrono(ms: number): string {
@@ -18,7 +19,12 @@ export function SessionTimer({ startedAt, label }: { startedAt: number; label: s
       role="timer"
       aria-label={label}
     >
-      <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+      <PlainOnly>
+        <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+      </PlainOnly>
+      <KawaiiOnly>
+        <HeartIcon className="h-3 w-3 text-accent" />
+      </KawaiiOnly>
       <span className="font-numbers text-base font-bold tabular-nums text-ink">{formatChrono(elapsed)}</span>
     </span>
   )

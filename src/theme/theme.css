@@ -35,7 +35,11 @@
  *  - Type: --font-body / --font-title / --font-exercise / --font-numbers,
  *    title & exercise-name casing, tracking and sizes.
  *  - Shape: --radius-*, --shadow-*, --space-unit.
- *  - Decoration: --decor-angkor (display value of the Khmer motif).
+ *  - Decoration: --decor-angkor (display value of the Khmer motif);
+ *    --decor-kawaii / --decor-plain (`contents` or `none`: shows the kawaii
+ *    decorations, or the plain elements they replace); --tab-pill (behind
+ *    the active tab's icon); --week-done-bg / --week-done-ink (trained days
+ *    in "Cette semaine"); --status-bar (iPhone home-screen app: black or default).
  */
 
 /* ---------------------------------------------------------------- Iron Night
@@ -126,6 +130,12 @@
   --space-unit: 0.25rem;
 
   --decor-angkor: none;
+  --decor-kawaii: none;
+  --decor-plain: contents;
+  --status-bar: black;
+  --tab-pill: transparent;
+  --week-done-bg: var(--accent);
+  --week-done-ink: var(--on-accent);
 }
 
 /* --------------------------------------------------------------- Khmer clair */
@@ -214,6 +224,12 @@
   --space-unit: 0.25rem;
 
   --decor-angkor: block;
+  --decor-kawaii: none;
+  --decor-plain: contents;
+  --status-bar: black;
+  --tab-pill: transparent;
+  --week-done-bg: var(--accent);
+  --week-done-ink: var(--on-accent);
 }
 
 /* -------------------------------------------------------------- Khmer sombre */
@@ -302,6 +318,133 @@
   --space-unit: 0.25rem;
 
   --decor-angkor: block;
+  --decor-kawaii: none;
+  --decor-plain: contents;
+  --status-bar: black;
+  --tab-pill: transparent;
+  --week-done-bg: var(--accent);
+  --week-done-ink: var(--on-accent);
+}
+
+/* ---------------------------------------------------------- Fraise Chantilly
+ * Light, pink and sweet. Its decorations (hearts, sprinkles, Mochi the mascot)
+ * show only here, through --decor-kawaii; the --kawaii-* / --mochi-* colors
+ * are only read by those decorations, so other themes don't define them. */
+[data-theme='fraise-chantilly'] {
+  --scheme: light;
+
+  --bg: #fff4f6;
+  --surface: #ffffff;
+  --surface-2: #ffe6ee;
+  --surface-3: #ffd9e5;
+  --surface-4: #ffcadb;
+  --nav-bg: #ffffff;
+
+  --border: #f7cfdb;
+  --border-strong: #ebafc2;
+
+  --text: #4a2c34;
+  --text-2: #6e4a55;
+  /* #8a6470 in the brief: darkened so it reads at 4.5:1 on the pink fields too. */
+  --text-muted: #7e5864;
+  --text-faint: #c99aa8;
+
+  --accent: #f06c9b;
+  --accent-hover: #e85a8c;
+  --on-accent: #341a23;
+  --accent-ink: #b5154f;
+  --accent-soft: #ffe6ee;
+  --accent-line: #f06c9b;
+
+  --highlight: #f6b85a;
+  --highlight-ink: #9a5b00;
+  --highlight-soft: #fff1d9;
+  --highlight-line: #f6b85a;
+  --on-highlight: #4a2c34;
+
+  --good: #8fd3be;
+  --good-ink: #1b7054;
+  --good-soft: #e3f6ef;
+  --on-good: #12382b;
+
+  --danger: #c8324f;
+  --danger-ink: #b3263f;
+  --danger-soft: #fde3e8;
+  --danger-line: #f3a3b3;
+  --on-danger: #ffffff;
+
+  --progress: #1b7054;
+  --stable: #7e5864;
+  --decline: #a65418;
+
+  --knob: #ffffff;
+  /* Opaque: overlays apply their own opacity (bg-scrim/40). */
+  --scrim: #4a2c34;
+  --on-scrim: #ffffff;
+  --toast-bg: #4a2c34;
+  --toast-text: #fff4f6;
+  --toast-action: #ff9ec0;
+  --chart-1: #f06c9b;
+  --chart-2: #8fd3be;
+  --star-glow: rgb(246 184 90 / 0.45);
+  --muscle-primary: #c8324f;
+  --on-muscle-primary: #ffffff;
+  --muscle-secondary: #f4a3b5;
+  --muscle-idle: #f3dce3;
+  --body: #ebc9d2;
+
+  --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-title: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-exercise: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-numbers: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --title-weight: 700;
+  --title-case: none;
+  --title-tracking: normal;
+  --h1-size: 1.5rem;
+  --h2-size: 1.15rem;
+  --exercise-weight: 700;
+  --exercise-case: none;
+  --exercise-tracking: normal;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-field: 18px;
+  --radius-card: 26px;
+  --radius-hero: 28px;
+  --shadow-card: 0 0 0 1px var(--border), 0 6px 16px rgb(240 108 155 / 0.1);
+  --shadow-raised: 0 10px 24px rgb(240 108 155 / 0.28);
+  --shadow-overlay: 0 16px 36px rgb(74 44 52 / 0.22);
+  --space-unit: 0.25rem;
+
+  --decor-angkor: none;
+  --decor-kawaii: contents;
+  --decor-plain: none;
+  /* iPhone installed app: light status bar (dark text). */
+  --status-bar: default;
+  --tab-pill: var(--accent-soft);
+  --week-done-bg: var(--surface-2);
+  --week-done-ink: var(--kawaii-heart);
+
+  --kawaii-heart: #e04460;
+  --sprinkle-1: #ffe6ee;
+  --sprinkle-2: #f6b85a;
+  --sprinkle-3: #8fd3be;
+  --sprinkle-4: #ffffff;
+  --sprinkle-5: #c9b6f2;
+  --mochi-body: #ffe6ee;
+  --mochi-line: #e9a9bd;
+  --mochi-shadow: #f7cfdb;
+  --mochi-shine: #ffffff;
+  --mochi-ink: #4a2c34;
+  --mochi-cheek: #f06c9b;
+  --mochi-bar: #8a6470;
+  --mochi-plate: #f06c9b;
+  --mochi-leaf: #8fd3be;
+  --mochi-star: #f6b85a;
+  /* Mochi drawn on the pink hero card */
+  --mochi-line-on-accent: #ffffff;
+  --mochi-shadow-on-accent: rgb(217 85 127 / 0.5);
+  --mochi-plate-on-accent: #e04460;
 }
 
 /* =========================================================================
@@ -347,6 +490,8 @@
 
   --color-danger: var(--danger);
   --color-muscle-primary: var(--muscle-primary);
+  --color-week-done: var(--week-done-bg);
+  --color-on-week-done: var(--week-done-ink);
   --color-on-muscle-primary: var(--on-muscle-primary);
   --color-muscle-secondary: var(--muscle-secondary);
   --color-muscle-idle: var(--muscle-idle);
@@ -428,4 +573,11 @@ h2 {
 /* Theme-specific decorations (e.g. the Angkor motif) toggle through a token. */
 .decor-angkor {
   display: var(--decor-angkor);
+}
+/* Wrappers: `contents` lets their children lay out as if the wrapper weren't there. */
+.decor-kawaii {
+  display: var(--decor-kawaii);
+}
+.decor-plain {
+  display: var(--decor-plain);
 }

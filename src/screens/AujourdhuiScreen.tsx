@@ -11,6 +11,8 @@ import { formatKg } from '../lib/tracking'
 import { DuplicateSessionSheet } from '../components/DuplicateSessionSheet'
 import { CheckIcon, ChevronRightIcon, CopyIcon, PlayIcon, PlusIcon, SettingsIcon, StarIcon } from '../components/Icons'
 import { getLocale, t, tn } from '../i18n'
+import { HeartIcon, KawaiiOnly, PlainOnly, Sprinkles } from '../components/kawaii/Kawaii'
+import { Mochi } from '../components/kawaii/Mochi'
 
 function longDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number)
@@ -43,7 +45,12 @@ export function AujourdhuiScreen() {
       <header className="mb-5 flex items-start justify-between gap-3 pt-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted">{longDate(today)}</p>
-          <h1 className="mt-0.5 !text-[2rem] leading-none text-ink">{t('home.title')}</h1>
+          <h1 className="mt-0.5 !text-[2rem] leading-none text-ink">
+            {t('home.title')}
+            <KawaiiOnly>
+              <HeartIcon className="ml-1.5 inline-block h-5 w-5 align-[-0.05em] text-accent" />
+            </KawaiiOnly>
+          </h1>
         </div>
         <Link
           to="/reglages"
@@ -55,14 +62,24 @@ export function AujourdhuiScreen() {
       </header>
 
       {/* Hero: resume the session in progress, or start a new one. */}
-      <section className="mb-6 rounded-3xl bg-accent p-5 text-on-accent">
+      <section className="relative mb-6 overflow-hidden rounded-3xl bg-accent p-5 text-on-accent">
+        <KawaiiOnly>
+          <Sprinkles className="pointer-events-none absolute right-2 top-2 h-16 w-[88px]" />
+        </KawaiiOnly>
         {active ? (
           <>
-            <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.inProgress')}</p>
-            <p className="font-display mt-1 text-[1.6rem] leading-tight">{active.title}</p>
-            <p className="mt-1 text-sm font-medium opacity-80">
-              {tn('common.exercises', active.exerciseCount)} · {tn('common.sets', active.setCount)}
-            </p>
+            <div className="flex items-end gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.inProgress')}</p>
+                <p className="font-display mt-1 text-[1.6rem] leading-tight">{active.title}</p>
+                <p className="mt-1 text-sm font-medium opacity-80">
+                  {tn('common.exercises', active.exerciseCount)} · {tn('common.sets', active.setCount)}
+                </p>
+              </div>
+              <KawaiiOnly>
+                <Mochi size={76} onAccent className="relative -mb-1 shrink-0" />
+              </KawaiiOnly>
+            </div>
             <button
               type="button"
               onClick={() => navigate('/seance')}
@@ -74,11 +91,18 @@ export function AujourdhuiScreen() {
           </>
         ) : (
           <>
-            <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.newWorkout')}</p>
-            <p className="font-display mt-1 text-[1.6rem] leading-tight">{t('home.ready')}</p>
-            <p className="mt-1 text-sm font-medium opacity-80">
-              {t('home.freeOrProgram')}
-            </p>
+            <div className="flex items-end gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.newWorkout')}</p>
+                <p className="font-display mt-1 text-[1.6rem] leading-tight">{t('home.ready')}</p>
+                <p className="mt-1 text-sm font-medium opacity-80">
+                  {t('home.freeOrProgram')}
+                </p>
+              </div>
+              <KawaiiOnly>
+                <Mochi size={76} onAccent className="relative -mb-1 shrink-0" />
+              </KawaiiOnly>
+            </div>
             <button
               type="button"
               disabled={starting}
@@ -164,11 +188,20 @@ export function AujourdhuiScreen() {
                   </span>
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                      d.trained ? 'bg-accent text-on-accent' : 'bg-surface-3 text-faint'
+                      d.trained ? 'bg-week-done text-on-week-done' : 'bg-surface-3 text-faint'
                     } ${isToday ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface' : ''}`}
                     aria-label={`${new Date(`${d.date}T12:00:00`).toLocaleDateString(getLocale(), { weekday: 'long' })}${d.trained ? t('home.trained') : ''}`}
                   >
-                    {d.trained ? <CheckIcon className="h-4 w-4" strokeWidth={3} /> : null}
+                    {d.trained ? (
+                      <>
+                        <PlainOnly>
+                          <CheckIcon className="h-4 w-4" strokeWidth={3} />
+                        </PlainOnly>
+                        <KawaiiOnly>
+                          <HeartIcon className="h-4 w-4" />
+                        </KawaiiOnly>
+                      </>
+                    ) : null}
                   </span>
                 </div>
               )

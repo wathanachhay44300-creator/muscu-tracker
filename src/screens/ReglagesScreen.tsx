@@ -202,7 +202,7 @@ function ThemeCard() {
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
       <p className="font-semibold text-ink">{t('settings.theme')}</p>
       <p className="mb-3 text-xs text-muted">{t('settings.themeHint')}</p>
-      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t('settings.theme')}>
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('settings.theme')}>
         {THEMES.map((th) => {
           const on = theme === th.id
           return (

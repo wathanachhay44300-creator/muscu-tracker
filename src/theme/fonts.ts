@@ -13,3 +13,10 @@ import '@fontsource/inter/latin-700.css'
 // Khmer themes
 import '@fontsource/libre-baskerville/latin-700.css'
 import '@fontsource/manrope/latin-800.css'
+// Fraise Chantilly
+import '@fontsource/fredoka/latin-600.css'
+import '@fontsource/fredoka/latin-700.css'
+import '@fontsource/nunito/latin-400.css'
+import '@fontsource/nunito/latin-600.css'
+import '@fontsource/nunito/latin-700.css'
+import '@fontsource/nunito/latin-800.css'

@@ -7,6 +7,7 @@ import { formatReps, formatWeight } from '../lib/stats'
 import { formatInt, formatKg } from '../lib/tracking'
 import { ActivityIcon, ChartIcon, ChevronRightIcon, ScaleIcon, SearchIcon, StarIcon } from '../components/Icons'
 import { t, tn } from '../i18n'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 interface ExerciseProgress {
   id: number
@@ -146,6 +147,7 @@ export function ProgresScreen() {
 
       {exercises && exercises.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center text-sm text-muted">
+          <EmptyMochi className="mb-2" />
           {t('progress.empty')}
         </p>
       ) : (

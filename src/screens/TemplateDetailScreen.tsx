@@ -20,6 +20,7 @@ import { todayISO } from '../lib/date'
 import type { Exercise } from '../types'
 import type { TemplateExerciseWithDetails } from '../hooks/useTemplates'
 import { groupLabel, t, tn } from '../i18n'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 export function TemplateDetailScreen() {
   const { templateId } = useParams()
@@ -94,6 +95,7 @@ export function TemplateDetailScreen() {
 
       {exercises.length === 0 ? (
         <div className="mb-4 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+          <EmptyMochi className="mb-2" />
           <p className="text-muted">{t('editor.empty')}</p>
         </div>
       ) : (

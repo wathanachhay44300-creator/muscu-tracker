@@ -31,7 +31,17 @@ export function BottomNav() {
                 active ? 'text-accent-ink' : 'text-muted'
               }`}
             >
-              <tab.icon className="h-6 w-6" strokeWidth={active ? 2.4 : 1.9} />
+              <span className="relative flex">
+                {/* Pill behind the active icon; transparent unless the theme sets --tab-pill. */}
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -inset-x-3.5 -inset-y-0.5 rounded-full"
+                    style={{ background: 'var(--tab-pill)' }}
+                  />
+                )}
+                <tab.icon className="relative h-6 w-6" strokeWidth={active ? 2.4 : 1.9} />
+              </span>
               {t(`nav.${tab.key}` as 'nav.today' | 'nav.history' | 'nav.progress' | 'nav.exercises')}
             </NavLink>
           )

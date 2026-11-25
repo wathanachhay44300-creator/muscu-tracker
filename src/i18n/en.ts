@@ -219,6 +219,8 @@ export const en: Dictionary = {
     'khmer-light_desc': 'Sand, red and gold',
     'khmer-dark': 'Khmer dark',
     'khmer-dark_desc': 'Warm brown, red and gold',
+    'fraise-chantilly': 'Fraise Chantilly',
+    'fraise-chantilly_desc': 'Pink, cream and sweets',
   },
   clipboard: {
     saveError: 'Could not save.',
@@ -655,5 +657,8 @@ export const en: Dictionary = {
     fessiers: 'Glutes',
     moyen_fessier: 'Glute med',
     mollets: 'Calves',
+  },
+  kawaii: {
+    mochi: 'Mochi, the mascot',
   },
 }

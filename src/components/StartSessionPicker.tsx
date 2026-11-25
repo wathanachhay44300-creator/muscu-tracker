@@ -1,6 +1,8 @@
 import { CopyIcon, DumbbellIcon, PlayIcon } from './Icons'
 import type { TemplateSummary } from '../hooks/useTemplates'
 import { t, tn } from '../i18n'
+import { PlainOnly } from './kawaii/Kawaii'
+import { EmptyMochi } from './kawaii/Mochi'
 
 interface StartSessionPickerProps {
   templates: TemplateSummary[] | undefined
@@ -26,7 +28,10 @@ export function StartSessionPicker({
 
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
-      <DumbbellIcon className="h-10 w-10 text-faint" />
+      <PlainOnly>
+        <DumbbellIcon className="h-10 w-10 text-faint" />
+      </PlainOnly>
+      <EmptyMochi />
       <div>
         <p className="font-medium text-ink-2">{t('start.noSession')}</p>
         <p className="mt-1 text-sm text-muted">{hasTemplates ? t('start.pickProgram') : t('start.startHint')}</p>

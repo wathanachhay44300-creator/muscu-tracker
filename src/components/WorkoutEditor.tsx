@@ -20,6 +20,7 @@ import { WorkoutExerciseCard } from './WorkoutExerciseCard'
 import { CheckIcon, PlusIcon } from './Icons'
 import type { Exercise, WorkoutExerciseWithSets } from '../types'
 import { t, tn } from '../i18n'
+import { EmptyMochi } from './kawaii/Mochi'
 
 interface WorkoutEditorProps {
   workoutId: number
@@ -84,6 +85,7 @@ export function WorkoutEditor({ workoutId, hideSummary = false, onSetAdded }: Wo
 
       {exercises.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+          <EmptyMochi className="mb-2" />
           <p className="text-muted">{t('editor.empty')}</p>
           <p className="mt-1 text-sm text-muted">
             {t('editor.emptyHint')}

@@ -24,6 +24,9 @@ import { setHapticsEnabled, setSoundEnabled } from '../lib/settingsActions'
 import { playRecordChime } from '../lib/sound'
 import { hapticSuccess } from '../lib/haptics'
 import { generateBilanImage, shareOrDownloadImage } from '../lib/shareImage'
+import { KawaiiOnly } from '../components/kawaii/Kawaii'
+import { Mochi } from '../components/kawaii/Mochi'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 export function BilanScreen() {
   const { workoutId } = useParams()
@@ -132,6 +135,11 @@ export function BilanScreen() {
       </div>
 
       {hasPR && (
+        <KawaiiOnly>
+          <Mochi mood="wink" size={72} bounce decorative={false} className="mx-auto mb-1 block" />
+        </KawaiiOnly>
+      )}
+      {hasPR && (
         <div className="animate-pop-in mb-4 flex items-start gap-2.5 rounded-2xl border border-highlight-line bg-highlight-soft px-4 py-3.5">
           <StarIcon className="pr-star-glow mt-0.5 h-5 w-5 shrink-0 text-highlight" />
           <p className="text-sm font-semibold text-highlight-ink">
@@ -159,6 +167,7 @@ export function BilanScreen() {
 
       {exercises.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line-strong px-4 py-8 text-center text-sm text-muted">
+          <EmptyMochi className="mb-2" />
           {t('summary.noExercise')}
         </p>
       ) : (

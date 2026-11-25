@@ -3,6 +3,8 @@ import { formatDateShort, relativeDateLabel } from '../lib/date'
 import { formatVolume } from '../lib/stats'
 import { ChevronRightIcon, ClipboardIcon, XIcon } from './Icons'
 import { t, tn } from '../i18n'
+import { PlainOnly } from './kawaii/Kawaii'
+import { EmptyMochi } from './kawaii/Mochi'
 
 interface DuplicateSessionSheetProps {
   onSelect: (workoutId: number) => void
@@ -40,7 +42,10 @@ export function DuplicateSessionSheet({ onSelect, onClose }: DuplicateSessionShe
         <div className="flex-1 overflow-y-auto px-5 pb-5">
           {withExercises.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
-              <ClipboardIcon className="h-8 w-8 text-faint" />
+              <PlainOnly>
+                <ClipboardIcon className="h-8 w-8 text-faint" />
+              </PlainOnly>
+              <EmptyMochi />
               <p className="text-sm text-muted">{t('duplicate.empty')}</p>
             </div>
           ) : (

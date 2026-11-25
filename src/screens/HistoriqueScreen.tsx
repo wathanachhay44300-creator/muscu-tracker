@@ -18,6 +18,8 @@ import { formatVolume } from '../lib/stats'
 import { CalendarIcon, ChevronRightIcon, PencilIcon, XIcon } from '../components/Icons'
 import { HistoryTabs } from '../components/HistoryTabs'
 import { getLocale, t, tn } from '../i18n'
+import { PlainOnly } from '../components/kawaii/Kawaii'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 const PAGE_SIZE = 10
 
@@ -122,7 +124,10 @@ export function HistoriqueScreen() {
 
       {history && all.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
-          <CalendarIcon className="h-10 w-10 text-faint" />
+          <PlainOnly>
+            <CalendarIcon className="h-10 w-10 text-faint" />
+          </PlainOnly>
+          <EmptyMochi />
           <p className="font-medium text-ink-2">{t('history.empty')}</p>
           <p className="text-sm text-muted">{t('history.emptyHint')}</p>
         </div>
@@ -130,6 +135,7 @@ export function HistoriqueScreen() {
 
       {all.length > 0 && filtered.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-10 text-center">
+          <EmptyMochi className="mb-2" />
           <p className="font-medium text-ink-2">{t('history.noMatch')}</p>
           <button
             type="button"

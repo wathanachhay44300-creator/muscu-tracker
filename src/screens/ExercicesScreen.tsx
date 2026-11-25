@@ -28,6 +28,7 @@ import {
   TrashIcon,
   XIcon,
 } from '../components/Icons'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 export function ExercicesScreen() {
   const [creating, setCreating] = useState(false)
@@ -367,6 +368,7 @@ function ExerciseRow({
 export function NoResults({ query, onCreate }: { query: string; onCreate: () => void }) {
   return (
     <div className="mt-6 rounded-2xl border border-dashed border-line-strong px-4 py-8 text-center">
+      <EmptyMochi className="mb-2" />
       <p className="text-sm text-muted">{t('picker.noneFor', { q: query.trim() })}</p>
       <button
         type="button"

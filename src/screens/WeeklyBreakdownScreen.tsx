@@ -5,6 +5,7 @@ import { MuscleGroupBreakdown } from '../components/MuscleGroupBreakdown'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { addDays, addWeeks, formatDateShort, mondayOf, todayISO } from '../lib/date'
 import { t, tn } from '../i18n'
+import { EmptyMochi } from '../components/kawaii/Mochi'
 
 export function WeeklyBreakdownScreen() {
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayISO()))
@@ -59,6 +60,7 @@ export function WeeklyBreakdownScreen() {
 
       {items && totalSets === 0 ? (
         <div className="rounded-2xl border border-dashed border-line-strong px-4 py-14 text-center">
+          <EmptyMochi className="mb-2" />
           <p className="text-muted">{t('weekly.empty')}</p>
         </div>
       ) : (

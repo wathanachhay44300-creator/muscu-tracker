@@ -220,6 +220,8 @@ export const fr = {
     'khmer-light_desc': 'Sable, rouge et or',
     'khmer-dark': 'Khmer sombre',
     'khmer-dark_desc': 'Brun chaud, rouge et or',
+    'fraise-chantilly': 'Fraise Chantilly',
+    'fraise-chantilly_desc': 'Rose, crème et gourmandises',
   },
   clipboard: {
     saveError: 'Enregistrement impossible.',
@@ -656,5 +658,8 @@ export const fr = {
     fessiers: 'Fessiers',
     moyen_fessier: 'Moyen fessier',
     mollets: 'Mollets',
+  },
+  kawaii: {
+    mochi: 'Mochi, la mascotte',
   },
 } as const
