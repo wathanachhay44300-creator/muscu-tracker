@@ -159,7 +159,9 @@ export function ProgresScreen() {
               className={`flex min-h-14 items-center gap-3 px-4 py-2.5 active:bg-surface-2 ${i > 0 ? 'border-t border-line' : ''}`}
             >
               <div className="min-w-0 flex-1">
-                <p className="font-exercise truncate text-[1.05rem] text-ink">{e.name}</p>
+                <p className="font-exercise name-fit text-ink" style={{ fontSize: 'var(--list-name-size)' }}>
+                  {e.name}
+                </p>
                 <p className="text-xs text-muted">
                   {tn('common.sessions', e.sessions)} · {relativeDateLabel(e.lastDate).toLowerCase()}
                 </p>

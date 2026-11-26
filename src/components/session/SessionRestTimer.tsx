@@ -73,6 +73,7 @@ export function SessionRestTimer({
       <div className="flex items-center gap-2">
         <p
           className={`font-numbers min-w-[5.5rem] text-[2.4rem] font-bold leading-none ${timer.isPaused ? 'text-muted' : 'text-timer-ink'}`}
+          style={timer.isPaused ? undefined : { textShadow: 'var(--glow-text)' }}
           aria-live="off"
         >
           {formatCountdown(timer.remainingMs)}
@@ -104,7 +105,15 @@ export function SessionRestTimer({
         </div>
       </div>
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label={t('session.rest')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-        <div className="h-full rounded-full bg-timer-bar" style={{ width: `${Math.min(100, progress * 100)}%`, transition: 'width 250ms linear' }} />
+        <div
+          className="h-full rounded-full bg-timer-bar"
+          style={{
+            width: `${Math.min(100, progress * 100)}%`,
+            transition: 'width 250ms linear',
+            backgroundImage: 'var(--timer-bar-image)',
+            boxShadow: 'var(--glow-bar)',
+          }}
+        />
       </div>
     </div>
   )

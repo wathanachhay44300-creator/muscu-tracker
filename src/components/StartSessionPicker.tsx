@@ -50,7 +50,7 @@ export function StartSessionPicker({
               className="flex w-full items-center justify-between gap-3 rounded-2xl border border-line bg-surface px-4 py-3.5 active:bg-surface-2 disabled:opacity-50"
             >
               <div className="min-w-0">
-                <p className="font-exercise truncate text-[1.05rem] text-ink">{template.name}</p>
+                <p className="font-exercise name-fit text-[1.05rem] text-ink">{template.name}</p>
                 <p className="text-xs text-muted">{tn('common.exercises', exerciseCount)}</p>
               </div>
               <PlayIcon className="h-4 w-4 shrink-0 text-accent-ink" />
@@ -68,6 +68,7 @@ export function StartSessionPicker({
             ? 'mt-1 w-full rounded-2xl bg-surface-3 px-6 py-3 font-semibold text-ink-2 active:bg-surface-4 disabled:opacity-50'
             : 'mt-2 w-full rounded-2xl bg-accent px-6 py-3.5 font-bold text-on-accent active:bg-accent-hover disabled:opacity-50'
         }
+        style={hasTemplates ? undefined : { boxShadow: 'var(--glow-button)' }}
       >
         {tThemed(theme, 'common.freeSession')}
       </button>

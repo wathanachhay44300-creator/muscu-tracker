@@ -13,6 +13,7 @@ import { ExercicesScreen } from './screens/ExercicesScreen'
 import { ProgrammesScreen } from './screens/ProgrammesScreen'
 import { DumbbellIcon } from './components/Icons'
 import { RestTimerWidget } from './components/RestTimerWidget'
+import { JokerBackdrop } from './components/joker/Joker'
 import { SnackbarProvider } from './contexts/SnackbarContext'
 import { DeepLinkImporter } from './components/DeepLinkImporter'
 import { I18nProvider } from './i18n/I18nProvider'
@@ -50,7 +51,8 @@ export default function App() {
       {/* Re-mounts the screens when the language changes (no reload, route kept). */}
       <I18nProvider>
       <SnackbarProvider>
-        <div className="app-main min-h-dvh bg-page">
+        <div className="app-main min-h-dvh bg-app">
+          <JokerBackdrop />
           <ResumeSessionBanner />
           <Suspense fallback={null}>
           <Routes>

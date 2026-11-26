@@ -48,6 +48,15 @@
  *    --hero-title-size (home card), --chrono-bg / -line / -ink / -dot,
  *    --timer-ink / --timer-bar (rest timer), --week-today, --ruler-mark
  *    (centre mark of a box being set), --font-synthesis.
+ *  - Joker Aura additions, same idea: --decor-joker / --decor-nojoker,
+ *    --app-bg (main container; transparent lets fixed halos show),
+ *    --add-set, --record-title / --record-line, --home-title-size,
+ *    --field-number-size, --ruler-mark-idle / --ruler-tick-active,
+ *    --hero-image / --hero-shadow / --hero-pad, --timer-bar-image and the
+ *    glows --glow-button / -field / -chrono / -text / -bar / -icon
+ *    (`none` everywhere but the themes that glow), --name-display /
+ *    --name-lines / --name-space (see .name-fit), --list-name-size (names
+ *    beside a record pill, "Records par exercice").
  */
 
 /* ---------------------------------------------------------------- Iron Night
@@ -159,6 +168,30 @@
   --week-today: var(--accent);
   --ruler-mark: var(--accent);
   --font-synthesis: weight style small-caps;
+  --decor-joker: none;
+  --decor-nojoker: contents;
+  --app-bg: var(--bg);
+  --add-set: var(--link);
+  --record-title: var(--text);
+  --record-line: var(--highlight-line);
+  --home-title-size: 2rem;
+  --field-number-size: 1.6rem;
+  --ruler-mark-idle: var(--text-muted);
+  --ruler-tick-active: var(--text-faint);
+  --hero-image: none;
+  --hero-shadow: none;
+  --hero-pad: 1.25rem;
+  --timer-bar-image: none;
+  --glow-button: none;
+  --glow-field: none;
+  --glow-chrono: none;
+  --glow-text: none;
+  --glow-bar: none;
+  --glow-icon: none;
+  --name-display: block;
+  --name-lines: none;
+  --name-space: nowrap;
+  --list-name-size: 1.05rem;
   --tab-pill: transparent;
   --week-done-bg: var(--accent);
   --week-done-ink: var(--on-accent);
@@ -271,6 +304,30 @@
   --week-today: var(--accent);
   --ruler-mark: var(--accent);
   --font-synthesis: weight style small-caps;
+  --decor-joker: none;
+  --decor-nojoker: contents;
+  --app-bg: var(--bg);
+  --add-set: var(--link);
+  --record-title: var(--text);
+  --record-line: var(--highlight-line);
+  --home-title-size: 2rem;
+  --field-number-size: 1.6rem;
+  --ruler-mark-idle: var(--text-muted);
+  --ruler-tick-active: var(--text-faint);
+  --hero-image: none;
+  --hero-shadow: none;
+  --hero-pad: 1.25rem;
+  --timer-bar-image: none;
+  --glow-button: none;
+  --glow-field: none;
+  --glow-chrono: none;
+  --glow-text: none;
+  --glow-bar: none;
+  --glow-icon: none;
+  --name-display: block;
+  --name-lines: none;
+  --name-space: nowrap;
+  --list-name-size: 1.05rem;
   --tab-pill: transparent;
   --week-done-bg: var(--accent);
   --week-done-ink: var(--on-accent);
@@ -383,6 +440,30 @@
   --week-today: var(--accent);
   --ruler-mark: var(--accent);
   --font-synthesis: weight style small-caps;
+  --decor-joker: none;
+  --decor-nojoker: contents;
+  --app-bg: var(--bg);
+  --add-set: var(--link);
+  --record-title: var(--text);
+  --record-line: var(--highlight-line);
+  --home-title-size: 2rem;
+  --field-number-size: 1.6rem;
+  --ruler-mark-idle: var(--text-muted);
+  --ruler-tick-active: var(--text-faint);
+  --hero-image: none;
+  --hero-shadow: none;
+  --hero-pad: 1.25rem;
+  --timer-bar-image: none;
+  --glow-button: none;
+  --glow-field: none;
+  --glow-chrono: none;
+  --glow-text: none;
+  --glow-bar: none;
+  --glow-icon: none;
+  --name-display: block;
+  --name-lines: none;
+  --name-space: nowrap;
+  --list-name-size: 1.05rem;
   --tab-pill: transparent;
   --week-done-bg: var(--accent);
   --week-done-ink: var(--on-accent);
@@ -501,6 +582,30 @@
   --week-today: var(--accent);
   --ruler-mark: var(--accent);
   --font-synthesis: weight style small-caps;
+  --decor-joker: none;
+  --decor-nojoker: contents;
+  --app-bg: var(--bg);
+  --add-set: var(--link);
+  --record-title: var(--text);
+  --record-line: var(--highlight-line);
+  --home-title-size: 2rem;
+  --field-number-size: 1.6rem;
+  --ruler-mark-idle: var(--text-muted);
+  --ruler-tick-active: var(--text-faint);
+  --hero-image: none;
+  --hero-shadow: none;
+  --hero-pad: 1.25rem;
+  --timer-bar-image: none;
+  --glow-button: none;
+  --glow-field: none;
+  --glow-chrono: none;
+  --glow-text: none;
+  --glow-bar: none;
+  --glow-icon: none;
+  --name-display: block;
+  --name-lines: none;
+  --name-space: nowrap;
+  --list-name-size: 1.05rem;
   --tab-pill: var(--accent-soft);
   --week-done-bg: var(--surface-2);
   --week-done-ink: var(--kawaii-heart);
@@ -647,6 +752,30 @@
   --week-today: var(--highlight);
   --ruler-mark: var(--highlight);
   --font-synthesis: style small-caps;
+  --decor-joker: none;
+  --decor-nojoker: contents;
+  --app-bg: var(--bg);
+  --add-set: var(--link);
+  --record-title: var(--text);
+  --record-line: var(--highlight-line);
+  --home-title-size: 2rem;
+  --field-number-size: 1.6rem;
+  --ruler-mark-idle: var(--text-muted);
+  --ruler-tick-active: var(--text-faint);
+  --hero-image: none;
+  --hero-shadow: none;
+  --hero-pad: 1.25rem;
+  --timer-bar-image: none;
+  --glow-button: none;
+  --glow-field: none;
+  --glow-chrono: none;
+  --glow-text: none;
+  --glow-bar: none;
+  --glow-icon: none;
+  --name-display: block;
+  --name-lines: none;
+  --name-space: nowrap;
+  --list-name-size: 1.05rem;
 
   --rope-red: #d7263d;
   --rope-white: #f4f4f6;
@@ -659,6 +788,167 @@
   --belt-strap: #2a3550;
   --belt-gold: #f2c14e;
   --belt-engrave: #8a6514;
+}
+
+/* ---------------------------------------------------------------- Joker Aura
+ * Black night with a glowing magenta / violet aura and playing cards.
+ * Magenta is for actions (main button, box being set, active tab, links),
+ * violet for landmarks and time (chrono, rest timer, ruler mark, today,
+ * "+ Ajouter une série"). The glows (--glow-*) and the card decorations
+ * (--decor-joker) show only here; --joker-* colors are only read by them. */
+[data-theme='joker-aura'] {
+  --scheme: dark;
+
+  --bg: #0b0810;
+  --surface: #15101d;
+  --surface-2: #1e1729;
+  --surface-3: #2a2036;
+  --surface-4: #352a44;
+  --nav-bg: #08060c;
+
+  --border: #2a2036;
+  --border-strong: #3a2e4a;
+
+  --text: #f5f0fa;
+  --text-2: #d8cce6;
+  --text-muted: #a89bb8;
+  --text-faint: #4c3f5e;
+
+  --accent: #ff2e93;
+  --accent-hover: #ff4fa6;
+  --on-accent: #14060d;
+  --accent-ink: #ff6bb5;
+  --accent-soft: #2a1030;
+  --accent-line: #ff2e93;
+
+  --highlight: #8b5cf6;
+  --highlight-ink: #c9a8ff;
+  --highlight-soft: #211733;
+  --highlight-line: #8b5cf6;
+  --on-highlight: #0b0810;
+
+  --good: #3dd68c;
+  --good-ink: #5be3a0;
+  --good-soft: #12301f;
+  --on-good: #04140b;
+
+  /* #e5484d in the brief: darkened so white text on it reads at 4.5:1. */
+  --danger: #d13a40;
+  --danger-ink: #ff8589;
+  --danger-soft: #3a1518;
+  --danger-line: #7a2a30;
+  --on-danger: #ffffff;
+
+  --progress: #5be3a0;
+  --stable: #a89bb8;
+  --decline: #ff9f5a;
+
+  --knob: #f5f0fa;
+  /* Opaque: overlays apply their own opacity (bg-scrim/40). */
+  --scrim: #050308;
+  --on-scrim: #ffffff;
+  --toast-bg: #f5f0fa;
+  --toast-text: #0b0810;
+  /* #e0157a in the brief: darkened to read at 4.5:1 on the light toast. */
+  --toast-action: #c9106a;
+  --chart-1: #ff2e93;
+  --chart-2: #8b5cf6;
+  --star-glow: rgb(255 46 147 / 0.45);
+  --muscle-primary: #ff2e93;
+  --on-muscle-primary: #0b0810;
+  --muscle-secondary: #7a45c8;
+  --muscle-idle: #2a2036;
+  /* #1e1729 in the brief: that's the diagram frame's color, the silhouette vanished into it. */
+  --body: #110c18;
+
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-title: 'Unbounded', 'Inter', system-ui, sans-serif;
+  --font-exercise: 'Unbounded', 'Inter', system-ui, sans-serif;
+  --font-numbers: 'Unbounded', 'Inter', system-ui, sans-serif;
+  --title-weight: 800;
+  --title-case: none;
+  --title-tracking: normal;
+  /* Unbounded is wide: a little smaller so titles and names don't overflow. */
+  --h1-size: 1.4rem;
+  --h2-size: 1.05rem;
+  --exercise-weight: 700;
+  --exercise-case: none;
+  --exercise-tracking: normal;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-field: 14px;
+  --radius-card: 20px;
+  --radius-hero: 22px;
+  --shadow-card: inset 0 0 0 1px var(--border);
+  --shadow-raised: 0 4px 14px rgb(0 0 0 / 0.45);
+  --shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.6);
+  --space-unit: 0.25rem;
+
+  --decor-angkor: none;
+  --decor-kawaii: none;
+  --decor-plain: contents;
+  --tab-pill: transparent;
+  --week-done-bg: var(--accent);
+  --week-done-ink: var(--on-accent);
+  --status-bar: black;
+  --decor-ring: none;
+  --decor-noring: contents;
+  --nav-active: var(--accent-ink);
+  --link: var(--accent-ink);
+  --hero-bg: #120b19;
+  --on-hero: var(--text);
+  --hero-button: rgb(139 92 246 / 0.18);
+  --on-hero-button: #e7dcff;
+  --hero-title-size: 1.5rem;
+  --chrono-bg: var(--surface);
+  --chrono-line: var(--border-strong);
+  --chrono-ink: var(--highlight-ink);
+  --chrono-dot: var(--accent);
+  --timer-ink: var(--highlight-ink);
+  --timer-bar: var(--highlight);
+  --week-today: var(--highlight);
+  --ruler-mark: #c9a8ff;
+  --font-synthesis: weight style small-caps;
+  --decor-joker: contents;
+  --decor-nojoker: none;
+  /* Transparent so the aura halos behind the screens show through. */
+  --app-bg: transparent;
+  --add-set: var(--highlight-ink);
+  --record-title: var(--highlight-ink);
+  --record-line: var(--highlight-line);
+  --home-title-size: 1.55rem;
+  --field-number-size: 1.25rem;
+  --ruler-mark-idle: var(--highlight);
+  --ruler-tick-active: rgb(255 46 147 / 0.8);
+  --hero-image: linear-gradient(160deg, #1e1029 0%, #120b19 60%);
+  --hero-shadow: inset 0 0 0 1px rgb(255 46 147 / 0.45), 0 0 34px rgb(139 92 246 / 0.35);
+  --hero-pad: 1.625rem;
+  --timer-bar-image: linear-gradient(to right, #8b5cf6, #ff2e93);
+  --glow-button: 0 0 22px rgb(255 46 147 / 0.55);
+  --glow-field: inset 0 0 0 1.5px #ff2e93, 0 0 18px rgb(255 46 147 / 0.4);
+  --glow-chrono: inset 0 0 0 1px rgb(139 92 246 / 0.6), 0 0 14px rgb(139 92 246 / 0.35);
+  --glow-text: 0 0 12px rgb(139 92 246 / 0.8);
+  --glow-bar: 0 0 10px rgb(255 46 147 / 0.7);
+  --glow-icon: drop-shadow(0 0 6px rgb(255 46 147 / 0.8));
+  /* Long exercise names go on two lines instead of being cut (Unbounded is wide). */
+  --name-display: -webkit-box;
+  --name-lines: 2;
+  --name-space: normal;
+  --list-name-size: 0.9rem;
+
+  --joker-magenta: #ff2e93;
+  --joker-violet: #8b5cf6;
+  --joker-card: #f5f0fa;
+  --joker-suit-dark: #0b0810;
+  --joker-suit-red: #e0157a;
+  --joker-watermark: rgb(139 92 246 / 0.22);
+  --joker-card-glow: 0 0 12px rgb(255 46 147 / 0.45);
+  --joker-card-glow-violet: 0 0 14px rgb(139 92 246 / 0.55);
+  --joker-today-bg: rgb(139 92 246 / 0.12);
+  --joker-halo-violet: radial-gradient(circle, rgb(139 92 246 / 0.3), transparent 60%);
+  --joker-halo-magenta: radial-gradient(circle, rgb(255 46 147 / 0.22), transparent 60%);
+  --joker-halo-session: radial-gradient(circle, rgb(139 92 246 / 0.22), transparent 60%);
 }
 
 /* =========================================================================
@@ -719,6 +1009,11 @@
   --color-timer-bar: var(--timer-bar);
   --color-week-today: var(--week-today);
   --color-ruler-mark: var(--ruler-mark);
+  --color-ruler-mark-idle: var(--ruler-mark-idle);
+  --color-app: var(--app-bg);
+  --color-add-set: var(--add-set);
+  --color-record-title: var(--record-title);
+  --color-record-line: var(--record-line);
   --color-on-week-done: var(--week-done-ink);
   --color-on-muscle-primary: var(--on-muscle-primary);
   --color-muscle-secondary: var(--muscle-secondary);
@@ -815,4 +1110,21 @@ h2 {
 }
 .decor-noring {
   display: var(--decor-noring);
+}
+/* Exercise names that must fit one row: exactly `truncate` by default; a
+ * theme can let them take two lines instead (--name-display / -lines / -space). */
+.name-fit {
+  overflow: hidden;
+  display: var(--name-display);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--name-lines);
+  line-clamp: var(--name-lines);
+  white-space: var(--name-space);
+  text-overflow: ellipsis;
+}
+.decor-joker {
+  display: var(--decor-joker);
+}
+.decor-nojoker {
+  display: var(--decor-nojoker);
 }

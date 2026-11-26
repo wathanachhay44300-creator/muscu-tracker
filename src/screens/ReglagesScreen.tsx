@@ -9,6 +9,7 @@ import type { WeightGoal } from '../types'
 import { hapticLight } from '../lib/haptics'
 import { useTheme } from '../hooks/useTheme'
 import { THEMES } from '../theme/themes'
+import { JokerOnly, MiniCard } from '../components/joker/Joker'
 import {
   getNotificationSupport,
   requestNotificationPermission,
@@ -215,7 +216,10 @@ function ThemeCard() {
               className={`overflow-hidden rounded-xl border-2 text-left ${on ? 'border-accent' : 'border-line'}`}
             >
               <div data-theme={th.id} className="bg-page p-2">
-                <div className="rounded-lg bg-surface p-2">
+                <div className="relative rounded-lg bg-surface p-2">
+                  <JokerOnly>
+                    <MiniCard suit="spade" glow="magenta" className="absolute right-1.5 top-1.5 h-6 w-[18px]" />
+                  </JokerOnly>
                   <p className="font-display text-[12px] leading-tight text-ink">{tDynamic(`theme.${th.id}`)}</p>
                   <div className="mt-1.5 flex items-center gap-1">
                     <span className="h-3 w-6 rounded-full bg-accent" />

@@ -40,7 +40,11 @@ export function BottomNav() {
                     style={{ background: 'var(--tab-pill)' }}
                   />
                 )}
-                <tab.icon className="relative h-6 w-6" strokeWidth={active ? 2.4 : 1.9} />
+                <tab.icon
+                  className="relative h-6 w-6"
+                  strokeWidth={active ? 2.4 : 1.9}
+                  style={active ? { filter: 'var(--glow-icon)' } : undefined}
+                />
               </span>
               {t(`nav.${tab.key}` as 'nav.today' | 'nav.history' | 'nav.progress' | 'nav.exercises')}
             </NavLink>

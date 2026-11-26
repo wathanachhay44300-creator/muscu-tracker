@@ -26,3 +26,7 @@ import '@fontsource/archivo/latin-500.css'
 import '@fontsource/archivo/latin-600.css'
 import '@fontsource/archivo/latin-700.css'
 import '@fontsource/archivo/latin-800.css'
+// Joker Aura (Inter is shared with Iron Night above)
+import '@fontsource/unbounded/latin-600.css'
+import '@fontsource/unbounded/latin-700.css'
+import '@fontsource/unbounded/latin-800.css'

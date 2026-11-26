@@ -223,6 +223,8 @@ export const en: Dictionary = {
     'fraise-chantilly_desc': 'Pink, cream and sweets',
     'title-fight': 'Title Fight',
     'title-fight_desc': 'Fight night: navy, red and gold',
+    'joker-aura': 'Joker Aura',
+    'joker-aura_desc': 'Black night, magenta and violet',
   },
   clipboard: {
     saveError: 'Could not save.',
@@ -670,8 +672,14 @@ export const en: Dictionary = {
       common: { freeSession: 'Free', sessions_one: '{n} fight', sessions_other: '{n} fights' },
       session: { rest: 'Between rounds' },
     },
+    'joker-aura': {
+      home: { latestRecord: 'Trump card · last record' },
+    },
   },
   ring: {
     tonight: 'Tonight',
+  },
+  joker: {
+    hand: 'Each workout flips a card: 4 in a week = a full hand.',
   },
 }

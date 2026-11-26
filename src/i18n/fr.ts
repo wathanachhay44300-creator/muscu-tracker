@@ -224,6 +224,8 @@ export const fr = {
     'fraise-chantilly_desc': 'Rose, crème et gourmandises',
     'title-fight': 'Title Fight',
     'title-fight_desc': 'Soirée de boxe : nuit, rouge et or',
+    'joker-aura': 'Joker Aura',
+    'joker-aura_desc': 'Nuit noire, magenta et violet',
   },
   clipboard: {
     saveError: 'Enregistrement impossible.',
@@ -671,8 +673,14 @@ export const fr = {
       common: { freeSession: 'Libre', sessions_one: '{n} combat', sessions_other: '{n} combats' },
       session: { rest: 'Entre les rounds' },
     },
+    'joker-aura': {
+      home: { latestRecord: 'Carte maîtresse · dernier record' },
+    },
   },
   ring: {
     tonight: 'Ce soir',
+  },
+  joker: {
+    hand: 'Chaque séance retourne une carte : 4 dans la semaine = une main complète.',
   },
 } as const

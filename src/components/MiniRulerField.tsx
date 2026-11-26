@@ -310,7 +310,7 @@ export function MiniRulerField({
       className={`relative h-14 select-none overflow-hidden rounded-xl border ${
         active ? 'border-accent bg-accent-soft' : 'border-transparent bg-surface-2'
       } ${className}`}
-      style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+      style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none', boxShadow: active ? 'var(--glow-field)' : undefined }}
     >
       {/* The scrolling ruler covers the whole box: a sideways swipe anywhere moves it. */}
       <div
@@ -347,7 +347,7 @@ export function MiniRulerField({
           aria-hidden="true"
           style={{
             width: count * GAP + 1,
-            backgroundImage: 'linear-gradient(to right, var(--text-faint) 1px, transparent 1px)',
+            backgroundImage: `linear-gradient(to right, ${active ? 'var(--ruler-tick-active)' : 'var(--text-faint)'} 1px, transparent 1px)`,
             backgroundSize: `${GAP}px 8px`,
             backgroundRepeat: 'repeat-x',
             backgroundPosition: '0 calc(100% - 5px)',
@@ -363,14 +363,15 @@ export function MiniRulerField({
       {/* Number + unit (display only) and the fixed centre mark */}
       <div className="pointer-events-none absolute inset-x-0 top-1 flex items-baseline justify-center gap-1">
         <span
-          className={`font-numbers text-[1.6rem] font-bold leading-none ${active ? 'text-accent-ink' : 'text-ink'} ${
+          className={`font-numbers font-bold leading-none ${active ? 'text-accent-ink' : 'text-ink'} ${
             editing ? 'invisible' : ''
           }`}
-          style={
-            bump && !editing
+          style={{
+            fontSize: 'var(--field-number-size)',
+            ...(bump && !editing
               ? { animation: `${bump.n % 2 ? 'num-bump-a' : 'num-bump-b'} 170ms ease-out`, ['--bump-dir' as string]: String(bump.dir) }
-              : undefined
-          }
+              : {}),
+          }}
         >
           {formatDecimal(current)}
         </span>
@@ -379,7 +380,7 @@ export function MiniRulerField({
       <span
         aria-hidden="true"
         className={`pointer-events-none absolute bottom-1 left-1/2 h-3 w-0.5 -translate-x-1/2 rounded-full ${
-          active ? 'bg-ruler-mark' : 'bg-muted'
+          active ? 'bg-ruler-mark' : 'bg-ruler-mark-idle'
         }`}
       />
 
@@ -444,9 +445,10 @@ export function MiniRulerField({
         autoComplete="off"
         aria-label={label}
         tabIndex={-1}
-        className={`font-numbers absolute inset-x-1 top-1 h-8 rounded-lg bg-transparent text-center text-[1.6rem] font-bold leading-none text-accent-ink outline-none ${
+        className={`font-numbers absolute inset-x-1 top-1 h-8 rounded-lg bg-transparent text-center font-bold leading-none text-accent-ink outline-none ${
           editing ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
+        style={{ fontSize: 'var(--field-number-size)' }}
       />
     </div>
   )

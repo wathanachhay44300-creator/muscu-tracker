@@ -121,7 +121,7 @@ export function TemplateDetailScreen() {
                   <GripIcon className="h-5 w-5" />
                 </button>
                 <div className="min-w-0">
-                  <p className="font-exercise truncate text-ink">{te.exercise.name}</p>
+                  <p className="font-exercise name-fit text-ink">{te.exercise.name}</p>
                   <p className="text-xs text-muted">{groupLabel(te.exercise.muscleGroup)}</p>
                 </div>
               </div>

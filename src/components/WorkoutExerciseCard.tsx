@@ -268,7 +268,7 @@ export const WorkoutExerciseCard = memo(function WorkoutExerciseCard({
         data-no-long-press
         data-no-swipe
         onClick={() => handleAddSet()}
-        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-surface-2 py-2.5 text-sm font-semibold text-link active:bg-surface-3"
+        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-surface-2 py-2.5 text-sm font-semibold text-add-set active:bg-surface-3"
       >
         <PlusIcon className="h-4 w-4" />
         {t('card.addSet')}
