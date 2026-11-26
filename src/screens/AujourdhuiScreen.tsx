@@ -15,6 +15,7 @@ import { useThemeId } from '../hooks/useTheme'
 import { BeltIcon, GloveIcon, NoRing, RingOnly, RopeBand, Spotlight } from '../components/ring/Ring'
 import { JokerHeroDecor, JokerOnly, MiniCard, NoJoker, SuitIcon } from '../components/joker/Joker'
 import { PROGRAM_SUITS } from '../lib/cards'
+import { CoinIcon, DragonHeroDecor, DragonOnly, NoDragon, RecordTrophyIcon } from '../components/dragon/Dragon'
 import { HeartIcon, KawaiiOnly, PlainOnly, Sprinkles } from '../components/kawaii/Kawaii'
 import { Mochi } from '../components/kawaii/Mochi'
 
@@ -72,6 +73,7 @@ export function AujourdhuiScreen() {
         style={{ backgroundImage: 'var(--hero-image)', boxShadow: 'var(--hero-shadow)', padding: 'var(--hero-pad)' }}
       >
         <JokerHeroDecor />
+        <DragonHeroDecor />
         <RingOnly>
           <span className="pointer-events-none absolute inset-0 -z-10 block">
             <Spotlight />
@@ -85,9 +87,12 @@ export function AujourdhuiScreen() {
           <>
             <div className="flex items-end gap-2">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-wide opacity-75">{t('home.inProgress')}</p>
+                <p
+                  className="text-xs font-bold uppercase tracking-wide"
+                  style={{ color: 'var(--hero-label)', opacity: 'var(--hero-label-opacity)' }}
+                >{t('home.inProgress')}</p>
                 <p className="font-display mt-1 leading-tight" style={{ fontSize: 'var(--hero-title-size)' }}>{active.title}</p>
-                <p className="mt-1 text-sm font-medium opacity-80">
+                <p className="mt-1 text-sm font-medium" style={{ color: 'var(--hero-small)', opacity: 'var(--hero-small-opacity)' }}>
                   {tn('common.exercises', active.exerciseCount)} · {tn('common.sets', active.setCount)}
                 </p>
               </div>
@@ -99,7 +104,7 @@ export function AujourdhuiScreen() {
               type="button"
               onClick={() => navigate('/seance')}
               className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-hero-button text-base font-bold text-on-hero-button active:opacity-90"
-              style={{ boxShadow: 'var(--glow-button)' }}
+              style={{ boxShadow: 'var(--glow-button)', width: 'calc(100% - var(--hero-actions-end))' }}
             >
               <PlayIcon className="h-4 w-4" />
               {t('home.resume')}
@@ -110,7 +115,10 @@ export function AujourdhuiScreen() {
             <div className="flex items-end gap-2">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-xs font-bold uppercase tracking-wide opacity-75">{tThemed(theme, 'home.newWorkout')}</p>
+                  <p
+                  className="text-xs font-bold uppercase tracking-wide"
+                  style={{ color: 'var(--hero-label)', opacity: 'var(--hero-label-opacity)' }}
+                >{tThemed(theme, 'home.newWorkout')}</p>
                   <RingOnly>
                     <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-on-accent">
                       {t('ring.tonight')}
@@ -118,7 +126,7 @@ export function AujourdhuiScreen() {
                   </RingOnly>
                 </div>
                 <p className="font-display mt-1 leading-tight" style={{ fontSize: 'var(--hero-title-size)' }}>{t('home.ready')}</p>
-                <p className="mt-1 text-sm font-medium opacity-80">
+                <p className="mt-1 text-sm font-medium" style={{ color: 'var(--hero-small)', opacity: 'var(--hero-small-opacity)' }}>
                   {t('home.freeOrProgram')}
                 </p>
               </div>
@@ -131,7 +139,7 @@ export function AujourdhuiScreen() {
               disabled={starting}
               onClick={() => start(() => getOrCreateWorkout(today))}
               className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-hero-button text-base font-bold text-on-hero-button active:opacity-90 disabled:opacity-60"
-              style={{ boxShadow: 'var(--glow-button)' }}
+              style={{ boxShadow: 'var(--glow-button)', width: 'calc(100% - var(--hero-actions-end))' }}
             >
               <PlayIcon className="h-4 w-4" />
               {tThemed(theme, 'home.free')}
@@ -141,6 +149,7 @@ export function AujourdhuiScreen() {
               disabled={starting}
               onClick={() => setDuplicating(true)}
               className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-on-hero/40 text-sm font-semibold active:bg-on-hero/10 disabled:opacity-60"
+              style={{ width: 'calc(100% - var(--hero-actions-end))' }}
             >
               <CopyIcon className="h-4 w-4" />
               {t('home.duplicateWorkout')}
@@ -159,7 +168,11 @@ export function AujourdhuiScreen() {
         </div>
         <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {templates?.map(({ template, exerciseCount }, i) => (
-            <div key={template.id} className="flex w-40 shrink-0 flex-col rounded-2xl border border-line bg-surface p-3.5">
+            <div
+              key={template.id}
+              className="flex w-40 shrink-0 flex-col border border-line bg-surface p-3.5"
+              style={{ borderRadius: 'var(--program-radius)' }}
+            >
               <Link to={`/programmes/${template.id}`} className="min-h-[3.25rem] flex-1 active:opacity-70">
                 <p className="font-exercise line-clamp-2 text-[1.05rem] leading-tight text-ink">
                   <JokerOnly>
@@ -191,7 +204,8 @@ export function AujourdhuiScreen() {
           ))}
           <Link
             to="/programmes?nouveau=1"
-            className="flex w-28 shrink-0 flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-line-strong text-sm font-semibold text-muted active:bg-surface-3"
+            className="flex w-28 shrink-0 flex-col items-center justify-center gap-1.5 border border-dashed border-line-strong text-sm font-semibold text-muted active:bg-surface-3"
+            style={{ borderRadius: 'var(--program-radius)' }}
           >
             <PlusIcon className="h-5 w-5" />
             {t('home.new')}
@@ -224,6 +238,7 @@ export function AujourdhuiScreen() {
                     {new Date(`${d.date}T12:00:00`).toLocaleDateString(getLocale(), { weekday: 'narrow' })}
                   </span>
                   <NoJoker>
+                  <NoDragon>
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full ${
                       d.trained ? 'bg-week-done text-on-week-done' : 'bg-surface-3 text-faint'
@@ -246,7 +261,28 @@ export function AujourdhuiScreen() {
                       </>
                     ) : null}
                   </span>
+                  </NoDragon>
                   </NoJoker>
+                  <DragonOnly>
+                    <span aria-label={dayLabel} role="img" className="flex">
+                      {d.trained ? (
+                        <span
+                          className="flex h-9 w-9 rounded-full"
+                          // Today: red ring around the coin.
+                          style={isToday ? { boxShadow: '0 0 0 2px var(--surface), 0 0 0 4px var(--week-today)' } : undefined}
+                        >
+                          <CoinIcon className="h-9 w-9" />
+                        </span>
+                      ) : isToday ? (
+                        <span
+                          className="block h-9 w-9 rounded-full border-2"
+                          style={{ borderColor: 'var(--dragon-red)', background: 'var(--dragon-red-soft)' }}
+                        />
+                      ) : (
+                        <span className="block h-9 w-9 rounded-full border border-dotted border-line" />
+                      )}
+                    </span>
+                  </DragonOnly>
                   <JokerOnly>
                     <span aria-label={dayLabel} role="img" className="flex">
                       {d.trained ? (
@@ -304,9 +340,14 @@ export function AujourdhuiScreen() {
           >
             <NoRing>
               <NoJoker>
-                <StarIcon className="pr-star-glow h-6 w-6 shrink-0 text-highlight" />
+                <NoDragon>
+                  <StarIcon className="pr-star-glow h-6 w-6 shrink-0 text-highlight" />
+                </NoDragon>
               </NoJoker>
             </NoRing>
+            <DragonOnly>
+              <RecordTrophyIcon className="h-10 w-10 shrink-0" />
+            </DragonOnly>
             <JokerOnly>
               <MiniCard suit="heart" red ace glow="violet" className="relative h-[54px] w-10 shrink-0" />
             </JokerOnly>

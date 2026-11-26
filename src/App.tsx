@@ -14,6 +14,7 @@ import { ProgrammesScreen } from './screens/ProgrammesScreen'
 import { DumbbellIcon } from './components/Icons'
 import { RestTimerWidget } from './components/RestTimerWidget'
 import { JokerBackdrop } from './components/joker/Joker'
+import { DragonBackdrop } from './components/dragon/Dragon'
 import { SnackbarProvider } from './contexts/SnackbarContext'
 import { DeepLinkImporter } from './components/DeepLinkImporter'
 import { I18nProvider } from './i18n/I18nProvider'
@@ -53,6 +54,7 @@ export default function App() {
       <SnackbarProvider>
         <div className="app-main min-h-dvh bg-app">
           <JokerBackdrop />
+          <DragonBackdrop />
           <ResumeSessionBanner />
           <Suspense fallback={null}>
           <Routes>

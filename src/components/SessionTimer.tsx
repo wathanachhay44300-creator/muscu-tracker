@@ -1,6 +1,7 @@
 import { useElapsedTime } from '../hooks/useElapsedTime'
 import { HeartIcon, KawaiiOnly, PlainOnly } from './kawaii/Kawaii'
 import { JokerOnly, NoJoker, SuitIcon } from './joker/Joker'
+import { DragonOnly, NoDragon, SealGlyph } from './dragon/Dragon'
 
 /** "12:05" or "1:02:05" */
 function formatChrono(ms: number): string {
@@ -23,12 +24,17 @@ export function SessionTimer({ startedAt, label }: { startedAt: number; label: s
     >
       <PlainOnly>
         <NoJoker>
-          <span className="h-2 w-2 rounded-full bg-chrono-dot" aria-hidden="true" />
+          <NoDragon>
+            <span className="h-2 w-2 rounded-full bg-chrono-dot" aria-hidden="true" />
+          </NoDragon>
         </NoJoker>
       </PlainOnly>
       <JokerOnly>
         <SuitIcon suit="spade" className="h-3 w-3" style={{ color: 'var(--joker-magenta)' }} />
       </JokerOnly>
+      <DragonOnly>
+        <SealGlyph char="气" className="text-[17px]" style={{ color: 'var(--dragon-red)' }} />
+      </DragonOnly>
       <KawaiiOnly>
         <HeartIcon className="h-3 w-3 text-accent" />
       </KawaiiOnly>

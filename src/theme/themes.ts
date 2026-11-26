@@ -11,6 +11,7 @@ export const THEMES = [
   { id: 'fraise-chantilly', label: 'Fraise Chantilly', description: 'Rose, crème et gourmandises' },
   { id: 'title-fight', label: 'Title Fight', description: 'Soirée de boxe : nuit, rouge et or' },
   { id: 'joker-aura', label: 'Joker Aura', description: 'Nuit noire, magenta et violet' },
+  { id: 'dragon-dor', label: "Dragon d'or", description: 'Rouge laqué et or, ambiance temple' },
 ] as const
 
 export type ThemeId = (typeof THEMES)[number]['id']

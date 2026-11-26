@@ -225,6 +225,8 @@ export const en: Dictionary = {
     'title-fight_desc': 'Fight night: navy, red and gold',
     'joker-aura': 'Joker Aura',
     'joker-aura_desc': 'Black night, magenta and violet',
+    'dragon-dor': 'Golden Dragon',
+    'dragon-dor_desc': 'Lacquer red and gold, temple mood',
   },
   clipboard: {
     saveError: 'Could not save.',

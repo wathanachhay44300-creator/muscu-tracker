@@ -3,6 +3,7 @@ import { PauseIcon, PlayIcon, XIcon } from '../Icons'
 import { t, tThemed } from '../../i18n'
 import { useThemeId } from '../../hooks/useTheme'
 import { BellIcon, RingOnly } from '../ring/Ring'
+import { DragonOnly, SealGlyph } from '../dragon/Dragon'
 
 type RestTimer = ReturnType<typeof useRestTimer>
 
@@ -43,6 +44,9 @@ export function SessionRestTimer({
           <RingOnly>
             <BellIcon className="h-4 w-4 shrink-0 text-highlight" />
           </RingOnly>
+          <DragonOnly>
+            <SealGlyph char="息" className="text-[18px] normal-case" style={{ color: 'var(--dragon-red)' }} />
+          </DragonOnly>
           {/* The boxing wording ("Entre les rounds") goes on two short lines. */}
           <span className={theme === 'title-fight' ? 'max-w-[4.5rem] leading-tight' : undefined}>
             {timer.isDone ? t('session.restDone') : tThemed(theme, 'session.rest')}

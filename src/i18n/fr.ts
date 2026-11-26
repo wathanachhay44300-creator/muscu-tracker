@@ -226,6 +226,8 @@ export const fr = {
     'title-fight_desc': 'Soirée de boxe : nuit, rouge et or',
     'joker-aura': 'Joker Aura',
     'joker-aura_desc': 'Nuit noire, magenta et violet',
+    'dragon-dor': 'Dragon d’or',
+    'dragon-dor_desc': 'Rouge laqué et or, ambiance temple',
   },
   clipboard: {
     saveError: 'Enregistrement impossible.',

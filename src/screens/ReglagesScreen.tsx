@@ -10,6 +10,7 @@ import { hapticLight } from '../lib/haptics'
 import { useTheme } from '../hooks/useTheme'
 import { THEMES } from '../theme/themes'
 import { JokerOnly, MiniCard } from '../components/joker/Joker'
+import { CoinIcon, DragonOnly } from '../components/dragon/Dragon'
 import {
   getNotificationSupport,
   requestNotificationPermission,
@@ -220,6 +221,14 @@ function ThemeCard() {
                   <JokerOnly>
                     <MiniCard suit="spade" glow="magenta" className="absolute right-1.5 top-1.5 h-6 w-[18px]" />
                   </JokerOnly>
+                  <DragonOnly>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 rounded-lg"
+                      style={{ boxShadow: 'inset 0 0 0 1.5px var(--dragon-gold)' }}
+                    />
+                    <CoinIcon className="absolute right-1.5 top-1.5 h-5 w-5" />
+                  </DragonOnly>
                   <p className="font-display text-[12px] leading-tight text-ink">{tDynamic(`theme.${th.id}`)}</p>
                   <div className="mt-1.5 flex items-center gap-1">
                     <span className="h-3 w-6 rounded-full bg-accent" />
